@@ -1,0 +1,927 @@
+<html>
+  <head>
+    <title>AI Virtual World</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="header">
+      <h1>Lokesh's World</h1>
+      <div class="section">
+        <button
+          id="clearCanvasBtn"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Clear Canvas"
+        >
+          🗑️
+        </button>
+        <button
+          id="settingsBtn"
+          onclick="showSettingsModal()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="World Settings"
+        >
+          ⚙️
+        </button>
+      </div>
+    </div>
+    <div class="canvas-container">
+      <canvas id="myCanvas"></canvas>
+      <div id="miniMapContainer">
+        <button
+          class="maximize-icon"
+          id="maximizeMiniMapBtn"
+          onclick="maximizeMiniMap()"
+        >
+          ➕ Show Mini Map
+        </button>
+        <div id="maximizedMapContent">
+          <button
+            class="minimize-icon"
+            id="minimizeMiniMapBtn"
+            onclick="minimizeMiniMap()"
+          >
+            ➖
+          </button>
+          <canvas id="miniMapCanvas"></canvas>
+          <div class="resize-handle handle-left"></div>
+          <div class="resize-handle handle-bottom"></div>
+        </div>
+      </div>
+    </div>
+    <div class="markings">
+      <button
+        id="stopBtn"
+        onclick="setMode('stop')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Stops Editor Mode"
+      >
+        🛑
+      </button>
+      &nbsp;
+      <button
+        id="crossingBtn"
+        onclick="setMode('crossing')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Crossing Editor Mode"
+      >
+        🚶
+      </button>
+      &nbsp;
+      <button
+        id="startBtn"
+        onclick="setMode('start')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Car Editor Mode"
+      >
+        🚙
+      </button>
+      &nbsp;
+      <button
+        id="parkingBtn"
+        onclick="setMode('parking')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Parking Editor Mode"
+      >
+        🅿️
+      </button>
+      &nbsp;
+      <button
+        id="targetBtn"
+        onclick="setMode('target')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Target Editor Mode"
+      >
+        🎯
+      </button>
+      &nbsp;
+      <button
+        id="yieldBtn"
+        onclick="setMode('yield')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Yield Editor Mode"
+      >
+        ⚠️
+      </button>
+      &nbsp;
+      <button
+        id="trafficLightBtn"
+        onclick="setMode('trafficLight')"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Light Editor Mode"
+      >
+        🚦
+      </button>
+    </div>
+    <div class="simulator">
+      <button
+        id="saveSimulationBtn"
+        onclick="saveSimulationResult()"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Save Simulation"
+      >
+        💾 🤖
+      </button>
+      &nbsp;
+      <button
+        id="resetSimulationBtn"
+        onclick="resetSimulation()"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Reset Simulation"
+      >
+        🔄 🤖
+      </button>
+      &nbsp; &nbsp; &nbsp; &nbsp;
+      <button
+        id="exitSimulationModeBtn"
+        onclick="exitSimulationMode()"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="Exit Simulation Mode"
+      >
+        <span class="btn-text text-sm">Exit Simulation Mode</span>
+      </button>
+    </div>
+    <div class="controls">
+      <div class="section">
+        <button
+          id="loadWorldBtn"
+          onclick="showLoadWorldModal()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Load World"
+        >
+          📂
+          <span class="btn-text">Load World</span>
+        </button>
+        <button
+          id="saveWorldBtn"
+          onclick="saveWorldData()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Save World"
+        >
+          💾
+          <span class="btn-text">Save World</span>
+        </button>
+        <button
+          id="editWorldBtn"
+          onclick="setMode('world')"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="World Editor Mode"
+        >
+          🌐
+          <span class="btn-text">Edit World</span>
+        </button>
+      </div>
+      <div class="section">
+        <button
+          id="loadOsmGraphBtn"
+          onclick="showLoadOsmGraphModal()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Load Skeleton from OSM Data"
+        >
+          🗺️
+          <span class="btn-text text-sm">
+            <div>Load Skeleton</div>
+            <div>(using OSM data)</div>
+          </span>
+        </button>
+        <button
+          id="disposeCarsBtn"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Delete Cars"
+        >
+          🗑️
+          <span class="btn-text">Remove Cars</span>
+        </button>
+        <button
+          id="disposeMarkingsBtn"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Delete Markings"
+        >
+          🗑️
+          <span class="btn-text">Remove Markings</span>
+        </button>
+      </div>
+      <div class="section">
+        <button
+          id="generateWorldBtn"
+          onclick="generateWorld()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Generate World"
+        >
+          🌐
+          <span class="btn-text">Create World</span>
+        </button>
+        <button
+          id="editGraphBtn"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Skeleton Editor"
+        >
+          ⬟
+          <span class="btn-text">Edit Skeleton</span>
+        </button>
+        <button
+          id="simulationBtn"
+          onclick="setMode('simulation')"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Simulation Mode"
+        >
+          🤖
+          <span class="btn-text">Train Cars</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Modal for loading -->
+    <div id="loadingModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <img src="images/loading.gif" alt="Loading World" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for progress bar -->
+    <div id="progressBarModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="title"></div>
+            <div class="progress">
+              <div
+                class="progress-bar progress-bar-striped"
+                role="progressbar"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="width: 0"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for errors -->
+    <div id="errorModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Error</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideErrorModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for confirming delete / change-->
+    <div id="confirmingModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideConfirmingModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary"></button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              onclick="hideConfirmingModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for saving success -->
+    <div id="saveConfirmationModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideSaveConfirmationModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="hideSaveConfirmationModal()"
+            >
+              Ok
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for changing Traffic Side -->
+    <div id="trafficSideChangeModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Traffic Side Change</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="cancelTrafficSideChange()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Changing the traffic side will reset all elements on the map. Do
+              you want to proceed with this action?
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="confirmTrafficSideChange()"
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              onclick="cancelTrafficSideChange()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for loading saved worlds -->
+    <div id="loadWorldModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="loadWorldModalTitle">
+              Load a saved world
+            </h4>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideLoadWorldModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="worldList" class="world-list"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              onclick="hideLoadWorldModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for loading graphs from OSM -->
+    <div id="loadOsmGraphModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="loadOsmGraphModalTitle">
+              Load Skeleton from OSM Data
+            </h4>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideLoadOsmGraphModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <textarea
+              id="osmDataInput"
+              class="form-control"
+              rows="5"
+              placeholder="Paste your OSM data here..."
+              data-toggle="popover"
+              data-placement="left"
+              data-trigger="manual"
+              data-content="Enter valid OSM data here for loading the world."
+            ></textarea>
+            <button
+              type="button"
+              class="btn btn-primary mt-2"
+              onclick="loadGraphFromOsm()"
+            >
+              Load Skeleton
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              onclick="hideLoadOsmGraphModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for settings -->
+    <div id="settingsModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Settings</h3>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              onclick="hideSettingsModal()"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <!-- World Section -->
+              <div class="form-group">
+                <legend>World</legend>
+                <div id="worldSettingsForm">
+                  <div id="worldSettingsDisclaimer">
+                    <small>
+                      Note: World settings can only be modified during the
+                      skeleton editing mode. To modify these settings, select
+                      <b>'Edit Skeleton'</b> and
+                      <b>Regenerate the World</b> after modifying these
+                      settings.
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="roadWidth">Road Width</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="100"
+                      id="roadWidth"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 100 and 500 (inclusive)."
+                      placeholder="Enter road width"
+                    />
+                    <small id="roadWidthError" class="error-message form-text">
+                      Road Width must be between 100 to 500 (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="buildingWidth">Building Width</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="150"
+                      id="buildingWidth"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 50 and 200 (inclusive)."
+                      placeholder="Enter building width"
+                    />
+                    <small
+                      id="buildingWidthError"
+                      class="error-message form-text"
+                    >
+                      Building Width must be between 50 to 200 (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="buildingMinLength"
+                      >Building Minimum Length</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="150"
+                      id="buildingMinLength"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 50 and 150 (inclusive)."
+                      placeholder="Enter building min length"
+                    />
+                    <small
+                      id="buildingMinLengthError"
+                      class="error-message form-text"
+                    >
+                      Building Minimum Length must be between 50 to 150
+                      (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="spacing">Spacing</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="50"
+                      id="spacing"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 0 and 100 (inclusive)."
+                      placeholder="Enter spacing"
+                    />
+                    <small id="spacingError" class="error-message form-text">
+                      Spacing must be between 0 to 100 (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="treeSize">Tree size</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="160"
+                      id="treeSize"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 100 and 200 (inclusive)."
+                      placeholder="Enter tree size"
+                    />
+                    <small id="treeSizeError" class="error-message form-text">
+                      Tree Size must be between 100 to 200 (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="treeHeight">Tree height</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="50"
+                      id="treeHeight"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-content="Enter a value between 100 and 300 (inclusive)."
+                      placeholder="Enter tree height"
+                    />
+                    <small id="treeHeightError" class="error-message form-text">
+                      Tree Height must be between 100 to 300 (inclusive).
+                    </small>
+                  </div>
+                  <div class="form-group flex">
+                    <label for="trafficToggle"> Left Hand Traffic </label>
+                    <input
+                      type="checkbox"
+                      id="trafficToggle"
+                      data-toggle="toggle"
+                      data-off="LHT"
+                      data-offstyle="success"
+                      data-on="RHT"
+                      data-onstyle="info"
+                    />
+                    <label for="trafficToggle"> Right Hand Traffic </label>
+                  </div>
+                </div>
+              </div>
+              <br />
+              <hr />
+
+              <!-- Cars Section -->
+              <div class="form-group">
+                <legend>Cars</legend>
+                <div class="form-group">
+                  <label for="carMaxSpeed">Max Speed</label>
+                  <select class="form-control" id="carMaxSpeed">
+                    <option value="2">Slow</option>
+                    <option value="3" selected>Medium</option>
+                    <option value="4">Fast</option>
+                    <option value="5">Very Fast</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="carAcceleration">Acceleration</label>
+                  <select class="form-control" id="carAcceleration">
+                    <option value="0.2">Low</option>
+                    <option value="0.3" selected>Medium</option>
+                    <option value="0.4">High</option>
+                  </select>
+                </div>
+              </div>
+              <br />
+              <hr />
+
+              <!-- Simulation Section -->
+              <div class="form-group">
+                <legend>Simulation</legend>
+                <div class="form-group">
+                  <label for="simulationNumCars">Number of cars</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    value="5"
+                    id="simulationNumCars"
+                    aria-describedby="simulationNumCars"
+                    data-toggle="popover"
+                    data-placement="left"
+                    data-trigger="manual"
+                    data-content="Whole number greater than 0 required."
+                    placeholder="Enter number of cars"
+                  />
+                  <small
+                    id="simulationNumCarsError"
+                    class="error-message form-text"
+                  >
+                    Number of cars for simulation must be greater than 0.
+                  </small>
+                </div>
+                <div class="form-group">
+                  <label for="simulationDiffFactor"
+                    >Differentiation Factor</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    value="0.1"
+                    id="simulationDiffFactor"
+                    aria-describedby="simulationDiffFactor"
+                    data-toggle="popover"
+                    data-placement="left"
+                    data-trigger="manual"
+                    data-content="Keep the differentiation factor in the range 0 to 1 (inclusive)."
+                    placeholder="Enter differentiation factor"
+                  />
+                  <small
+                    id="simulationDiffFactorError"
+                    class="error-message form-text"
+                  >
+                    Differentiation Factor for simulation must be between 0 and
+                    1 (inclusive).
+                  </small>
+                </div>
+              </div>
+              <br />
+              <hr />
+
+              <!-- Sensors Section -->
+              <div class="form-group">
+                <legend>Sensors</legend>
+                <div class="form-group">
+                  <label for="sensorRayCount">Ray Count</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    value="5"
+                    id="sensorRayCount"
+                    aria-describedby="sensorRayCount"
+                    data-toggle="popover"
+                    data-placement="left"
+                    data-trigger="manual"
+                    data-content="Keep the sensor ray count in the range 1 to 100 (inclusive)."
+                    placeholder="Enter sensor ray count"
+                  />
+                  <small
+                    id="sensorRayCountError"
+                    class="error-message form-text"
+                  >
+                    Sensor ray count must be between 1 and 100 (inclusive).
+                  </small>
+                </div>
+                <div class="form-group">
+                  <label for="sensorRaySpread">Ray Spread</label>
+                  <select class="form-control" id="sensorRaySpread">
+                    <option value="90">90º</option>
+                    <option value="180">180º</option>
+                    <option value="270">270º</option>
+                    <option value="360">360º</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="sensorRayLength">Ray Length</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    value="100"
+                    id="sensorRayLength"
+                    aria-describedby="sensorRayLength"
+                    data-toggle="popover"
+                    data-placement="left"
+                    data-trigger="manual"
+                    data-content="Keep the sensor ray length in the range 50 to 200 (inclusive)."
+                    placeholder="Enter sensor ray length"
+                  />
+                  <small
+                    id="sensorRayLengthError"
+                    class="error-message form-text"
+                  >
+                    Sensor ray length must be between 50 and 200 (inclusive).
+                  </small>
+                </div>
+                <div class="form-group flex">
+                  <label for="showSensors">Show Sensors</label>
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="showSensors"
+                  />
+                </div>
+              </div>
+              <br />
+              <hr />
+
+              <!-- Brain Section -->
+              <div class="form-group">
+                <legend>Brain</legend>
+                <div class="form-group">
+                  <label for="brainComplexity">Complexity</label>
+                  <select class="form-control" id="brainComplexity">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+              </div>
+              <br />
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div>
+              <button
+                id="resetSettingsBtn"
+                type="button"
+                class="btn btn-dark"
+                onclick="resetSettings()"
+                aria-describedby="resetSettingsBtn"
+              >
+                Reset to Default
+              </button>
+            </div>
+            <div>
+              <button
+                id="saveSettingsBtn"
+                type="button"
+                class="btn btn-primary"
+                onclick="saveSettings()"
+                aria-describedby="saveSettingsBtn"
+                data-toggle="popover"
+                data-placement="top"
+                data-trigger="manual"
+                data-content="Remember to save the default settings for your world."
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+                onclick="hideSettingsModal()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <script src="js/ecosystem/settings.js"></script>
+    <script src="js/ecosystem/world.js"></script>
+    <script src="js/ecosystem/viewport.js"></script>
+    <script src="js/ecosystem/miniMap.js"></script>
+    <script src="js/markings/marking.js"></script>
+    <script src="js/markings/start.js"></script>
+    <script src="js/markings/stop.js"></script>
+    <script src="js/markings/yield.js"></script>
+    <script src="js/markings/crossing.js"></script>
+    <script src="js/markings/parking.js"></script>
+    <script src="js/markings/target.js"></script>
+    <script src="js/markings/trafficLight.js"></script>
+    <script src="js/editors/graphEditor.js"></script>
+    <script src="js/editors/simulationEditor.js"></script>
+    <script src="js/editors/markingEditor.js"></script>
+    <script src="js/editors/startEditor.js"></script>
+    <script src="js/editors/stopEditor.js"></script>
+    <script src="js/editors/yieldEditor.js"></script>
+    <script src="js/editors/crossingEditor.js"></script>
+    <script src="js/editors/parkingEditor.js"></script>
+    <script src="js/editors/targetEditor.js"></script>
+    <script src="js/editors/trafficLightEditor.js"></script>
+    <script src="js/editors/miniMapEditor.js"></script>
+    <script src="js/items/car.js"></script>
+    <script src="js/items/tree.js"></script>
+    <script src="js/items/building.js"></script>
+    <script src="js/movement/sensor.js"></script>
+    <script src="js/movement/brain.js"></script>
+    <script src="js/utils/graph.js"></script>
+    <script src="js/utils/math.js"></script>
+    <script src="js/utils/datetime.js"></script>
+    <script src="js/utils/progressTracker.js"></script>
+    <script src="js/primitives/point.js"></script>
+    <script src="js/primitives/segment.js"></script>
+    <script src="js/primitives/polygon.js"></script>
+    <script src="js/primitives/envelope.js"></script>
+    <script src="js/osm/osm.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      const canvasWidth = myCanvas.offsetWidth;
+      document.querySelector(".header").style.width = `${canvasWidth}px`;
+      document.querySelector(".controls").style.width = `${canvasWidth}px`;
+    </script>
+  </body>
+</html>

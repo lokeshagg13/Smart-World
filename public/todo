@@ -1,0 +1,16 @@
+Confirmation for reset simulation, exit simulation buttons (with do not show again if possible).
+Way to avoid saving the same world multiple times.
+Check and compare where the loading progress bar reaches end and where not and find any differences.
+
+Car selection in world mode to follow it.
+Allow different car types to be shown on the map randomly. In that case, car size must also go as an input to brain while training.
+Zoom +- buttons on minimap and adjust scaler accordingly.
+Make any segment in graph as one way in the graph editor by pressing o while near that segment. In this case, remove lane guides from one way segments. 
+Only allow to add a start marking when there is a target marking already. (If cars can manage to auto-drive without a target, then ignore it)
+
+Immediate
+Add colored shortest path to minimap too
+
+
+Then continue with videos
+

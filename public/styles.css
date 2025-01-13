@@ -1,0 +1,353 @@
+body {
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  margin-top: 5rem;
+  align-items: center;
+}
+
+h1 {
+  color: white;
+  font-family: Arial;
+}
+
+.canvas-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+}
+
+#myCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: #2a5;
+}
+
+#miniMapContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  background: none;
+}
+
+#miniMapCanvas {
+  display: block;
+  background-color: black;
+  border-radius: 50%;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  cursor: pointer;
+}
+
+.resize-handle.handle-left {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+
+.resize-handle.handle-bottom {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.minimize-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 15px;
+  background: none;
+  padding: 0 5px;
+}
+
+.maximize-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  font-size: 15px;
+  display: none;
+}
+
+button {
+  background-color: white;
+  font-size: 20px;
+  padding: 5px 7px 7px 5px;
+  border: none;
+  border-radius: 5px;
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+}
+
+.header {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header .section {
+  display: flex;
+  justify-content: space-between;
+  width: 15%;
+  align-items: center;
+}
+
+.markings,
+.simulator {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.markings button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.markings button.clicked {
+  box-shadow: inset 4px 4px 5px rgba(0, 0, 0, 0.3);
+  transform: translateY(2px);
+}
+
+.controls {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.controls .section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 15vh;
+}
+
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-text {
+  display: block;
+  margin-left: 10px;
+  font-size: 15px;
+  opacity: 1;
+  width: 80%;
+}
+
+.btn-text.text-sm {
+  font-size: 10px !important;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+#saveConfirmationModal {
+  z-index: 1100;
+}
+
+#trafficSideChangeModal {
+  z-index: 1100;
+}
+
+#errorModal {
+  z-index: 1100;
+}
+
+#confirmingModal {
+  z-index: 1100;
+}
+
+#loadingModal {
+  z-index: 1050;
+}
+
+#progressBarModal .modal-dialog {
+  width: 50%;
+  max-width: 100vw;
+}
+
+#progressBarModal .title {
+  margin-bottom: 1rem;
+  font-size: large;
+}
+
+#progressBarModal .progress {
+  height: 1.5rem;
+  font-size: medium;
+}
+
+#settingsModal .modal-dialog {
+  max-height: 80vh;
+  height: 80vh;
+  overflow: auto;
+  z-index: 1;
+}
+
+#settingsModal .modal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+#settingsModal .modal-body {
+  padding: 15px;
+  max-height: calc(80vh - 120px);
+  overflow-y: auto;
+}
+
+#settingsModal .modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+#settingsModal small.error-message {
+  color: red;
+  display: none;
+}
+
+#settingsModal .form-group.flex {
+  justify-content: space-around;
+}
+
+#worldSettingsDisclaimer {
+  border: 1px solid;
+  padding: 0.6rem;
+  text-align: justify;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+#loadWorldModal .modal-dialog {
+  max-height: 60vh;
+  height: 60vh;
+  overflow: auto;
+}
+
+#loadWorldModal .modal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+#loadWorldModal .modal-body {
+  padding: 15px;
+  max-height: calc(60vh - 120px);
+  overflow-y: auto;
+}
+
+#loadOsmGraphModal div.modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+#loadOsmGraphModal div.modal-body button {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem;
+}
+
+.form-group.flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.form-group.flex label {
+  margin-bottom: 0;
+}
+
+#showSensors {
+  width: 25px;
+  height: 25px;
+  margin: 0 0 0 1rem;
+  position: relative;
+}
+
+.world-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.world-item {
+  text-align: center;
+  margin: 10px;
+  cursor: pointer;
+  width: 150px;
+}
+
+.world-item img {
+  border: 2px solid;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.world-item h4 {
+  font-size: 16px;
+  color: #333;
+  margin: 0.5rem 0;
+}
+
+.world-item .world-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.divider {
+  display: table;
+  font-size: 24px;
+  text-align: center;
+  width: 75%;
+  margin: 20px auto;
+}
+
+.divider span {
+  display: table-cell;
+  position: relative;
+}
+
+.divider span:first-child,
+.divider span:last-child {
+  width: 50%;
+  top: 15px;
+  -moz-background-size: 100% 2px;
+  background-size: 100% 2px;
+  background-position: 0 0, 0 100%;
+  background-repeat: no-repeat;
+}
+
+.divider span:first-child {
+  background-image: -webkit-linear-gradient(180deg, transparent, #000);
+  background-image: -moz-linear-gradient(180deg, transparent, #000);
+  background-image: -o-linear-gradient(180deg, transparent, #000);
+  background-image: linear-gradient(90deg, transparent, #000);
+}
+
+.divider span:nth-child(2) {
+  color: #000;
+  padding: 0px 20px;
+  width: auto;
+  white-space: nowrap;
+}
+
+.divider span:last-child {
+  background-image: -webkit-linear-gradient(180deg, #000, transparent);
+  background-image: -moz-linear-gradient(180deg, #000, transparent);
+  background-image: -o-linear-gradient(180deg, #000, transparent);
+  background-image: linear-gradient(90deg, #000, transparent);
+}
