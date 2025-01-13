@@ -1,38 +1,24 @@
 class Sensor {
-    constructor(car, rayCount = 5, rayLength = 150, raySpread = Math.PI / 2) {
-        this.car = car;
-        this.rayCount = rayCount;
-        this.rayLength = rayLength;
-        this.raySpread = raySpread;
+    constructor(origin = null, baseAngle = 0) {
+        this.rayCount = 3; // Must always be odd to have a center sensor ray sensing the markings
+        this.rayLength = 150;
+        this.raySpread = Math.PI / 2;
 
         this.rays = [];
         this.readings = [];
+        this.detectedObject = null;
     }
 
-    update(roadBorders, roadDividers) {
-        this.#castRays();
-        this.readings = [];
-        for (let i = 0; i < this.rays.length; i++) {
-            this.readings.push(
-                this.#getReading(
-                    this.rays[i],
-                    roadBorders,
-                    roadDividers
-                )
-            );
-        }
-    }
-
-    #castRays() {
+    #castRays(origin, baseAngle) {
         this.rays = [];
         for (let i = 0; i < this.rayCount; i++) {
             const rayAngle = lerp(
                 this.raySpread / 2,
                 -this.raySpread / 2,
                 (this.rayCount == 1) ? 0.5 : i / (this.rayCount - 1)
-            ) + this.car.angle;
+            ) + baseAngle;
 
-            const startPoint = this.car.center;
+            const startPoint = origin;
             const endPoint = new Point(
                 startPoint.x + Math.sin(rayAngle) * this.rayLength,
                 startPoint.y - Math.cos(rayAngle) * this.rayLength
@@ -41,8 +27,10 @@ class Sensor {
         }
     }
 
-    #getReading(ray, roadBorders, roadDividers) {
-        const touches = []
+    #getReading(ray, roadBorders, roadDividers, markings) {
+        let minOffset = Number.MAX_SAFE_INTEGER;
+        let minTouch = null;
+        let detectedObject = null;
         for (const roadBorder of roadBorders) {
             const touch = getIntersection(
                 ray.p1,
@@ -50,8 +38,10 @@ class Sensor {
                 roadBorder.p1,
                 roadBorder.p2
             );
-            if (touch) {
-                touches.push(touch)
+            if (touch && touch.offset < minOffset) {
+                minOffset = touch.offset;
+                minTouch = touch;
+                detectedObject = "roadBorder";
             }
         }
 
@@ -62,18 +52,87 @@ class Sensor {
                 roadDivider.p1,
                 roadDivider.p2
             );
-            if (touch) {
-                touches.push(touch)
+            if (touch && touch.offset < minOffset) {
+                minOffset = touch.offset;
+                minTouch = touch;
+                detectedObject = "roadDivider"
             }
         }
 
-        // Get the touch out of all touches which has the least offset
-        if (touches.length === 0) {
-            return null;
+        for (const marking of markings) {
+            if (marking instanceof StopMarking ||
+                (marking instanceof TrafficLightMarking && marking.state !== "green") ||
+                marking instanceof YieldMarking
+            ) {
+                const mainTouch = getIntersection(
+                    ray.p1,
+                    ray.p2,
+                    marking.mainBorder.p1,
+                    marking.mainBorder.p2
+                );
+                const otherTouch = getIntersection(
+                    ray.p1,
+                    ray.p2,
+                    marking.otherBorder.p1,
+                    marking.otherBorder.p2
+                );
+                if (mainTouch) {
+                    if (!otherTouch || (mainTouch.offset < otherTouch.offset)) {
+                        if (mainTouch.offset < minOffset) {
+                            minOffset = mainTouch.offset;
+                            minTouch = mainTouch;
+                            detectedObject = marking.type;
+                        }
+                    }
+                }
+            }
+            else if (
+                marking instanceof CrossingMarking ||
+                marking instanceof ParkingMarking ||
+                marking instanceof TargetMarking
+            ) {
+                for (const border of marking.borders) {
+                    const touch = getIntersection(
+                        ray.p1,
+                        ray.p2,
+                        border.p1,
+                        border.p2
+                    );
+                    if (touch && touch.offset < minOffset) {
+                        minOffset = touch.offset;
+                        minTouch = touch;
+                        detectedObject = marking.type;
+                    }
+                }
+            }
+        }
+
+        if (detectedObject) {
+            return { minTouch, detectedObject };
         } else {
-            const offsets = touches.map((t) => t.offset);
-            const minOffset = Math.min(...offsets);
-            return touches.find((t) => t.offset === minOffset);
+            return null;
+        }
+    }
+
+    update(origin, baseAngle, roadBorders, roadDividers, markings) {
+        this.#castRays(origin, baseAngle);
+        this.readings = [];
+        for (let i = 0; i < this.rays.length; i++) {
+            const sensorReading = this.#getReading(
+                this.rays[i],
+                roadBorders,
+                roadDividers,
+                markings
+            );
+            if (sensorReading) {
+                this.readings.push(sensorReading.minTouch);
+                if (i == Math.floor(this.rayCount / 2)) {
+                    this.detectedObject = sensorReading.detectedObject;
+                }
+            } else {
+                this.readings.push(null);
+                this.detectedObject = null;
+            }
         }
     }
 

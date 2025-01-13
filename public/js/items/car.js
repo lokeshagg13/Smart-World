@@ -1,8 +1,7 @@
 class Car {
-    constructor(center, angle, isSimulation, controlType = "AI") {
+    constructor(center, angle, controlType = "AI") {
         this.center = center;
         this.angle = angle;
-        this.isSimulation = isSimulation;
 
         const settings = World.loadSettingsFromLocalStorage();
         this.maxSpeed = settings.carMaxSpeed;
@@ -22,16 +21,11 @@ class Car {
         this.target = null;
         this.path = null;
 
+        this.showSensor = settings.showSensors;
+        this.sensor = new Sensor(this.center, this.angle);
+
         if (controlType === "AI") {
-            this.showSensor = settings.showSensors;
-            this.sensor = new Sensor(
-                this,
-                settings.sensorRayCount,
-                settings.sensorRayLength,
-                settings.sensorRaySpread
-            );
             this.brain = new NeuralNetwork(settings.brainNeuronCounts);
-            // this.controls.forward = true;
         } else {
             this.#addKeyboardListeners();
         }
@@ -157,15 +151,9 @@ class Car {
         this.acceleration = settings.carAcceleration;
         this.friction = settings.roadFriction;
         this.showSensor = settings.showSensors;
-        this.sensor = new Sensor(
-            this,
-            settings.sensorRayCount,
-            settings.sensorRayLength,
-            settings.sensorRaySpread
-        );
     }
 
-    update(roadBorders, roadDividers) {
+    update(roadBorders, roadDividers, markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
         if (!this.damaged) {
@@ -177,7 +165,7 @@ class Car {
             this.damaged = this.#assessDamage(roadBorders, roadDividers);
         }
         if (this.sensor) {
-            this.sensor.update(roadBorders, roadDividers);
+            this.sensor.update(this.center, this.angle, roadBorders, roadDividers, markings);
 
             // If there is no reading on a sensor which means no obstacle detected
             // then its input to the neural network is 0
@@ -185,22 +173,22 @@ class Car {
             // that nearer obstacles provide higher values to the network
             // than far object. Thus, in a way, inputs to the neural network
             // signifies the chances of collision with an obstacles.
-            const offsets = this.sensor.readings.map(
-                s => s == null ? 0 : 1 - s.offset
-            );
-            const outputs = NeuralNetwork.feedforward(offsets, this.brain);
+            // const offsets = this.sensor.readings.map(
+            //     s => s == null ? 0 : 1 - s.offset
+            // );
+            // const outputs = NeuralNetwork.feedforward(offsets, this.brain);
 
-            if (this.brain) {
-                this.controls.forward = outputs[0];
-                this.controls.left = outputs[1];
-                this.controls.right = outputs[2];
-                this.controls.reverse = outputs[3];
-            }
+            // if (this.brain) {
+            //     this.controls.forward = outputs[0];
+            //     this.controls.left = outputs[1];
+            //     this.controls.right = outputs[2];
+            //     this.controls.reverse = outputs[3];
+            // }
         }
     }
 
     draw(ctx) {
-        if (!this.isSimulation && !this.damaged && this.showSensor && this.sensor) {
+        if (!this.damaged && this.showSensor && this.sensor) {
             this.sensor.draw(ctx);
         }
 

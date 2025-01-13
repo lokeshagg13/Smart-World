@@ -284,7 +284,7 @@ class World {
     }
 
     // Intersections are graph points with two or more intersecting segments (or roads)
-    #getRoadIntersections() {
+    #getRoadIntersections(minDegree = 2) {
         const subset = [];
         for (const point of this.graph.points) {
             let degree = 0;
@@ -294,7 +294,7 @@ class World {
                 }
             }
 
-            if (degree >= 2) {
+            if (degree >= minDegree) {
                 subset.push(point);
             }
         }
@@ -308,7 +308,7 @@ class World {
         const controlCenters = [];
         for (const trafficLight of trafficLights) {
             // For each traffic light, get the nearest road intersection
-            const nearestIntersectionPoint = getNearestPoint(trafficLight.center, this.#getRoadIntersections());
+            const nearestIntersectionPoint = getNearestPoint(trafficLight.center, this.#getRoadIntersections(2));
             if (!nearestIntersectionPoint) continue;
             let controlCenter = controlCenters.find((c) => c.equals(nearestIntersectionPoint));
             if (!controlCenter) {
@@ -366,7 +366,7 @@ class World {
             );
 
         for (const car of cars) {
-            car.update(this.roadBorders, this.graph.segments);
+            car.update(this.roadBorders, this.graph.segments, this.markings);
         }
 
         this.carToFollow = cars.find(

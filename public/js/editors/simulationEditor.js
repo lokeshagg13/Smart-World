@@ -19,8 +19,7 @@ class SimulationEditor {
             directionVector,
             this.world.settings.roadWidth * 0.4,
             this.world.settings.roadWidth / 4,
-            this.world.settings.isLHT,
-            true
+            this.world.settings.isLHT
         );
     }
 

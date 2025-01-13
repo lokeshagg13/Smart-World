@@ -3,9 +3,11 @@ class TrafficLightMarking extends Marking {
         height = 25
         super(center, directionVector, width, height, isLHT);
         if (isLHT) {
-            this.border = this.polygon.segments[2];
+            this.mainBorder = this.polygon.segments[2];
+            this.otherBorder = this.polygon.segments[0];
         } else {
-            this.border = this.polygon.segments[0];
+            this.mainBorder = this.polygon.segments[0];
+            this.otherBorder = this.polygon.segments[2];
         }
         this.state = "off";
         this.type = "trafficLight";

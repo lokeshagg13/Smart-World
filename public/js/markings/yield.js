@@ -2,17 +2,19 @@ class YieldMarking extends Marking {
     constructor(center, directionVector, width, height, isLHT) {
         super(center, directionVector, width, height, isLHT);
         if (isLHT) {
-            this.border = this.polygon.segments[0];
+            this.mainBorder = this.polygon.segments[2];
+            this.otherBorder = this.polygon.segments[0];
             this.angle = angle(directionVector) + Math.PI / 2;
         } else {
-            this.border = this.polygon.segments[2];
+            this.mainBorder = this.polygon.segments[0];
+            this.otherBorder = this.polygon.segments[2];
             this.angle = angle(directionVector) - Math.PI / 2;
         }
         this.type = "yield";
     }
 
     draw(ctx) {
-        this.border.draw(ctx, { width: 5, color: "white", dash: [2, 2] });
+        this.otherBorder.draw(ctx, { width: 5, color: "white", dash: [2, 2] });
 
         ctx.save();
         ctx.translate(this.center.x, this.center.y);
