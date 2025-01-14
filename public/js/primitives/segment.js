@@ -44,6 +44,24 @@ class Segment {
         return proj
     }
 
+    containsPoint(p) {
+        const { x: x1, y: y1 } = this.p1;
+        const { x: x2, y: y2 } = this.p2;
+        const { x, y } = p;
+
+        // Check collinearity using cross-product
+        const crossProduct = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
+        if (Math.abs(crossProduct) > 1e-10) {
+            return false;
+        }
+
+        // Check if the point lies within the bounding box
+        const withinXBounds = Math.min(x1, x2) <= x && x <= Math.max(x1, x2);
+        const withinYBounds = Math.min(y1, y2) <= y && y <= Math.max(y1, y2);
+
+        return withinXBounds && withinYBounds;
+    }
+
     draw(ctx, { width = 2, color = "black", dash = [], cap = "butt" } = {}) {
         ctx.beginPath();
         ctx.lineWidth = width;
