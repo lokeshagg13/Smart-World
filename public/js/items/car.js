@@ -22,7 +22,7 @@ class Car {
         this.path = null;
 
         this.showSensor = settings.showSensors;
-        this.sensor = new Sensor(this.center, this.angle);
+        this.sensor = new Sensor();
 
         if (controlType === "AI") {
             this.brain = new NeuralNetwork(settings.brainNeuronCounts);

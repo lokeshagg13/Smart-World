@@ -1,78 +1,66 @@
-class Sensor {
-    constructor(origin = null, baseAngle = 0) {
-        this.rayCount = 3; // Must always be odd to have a center sensor ray sensing the markings
-        this.rayLength = 150;
-        this.raySpread = Math.PI / 2;
+class SensorRay {
+    constructor(startPoint, angle, rayLength = 200) {
+        this.startPoint = startPoint;
+        this.rayLength = rayLength;
+        this.endPoint = new Point(
+            startPoint.x + Math.sin(angle) * rayLength,
+            startPoint.y - Math.cos(angle) * rayLength
+        );
 
-        this.rays = [];
-        this.readings = [];
+        this.borderReading = null;
+        this.dividerReading = null;
+        this.markingReading = null;
         this.detectedObject = null;
     }
 
-    #castRays(origin, baseAngle) {
-        this.rays = [];
-        for (let i = 0; i < this.rayCount; i++) {
-            const rayAngle = lerp(
-                this.raySpread / 2,
-                -this.raySpread / 2,
-                (this.rayCount == 1) ? 0.5 : i / (this.rayCount - 1)
-            ) + baseAngle;
-
-            const startPoint = origin;
-            const endPoint = new Point(
-                startPoint.x + Math.sin(rayAngle) * this.rayLength,
-                startPoint.y - Math.cos(rayAngle) * this.rayLength
-            );
-            this.rays.push(new Segment(startPoint, endPoint));
-        }
-    }
-
-    #getReading(ray, roadBorders, roadDividers, markings) {
+    detectRoadBorders(roadBorders) {
         let minOffset = Number.MAX_SAFE_INTEGER;
-        let minTouch = null;
-        let detectedObject = null;
         for (const roadBorder of roadBorders) {
             const touch = getIntersection(
-                ray.p1,
-                ray.p2,
+                this.startPoint,
+                this.endPoint,
                 roadBorder.p1,
                 roadBorder.p2
             );
             if (touch && touch.offset < minOffset) {
                 minOffset = touch.offset;
-                minTouch = touch;
-                detectedObject = "roadBorder";
+                this.borderReading = touch;
             }
         }
+    }
 
+    detectRoadDividers(roadDividers) {
+        let minOffset = Number.MAX_SAFE_INTEGER;
         for (const roadDivider of roadDividers) {
             const touch = getIntersection(
-                ray.p1,
-                ray.p2,
+                this.startPoint,
+                this.endPoint,
                 roadDivider.p1,
                 roadDivider.p2
             );
             if (touch && touch.offset < minOffset) {
                 minOffset = touch.offset;
-                minTouch = touch;
-                detectedObject = "roadDivider"
+                this.dividerReading = touch;
             }
         }
+    }
 
+    detectMarkings(markings) {
+        let minOffset = Number.MAX_SAFE_INTEGER;
         for (const marking of markings) {
             if (marking instanceof StopMarking ||
                 (marking instanceof TrafficLightMarking && marking.state !== "green") ||
                 marking instanceof YieldMarking
             ) {
                 const mainTouch = getIntersection(
-                    ray.p1,
-                    ray.p2,
+                    this.startPoint,
+                    this.endPoint,
                     marking.mainBorder.p1,
                     marking.mainBorder.p2
                 );
                 const otherTouch = getIntersection(
-                    ray.p1,
-                    ray.p2,
+                    this.startPoint,
+                    this.endPoint,
                     marking.otherBorder.p1,
                     marking.otherBorder.p2
                 );
@@ -80,8 +68,8 @@ class Sensor {
                     if (!otherTouch || (mainTouch.offset < otherTouch.offset)) {
                         if (mainTouch.offset < minOffset) {
                             minOffset = mainTouch.offset;
-                            minTouch = mainTouch;
-                            detectedObject = marking.type;
+                            this.markingReading = mainTouch;
+                            this.detectedObject = marking.type;
                         }
                     }
                 }
@@ -93,82 +81,129 @@ class Sensor {
             ) {
                 for (const border of marking.borders) {
                     const touch = getIntersection(
-                        ray.p1,
-                        ray.p2,
+                        this.startPoint,
+                        this.endPoint,
                         border.p1,
                         border.p2
                     );
                     if (touch && touch.offset < minOffset) {
                         minOffset = touch.offset;
-                        minTouch = touch;
-                        detectedObject = marking.type;
+                        this.markingReading = touch;
+                        this.detectedObject = marking.type;
                     }
                 }
-            }
-        }
-
-        if (detectedObject) {
-            return { minTouch, detectedObject };
-        } else {
-            return null;
-        }
-    }
-
-    update(origin, baseAngle, roadBorders, roadDividers, markings) {
-        this.#castRays(origin, baseAngle);
-        this.readings = [];
-        for (let i = 0; i < this.rays.length; i++) {
-            const sensorReading = this.#getReading(
-                this.rays[i],
-                roadBorders,
-                roadDividers,
-                markings
-            );
-            if (sensorReading) {
-                this.readings.push(sensorReading.minTouch);
-                if (i == Math.floor(this.rayCount / 2)) {
-                    this.detectedObject = sensorReading.detectedObject;
-                }
-            } else {
-                this.readings.push(null);
-                this.detectedObject = null;
             }
         }
     }
 
     draw(ctx) {
-        for (let i = 0; i < this.rays.length; i++) {
-            let { p1: startPoint, p2: endPoint } = this.rays[i];
-            let midPoint = endPoint;
-            if (this.readings[i]) {
-                endPoint = new Point(this.readings[i].x, this.readings[i].y);
-            }
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#555";
+        ctx.moveTo(
+            this.startPoint.x,
+            this.startPoint.y
+        );
+        ctx.lineTo(
+            this.endPoint.x,
+            this.endPoint.y
+        );
+        ctx.stroke();
+
+        if (this.borderReading) {
+            ctx.beginPath();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "white";
+            ctx.moveTo(
+                this.startPoint.x,
+                this.startPoint.y
+            );
+            ctx.lineTo(
+                this.borderReading.x,
+                this.borderReading.y
+            );
+            ctx.arc(this.borderReading.x, this.borderReading.y, 2, 0, Math.PI * 2);
+            ctx.stroke();
 
             ctx.beginPath();
-            ctx.lineWidth = 2;
+            ctx.globalAlpha = Math.min(1, Math.max(0.1, 1 - distance(this.startPoint, this.borderReading) / this.rayLength));
+            ctx.lineWidth = 4;
             ctx.strokeStyle = "yellow";
             ctx.moveTo(
-                startPoint.x,
-                startPoint.y
+                this.startPoint.x,
+                this.startPoint.y
             );
             ctx.lineTo(
-                midPoint.x,
-                midPoint.y
+                this.borderReading.x,
+                this.borderReading.y
             );
+            ctx.arc(this.borderReading.x, this.borderReading.y, 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+
+        if (this.markingReading) {
+            ctx.beginPath();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "white";
+            ctx.moveTo(
+                this.startPoint.x,
+                this.startPoint.y
+            );
+            ctx.lineTo(
+                this.markingReading.x,
+                this.markingReading.y
+            );
+            ctx.arc(this.markingReading.x, this.markingReading.y, 2, 0, Math.PI * 2);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "black";
+            ctx.globalAlpha = Math.min(1, Math.max(0.1, 1 - distance(this.startPoint, this.markingReading) / this.rayLength));
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "red";
             ctx.moveTo(
-                endPoint.x,
-                endPoint.y
+                this.startPoint.x,
+                this.startPoint.y
             );
             ctx.lineTo(
-                midPoint.x,
-                midPoint.y
+                this.markingReading.x,
+                this.markingReading.y
             );
+            ctx.arc(this.markingReading.x, this.markingReading.y, 2, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.globalAlpha = 1;
         }
+
+    }
+}
+
+class Sensor {
+    constructor() {
+        this.fwdRay = null;
+        this.leftRay = null;
+        this.rightRay = null;
+    }
+
+    #castRays(origin, baseAngle) {
+        this.leftRay = new SensorRay(origin, baseAngle - Math.PI/4);
+        this.fwdRay = new SensorRay(origin, baseAngle);
+        this.rightRay = new SensorRay(origin, baseAngle + Math.PI/4);
+    }
+
+    update(origin, baseAngle, roadBorders, roadDividers, markings) {
+        this.#castRays(origin, baseAngle);
+        this.fwdRay.detectRoadBorders(roadBorders);
+        this.fwdRay.detectMarkings(markings);
+        this.leftRay.detectRoadBorders(roadBorders);
+        this.rightRay.detectRoadBorders(roadBorders);
+    }
+
+    draw(ctx) {
+        if (!this.fwdRay || !this.leftRay || !this.rightRay) {
+            return;
+        }
+        this.fwdRay.draw(ctx);
+        this.leftRay.draw(ctx);
+        this.rightRay.draw(ctx);
     }
 }
