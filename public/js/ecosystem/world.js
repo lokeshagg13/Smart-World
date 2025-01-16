@@ -350,8 +350,6 @@ class World {
     }
 
     #updateCars() {
-        // sensor check while filtering any cars are required 
-        // because we only update AI cars not KEYS-controlled cars.
         const cars = this
             .markings
             .filter(
@@ -375,6 +373,16 @@ class World {
                         ...cars.map(c => c.fitness)
                     )
                 )
+            )
+        );
+
+    }
+
+    #removeSuccessfulCars() {
+        this.markings = this.markings.filter(m => !(m instanceof StartMarking) ||
+            (
+                (m instanceof StartMarking) &&
+                (m.car.success === false)
             )
         );
     }
@@ -419,6 +427,7 @@ class World {
         this.#removeDisconnectedMarkings();
         this.#updateTrafficLights();
         this.#updateCars();
+        this.#removeSuccessfulCars();
 
         this.frameCount++;
 

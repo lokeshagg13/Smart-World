@@ -20,6 +20,7 @@ class Car {
 
         this.target = null;
         this.path = null;
+        this.success = false;    // becomes true when car reaches the target of the world
 
         this.showSensor = settings.showSensors;
         this.sensor = new Sensor();
@@ -166,10 +167,13 @@ class Car {
         }
         if (this.sensor) {
             this.sensor.update(this.center, this.angle, roadBorders, roadDividers, markings);
+            const sensorReadings = this.sensor.getReadings();
+            if (sensorReadings.targetSignReading > 0.7) {
+                this.success = true;
+            }
 
             if (this.brain) {
-                // const Ccontrols = this.brain.getControls({ ...this.sensor.getReadings(), speed: this.speed });
-                this.controls = this.brain.getControls({ ...this.sensor.getReadings(), speed: this.speed / this.maxSpeed });
+                this.controls = this.brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed });
             }
         }
     }
