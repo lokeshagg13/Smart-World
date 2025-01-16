@@ -95,6 +95,7 @@ class MarkingEditor {
                         marking.car.center,
                         this.intent.center
                     );
+                    marking.car.pathBorders = this.world.generateCarPath(marking.car.path);
                 }
             }
         }
@@ -107,6 +108,7 @@ class MarkingEditor {
                     this.intent.car.center,
                     currentTargetMarking.center
                 );
+                this.intent.car.pathBorders = this.world.generateCarPath(this.intent.car.path);
             }
         }
         this.world.markings.push(this.intent);

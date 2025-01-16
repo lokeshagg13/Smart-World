@@ -252,7 +252,7 @@ class Sensor {
         };
     }
 
-    update(origin, baseAngle, roadBorders, roadDividers, markings) {
+    update(origin, baseAngle, roadBorders, markings) {
         this.#castRays(origin, baseAngle);
         this.frontRay.detectRoadBorders(roadBorders);
         this.frontRay.detectMarkings(markings);

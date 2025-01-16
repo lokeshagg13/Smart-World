@@ -15,9 +15,61 @@ class Polygon {
         );
     }
 
-    static async union(polygons, progressTracker) {
+    static union(polygons) {
+        Polygon.multiBreak(polygons);
+        const keptSegments = [];
+        for (let i = 0; i < polygons.length; i++) {
+            for (const segment of polygons[i].segments) {
+                let keep = true;
+                for (let j = 0; j < polygons.length; j++) {
+                    if (i != j) {
+                        if (polygons[j].containsSegment(segment)) {
+                            keep = false;
+                            break;
+                        }
+                    }
+                }
+                if (keep) {
+                    keptSegments.push(segment);
+                }
+            }
+        }
+        return keptSegments;
+    }
+
+    static multiBreak(polygons) {
+        for (let i = 0; i < polygons.length - 1; i++) {
+            for (let j = i + 1; j < polygons.length; j++) {
+                Polygon.break(polygons[i], polygons[j])
+            }
+        }
+    }
+
+    static break(polygon1, polygon2) {
+        const segments1 = polygon1.segments;
+        const segments2 = polygon2.segments;
+        for (let i = 0; i < segments1.length; i++) {
+            for (let j = 0; j < segments2.length; j++) {
+                const intersection = getIntersection(
+                    segments1[i].p1, segments1[i].p2, segments2[j].p1, segments2[j].p2
+                );
+
+                if (intersection && intersection.offset != 1 && intersection.offset != 0) {
+                    const intersectionPoint = new Point(intersection.x, intersection.y)
+                    let aux = segments1[i].p2;
+                    segments1[i].p2 = intersectionPoint;
+                    segments1.splice(i + 1, 0, new Segment(intersectionPoint, aux));
+                    aux = segments2[j].p2;
+                    segments2[j].p2 = intersectionPoint;
+                    segments2.splice(j + 1, 0, new Segment(intersectionPoint, aux));
+                }
+            }
+        }
+    }
+
+    static async unionAsync(polygons, progressTracker) {
         progressTracker.reset(polygons.length - 1);
-        await Polygon.multiBreak(polygons, progressTracker);
+        await Polygon.multiBreakAsync(polygons, progressTracker);
         const keptSegments = [];
         progressTracker.reset(polygons.length);
         for (let i = 0; i < polygons.length; i++) {
@@ -41,17 +93,17 @@ class Polygon {
         return keptSegments;
     }
 
-    static async multiBreak(polygons, progressTracker) {
+    static async multiBreakAsync(polygons, progressTracker) {
         for (let i = 0; i < polygons.length - 1; i++) {
             for (let j = i + 1; j < polygons.length; j++) {
-                await Polygon.break(polygons[i], polygons[j])
+                await Polygon.breakAsync(polygons[i], polygons[j])
             }
             progressTracker.updateProgress();
             await new Promise((resolve) => setTimeout(resolve, 0));
         }
     }
 
-    static async break(polygon1, polygon2) {
+    static async breakAsync(polygon1, polygon2) {
         const segments1 = polygon1.segments;
         const segments2 = polygon2.segments;
         for (let i = 0; i < segments1.length; i++) {

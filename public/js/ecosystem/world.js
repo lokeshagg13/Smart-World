@@ -107,7 +107,7 @@ class World {
             }
 
             progressTracker.reset(100, 'Generating road borders');
-            this.roadBorders = await Polygon.union(this.envelopes.map((envelop) => envelop.polygon), progressTracker);
+            this.roadBorders = await Polygon.unionAsync(this.envelopes.map((envelop) => envelop.polygon), progressTracker);
             this.buildings = await this.#generateBuildings(progressTracker);
             this.trees = await this.#generateTrees(progressTracker);
 
@@ -136,7 +136,7 @@ class World {
             await progressTracker.updateProgress();
             await new Promise((resolve) => setTimeout(resolve, 0));
         }
-        const segments = Polygon.union(tmpEnvelopes.map((e) => e.polygon), progressTracker);
+        const segments = await Polygon.unionAsync(tmpEnvelopes.map((e) => e.polygon), progressTracker);
         return segments;
     }
 
@@ -226,7 +226,7 @@ class World {
             await new Promise((resolve) => setTimeout(resolve, 0));
         }
 
-        const guides = await Polygon.union(tmpEnvelopes.map((e) => e.polygon), progressTracker);
+        const guides = await Polygon.unionAsync(tmpEnvelopes.map((e) => e.polygon), progressTracker);
         const buildingSuitableGuides = guides.filter((segment) => (segment.length() > this.settings.buildingMinLength));
 
         // Creating supports for buildings using the buildings
@@ -363,7 +363,7 @@ class World {
             );
 
         for (const car of cars) {
-            car.update(this.roadBorders, this.graph.segments, this.markings);
+            car.update(this.roadBorders, this.markings);
         }
 
         this.carToFollow = cars.find(
@@ -423,6 +423,20 @@ class World {
         }
     }
 
+    generateCarPath(path) {
+        const pathSegments = [];
+
+        for (let i = 1; i < path.length; i++) {
+            pathSegments.push(new Segment(path[i - 1], path[i]));
+        }
+        const tmpEnvelopes = pathSegments.map(
+            (s) => new Envelope(s, this.settings.roadWidth, this.settings.roadRoundness)
+        );
+
+        const pathBorders = Polygon.union(tmpEnvelopes.map((e) => e.polygon));
+        return pathBorders;
+    }
+
     draw(ctx, viewpoint, renderRadius = 1000) {
         this.#removeDisconnectedMarkings();
         this.#updateTrafficLights();
@@ -446,6 +460,13 @@ class World {
         // Road Markings
         for (const marking of this.markings) {
             marking.draw(ctx);
+        }
+
+        // Path for followed car
+        if (this.carToFollow && this.carToFollow.pathBorders) {
+            for (const segment of this.carToFollow.pathBorders) {
+                segment.draw(ctx, { color: "red", width: 4 });
+            }
         }
 
         // Buildings & Trees

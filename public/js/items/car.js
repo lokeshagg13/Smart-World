@@ -20,6 +20,7 @@ class Car {
 
         this.target = null;
         this.path = null;
+        this.pathBorders = null;
         this.success = false;    // becomes true when car reaches the target of the world
 
         this.showSensor = settings.showSensors;
@@ -132,18 +133,13 @@ class Car {
         return new Polygon(points);
     }
 
-    #assessDamage(roadBorders, roadDividers) {
-        for (let i = 0; i < roadBorders.length; i++) {
-            if (polygonSegmentIntersect(this.polygon, roadBorders[i])) {
+    #assessDamage() {
+        for (let i = 0; i < this.pathBorders.length; i++) {
+            if (polygonSegmentIntersect(this.polygon, this.pathBorders[i])) {
                 return true;
             }
         }
 
-        for (let i = 0; i < roadDividers.length; i++) {
-            if (polygonSegmentIntersect(this.polygon, roadDividers[i])) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -154,7 +150,7 @@ class Car {
         this.showSensor = settings.showSensors;
     }
 
-    update(roadBorders, roadDividers, markings) {
+    update(roadBorders, markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
         if (!this.damaged) {
@@ -163,10 +159,10 @@ class Car {
                 this.fitness += 1;
             }
             this.polygon = this.#createPolygonAroundCar();
-            this.damaged = this.#assessDamage(roadBorders, roadDividers);
+            this.damaged = this.#assessDamage();
         }
         if (this.sensor) {
-            this.sensor.update(this.center, this.angle, roadBorders, roadDividers, markings);
+            this.sensor.update(this.center, this.angle, roadBorders, markings);
             const sensorReadings = this.sensor.getReadings();
             if (sensorReadings.targetSignReading > 0.7) {
                 this.success = true;
