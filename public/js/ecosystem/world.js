@@ -347,7 +347,6 @@ class World {
                 }
             }
         }
-        this.frameCount++
     }
 
     #updateCars() {
@@ -397,6 +396,18 @@ class World {
         }
     }
 
+    #generateRandomPedestrians() {
+        if (Math.floor(this.frameCount % 120) !== 0) {
+            return;
+        }
+        const crossings = this.markings.filter(m => m instanceof CrossingMarking);
+        if (crossings.length === 0) {
+            return;
+        }
+        const randomCrossing = crossings[Math.floor(Math.random() * crossings.length)];
+        randomCrossing.pedCount += 1;
+    }
+
     getTargetMarking() {
         return {
             index: this.markings.findIndex(m => m instanceof TargetMarking),
@@ -408,6 +419,8 @@ class World {
         this.#removeDisconnectedMarkings();
         this.#updateTrafficLights();
         this.#updateCars();
+
+        this.frameCount++;
 
         // Road Paths
         for (const envelope of this.envelopes) {

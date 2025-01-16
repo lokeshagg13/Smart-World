@@ -2,6 +2,7 @@ class CrossingMarking extends Marking {
     constructor(center, directionVector, width, height, isLHT) {
         super(center, directionVector, width, height, isLHT);
         this.borders = [this.polygon.segments[0], this.polygon.segments[2]];
+        this.pedCount = 0;
         this.type = "crossing";
     }
 

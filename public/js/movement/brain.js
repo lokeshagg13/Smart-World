@@ -1,3 +1,80 @@
+class Brain {
+    constructor() {
+        this.network = new NeuralNetwork([9, 9, 4]);
+
+        // First Level - Biases
+        this.network.levels[0].biases[0] = -0.9;
+        this.network.levels[0].biases[1] = -0.5;  // Speed cap (to make smoother turns, keep this value bigger and to make sharp turns, make this closer to -1)
+        this.network.levels[0].biases[2] = -0.9;
+        this.network.levels[0].biases[3] = 0.85;
+        this.network.levels[0].biases[4] = 0.85;
+        this.network.levels[0].biases[5] = 0.85;
+        this.network.levels[0].biases[6] = 0.85;
+        this.network.levels[0].biases[7] = -0.3;
+        this.network.levels[0].biases[8] = 0.29;
+        // First Level - Weights
+        // For weights[x][y], x = 0 (frontReading), 
+        //                        1 (speed), 
+        //                        2 (trafficLightReading)
+        //                        3 (stopSignReading), 
+        //                        4 (crossingSignReading), 
+        //                        5 (yeildSignReading), 
+        //                        6 (parkingSignReading),
+        //                        7 (leftReading), 
+        //                        8 (rightReading)
+        this.network.levels[0].weights[0][0] = -1;
+        this.network.levels[0].weights[1][0] = -1;
+        this.network.levels[0].weights[1][1] = -1;
+        this.network.levels[0].weights[1][2] = -1;
+        this.network.levels[0].weights[2][2] = -1;
+        this.network.levels[0].weights[3][2] = -1;
+        this.network.levels[0].weights[3][3] = 1;
+        this.network.levels[0].weights[4][2] = -1;
+        this.network.levels[0].weights[4][3] = 1;
+        this.network.levels[0].weights[5][2] = -1;
+        this.network.levels[0].weights[5][3] = 1;
+        this.network.levels[0].weights[6][2] = -1;
+        this.network.levels[0].weights[6][3] = 1;
+        this.network.levels[0].weights[7][7] = -1;
+        this.network.levels[0].weights[7][8] = 1;
+        this.network.levels[0].weights[8][7] = 1;
+        this.network.levels[0].weights[8][8] = -1;
+
+        // Second Level - Biases
+        this.network.levels[1].biases[0] = 0.6;
+        this.network.levels[1].biases[1] = -0.6;
+        // Second Level - Weights
+        this.network.levels[1].weights[0][0] = 0.3;
+        this.network.levels[1].weights[0][1] = -0.3;
+        this.network.levels[1].weights[1][0] = 0.3;
+        this.network.levels[1].weights[1][1] = -0.3;
+        this.network.levels[1].weights[2][0] = 0.05;
+        this.network.levels[1].weights[2][1] = -0.05;
+        this.network.levels[1].weights[3][0] = 0.05;
+        this.network.levels[1].weights[3][1] = -0.05;
+        this.network.levels[1].weights[4][0] = 0.05;
+        this.network.levels[1].weights[4][1] = -0.05;
+        this.network.levels[1].weights[5][0] = 0.05;
+        this.network.levels[1].weights[5][1] = -0.05;
+        this.network.levels[1].weights[6][0] = 0.05;
+        this.network.levels[1].weights[6][1] = -0.05;
+        this.network.levels[1].weights[7][2] = 0.1;
+        this.network.levels[1].weights[8][3] = 0.1;
+    }
+
+    getControls({ frontReading = 0, leftReading = 0, rightReading = 0, speed = 0, stopSignReading = 0, trafficLightReading = 0, crossingSignReading = 0, yeildSignReading = 0, parkingSignReading = 0, targetSignReading = 0 } = {}) {
+        const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, leftReading, rightReading];
+        const outputs = NeuralNetwork.feedforward(inputs, this.network);
+        const controls = {
+            forward: outputs[0],
+            reverse: outputs[1],
+            left: outputs[2],
+            right: outputs[3]
+        }
+        return controls;
+    }
+}
+
 class NeuralNetwork {
     constructor(neuronCounts) {
         this.levels = [];
@@ -54,7 +131,19 @@ class Level {
             this.weights[i] = new Array(outputCount);
         }
 
-        Level.#randomize(this);
+        Level.#fill(this, 0);
+        // Level.#randomize(this);
+    }
+
+    static #fill(level, value) {
+        for (let i = 0; i < level.inputs.length; i++) {
+            for (let j = 0; j < level.outputs.length; j++) {
+                level.weights[i][j] = value;
+            }
+        }
+        for (let i = 0; i < level.biases.length; i++) {
+            level.biases[i] = value;
+        }
     }
 
     static #randomize(level) {

@@ -25,7 +25,7 @@ class Car {
         this.sensor = new Sensor();
 
         if (controlType === "AI") {
-            this.brain = new NeuralNetwork(settings.brainNeuronCounts);
+            this.brain = new Brain();
         } else {
             this.#addKeyboardListeners();
         }
@@ -167,23 +167,10 @@ class Car {
         if (this.sensor) {
             this.sensor.update(this.center, this.angle, roadBorders, roadDividers, markings);
 
-            // If there is no reading on a sensor which means no obstacle detected
-            // then its input to the neural network is 0
-            // Otherwise, it provides an inversed input to the network so
-            // that nearer obstacles provide higher values to the network
-            // than far object. Thus, in a way, inputs to the neural network
-            // signifies the chances of collision with an obstacles.
-            // const offsets = this.sensor.readings.map(
-            //     s => s == null ? 0 : 1 - s.offset
-            // );
-            // const outputs = NeuralNetwork.feedforward(offsets, this.brain);
-
-            // if (this.brain) {
-            //     this.controls.forward = outputs[0];
-            //     this.controls.left = outputs[1];
-            //     this.controls.right = outputs[2];
-            //     this.controls.reverse = outputs[3];
-            // }
+            if (this.brain) {
+                // const Ccontrols = this.brain.getControls({ ...this.sensor.getReadings(), speed: this.speed });
+                this.controls = this.brain.getControls({ ...this.sensor.getReadings(), speed: this.speed / this.maxSpeed });
+            }
         }
     }
 

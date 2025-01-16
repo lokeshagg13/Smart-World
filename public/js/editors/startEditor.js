@@ -11,10 +11,6 @@ class StartEditor extends MarkingEditor {
             this.world.settings.roadWidth / 4,
             this.world.settings.isLHT
         );
-        const bestBrainString = localStorage.getItem("bestBrain");
-        if (bestBrainString) {
-            startMarking.car.brain = JSON.parse(bestBrainString);
-        }
         return startMarking;
     }
 }
