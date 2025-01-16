@@ -132,27 +132,26 @@ class MultiSensorRay extends RoadSensorRay {
         return closestTouch;
     }
 
-    #intersectionForTargetMarking(markings) {
-        if (markings.length === 0) return;
-        const marking = markings[0];
+    #intersectionForTargetMarking(targetMarking) {
         let maxOffset = Number.MIN_SAFE_INTEGER;
         let farthestTouch = null;
-        for (const border of marking.borders) {
-            const touch = getIntersection(
-                this.startPoint,
-                this.endPoint,
-                border.p1,
-                border.p2
-            );
-            if (!touch) {
-                // It means sensor is not yet reaching one of the border
-                return null;
+        if (targetMarking) {
+            for (const border of targetMarking.borders) {
+                const touch = getIntersection(
+                    this.startPoint,
+                    this.endPoint,
+                    border.p1,
+                    border.p2
+                );
+                if (!touch) {
+                    // It means sensor is not yet reaching one of the border
+                    return null;
+                }
+                if (touch && touch.offset > maxOffset) {
+                    maxOffset = touch.offset;
+                    farthestTouch = touch;
+                }
             }
-            if (touch && touch.offset > maxOffset) {
-                maxOffset = touch.offset;
-                farthestTouch = touch;
-            }
-
         }
         return farthestTouch;
     }
@@ -210,7 +209,7 @@ class MultiSensorRay extends RoadSensorRay {
             markings.filter(m => m instanceof ParkingMarking)
         );
         this.targetSignReading = this.#intersectionForTargetMarking(
-            markings.filter(m => m instanceof TargetMarking)
+            markings.find(m => m instanceof TargetMarking)
         );
     }
 
