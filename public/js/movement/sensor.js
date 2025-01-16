@@ -179,7 +179,7 @@ class MultiSensorRay extends RoadSensorRay {
             markings.filter(m => m instanceof YieldMarking)
         );
         this.crossingSignReading = this.#intersectionForBothSidedMarkings(
-            markings.filter(m => m instanceof CrossingMarking)
+            markings.filter(m => (m instanceof CrossingMarking) && (m.pedCount > 0))
         );
         this.parkingSignReading = this.#intersectionForBothSidedMarkings(
             markings.filter(m => m instanceof ParkingMarking)
