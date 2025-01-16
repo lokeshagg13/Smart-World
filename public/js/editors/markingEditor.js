@@ -62,7 +62,7 @@ class MarkingEditor {
 
     #handleMouseMove(ev) {
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
-        const nearestSegment = getNearestSegment(
+        const nearestSegment = Graph.getNearestSegment(
             this.hoveredPoint,
             this.targetSegments,
             12 * this.viewport.zoom
@@ -91,11 +91,9 @@ class MarkingEditor {
             for (const marking of this.world.markings) {
                 if (marking instanceof StartMarking) {
                     marking.car.target = this.intent;
-                    const startPoint = getNearestPoint(marking.car.center, this.world.graph.points);
-                    const endPoint = getNearestPoint(this.intent.center, this.world.graph.points);
                     marking.car.path = this.world.graph.getShortestPath(
-                        startPoint,
-                        endPoint
+                        marking.car.center,
+                        this.intent.center
                     );
                 }
             }
@@ -105,11 +103,9 @@ class MarkingEditor {
             if (currentTargetMarking.index >= 0) {
                 currentTargetMarking = currentTargetMarking.element;
                 this.intent.car.target = currentTargetMarking;
-                const startPoint = getNearestPoint(this.intent.car.center, this.world.graph.points);
-                const endPoint = getNearestPoint(currentTargetMarking.center, this.world.graph.points);
                 this.intent.car.path = this.world.graph.getShortestPath(
-                    startPoint,
-                    endPoint
+                    this.intent.car.center,
+                    currentTargetMarking.center
                 );
             }
         }

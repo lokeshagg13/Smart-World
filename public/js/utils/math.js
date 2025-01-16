@@ -1,29 +1,3 @@
-function getNearestPoint(loc, points, threshold = Number.MAX_SAFE_INTEGER) {
-    let minDist = Number.MAX_SAFE_INTEGER;
-    let nearestPoint = null;
-    for (const point of points) {
-        const dist = distance(point, loc);
-        if (dist < minDist && dist < threshold) {
-            minDist = dist;
-            nearestPoint = point;
-        }
-    }
-    return nearestPoint;
-}
-
-function getNearestSegment(loc, segments, threshold = Number.MAX_SAFE_INTEGER) {
-    let minDist = Number.MAX_SAFE_INTEGER;
-    let nearestSegment = null;
-    for (const segment of segments) {
-        const dist = segment.distanceToPoint(loc);
-        if (dist < minDist && dist < threshold) {
-            minDist = dist;
-            nearestSegment = segment;
-        }
-    }
-    return nearestSegment;
-}
-
 function tryParseInt(num, defaultVal) {
     try {
         return parseInt(num);

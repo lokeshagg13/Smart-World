@@ -67,7 +67,7 @@ class GraphEditor {
 
     #handleMouseMove(ev) {
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
-        this.nearestPoint = getNearestPoint(this.hoveredPoint, this.world.graph.points, 12 * this.viewport.zoom);
+        this.nearestPoint = Graph.getNearestPoint(this.hoveredPoint, this.world.graph.points, 12 * this.viewport.zoom);
         if (this.dragging) {
             this.selectedPoint.x = this.hoveredPoint.x;
             this.selectedPoint.y = this.hoveredPoint.y;

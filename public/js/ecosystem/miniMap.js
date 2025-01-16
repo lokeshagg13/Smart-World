@@ -71,23 +71,13 @@ class MiniMap {
             // Draw path to target
             if (this.world.carToFollow && this.world.carToFollow.path) {
                 const path = this.world.carToFollow.path;
-                new Segment(viewpoint, path[0]).draw(this.ctx, { width: 2 / scaler, color: "cyan" });
-                for (let i = 0; i < path.length - 1; i++) {
-                    const segment = new Segment(path[i], path[i + 1]);
-                    if (i == path.length - 2) {
-                        if (segment.containsPoint(targetMarking.center)) {
-                            new Segment(path[i], targetMarking.center).draw(this.ctx, { width: 2 / scaler, color: "cyan" });
-                        } else {
-                            segment.draw(this.ctx, { width: 2 / scaler, color: "cyan" });
-                            new Segment(path[i + 1], targetMarking.center).draw(this.ctx, { width: 2 / scaler, color: "cyan" });
-                        }
-                    }
-                    else {
-                        segment.draw(this.ctx, { width: 2 / scaler, color: "cyan" });
-                    }
+                path[0].draw(this.ctx, { size: 250, color: "yellow", outline: true });
+                for (let i = 1; i < path.length; i++) {
+                    new Segment(path[i - 1], path[i]).draw(this.ctx, { width: 2 / scaler, color: "cyan" });
                 }
             }
 
+            // Draw car 
             this.ctx.restore();
             if (this.world.carToFollow) {
                 new Point(width / 2, height / 2)

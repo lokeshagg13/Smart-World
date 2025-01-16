@@ -77,7 +77,7 @@ class SimulationEditor {
             return;
         }
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
-        const nearestSegment = getNearestSegment(
+        const nearestSegment = Graph.getNearestSegment(
             this.hoveredPoint,
             this.targetSegments,
             12 * this.viewport.zoom

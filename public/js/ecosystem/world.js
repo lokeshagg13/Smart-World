@@ -308,7 +308,7 @@ class World {
         const controlCenters = [];
         for (const trafficLight of trafficLights) {
             // For each traffic light, get the nearest road intersection
-            const nearestIntersectionPoint = getNearestPoint(trafficLight.center, this.#getRoadIntersections(2));
+            const nearestIntersectionPoint = Graph.getNearestPoint(trafficLight.center, this.#getRoadIntersections(2));
             if (!nearestIntersectionPoint) continue;
             let controlCenter = controlCenters.find((c) => c.equals(nearestIntersectionPoint));
             if (!controlCenter) {

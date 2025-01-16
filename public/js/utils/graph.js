@@ -8,9 +8,36 @@ class Graph {
         const points = info.points.map((p) => new Point(p.x, p.y));
         const segments = info.segments.map((s) => new Segment(
             points.find((p) => p.equals(s.p1)),
-            points.find((p) => p.equals(s.p2))
+            points.find((p) => p.equals(s.p2)),
+            s.oneWay
         ));
         return new Graph(points, segments);
+    }
+
+    static getNearestPoint(loc, points, threshold = Number.MAX_SAFE_INTEGER) {
+        let minDist = Number.MAX_SAFE_INTEGER;
+        let nearestPoint = null;
+        for (const point of points) {
+            const dist = distance(point, loc);
+            if (dist < minDist && dist < threshold) {
+                minDist = dist;
+                nearestPoint = point;
+            }
+        }
+        return nearestPoint;
+    }
+
+    static getNearestSegment(loc, segments, threshold = Number.MAX_SAFE_INTEGER) {
+        let minDist = Number.MAX_SAFE_INTEGER;
+        let nearestSegment = null;
+        for (const segment of segments) {
+            const dist = segment.distanceToPoint(loc);
+            if (dist < minDist && dist < threshold) {
+                minDist = dist;
+                nearestSegment = segment;
+            }
+        }
+        return nearestSegment;
     }
 
     hash() {
@@ -63,6 +90,18 @@ class Graph {
         this.segments.splice(this.segments.indexOf(segment), 1);
     }
 
+    interpolate(point) {
+        const nearestSegment = Graph.getNearestSegment(point, this.segments);
+        let projectedPoint = nearestSegment.projectPoint(point);
+        if (projectedPoint) {
+            projectedPoint = projectedPoint.point;
+        }
+        this.tryAddPoint(projectedPoint);
+        this.tryAddSegment(new Segment(nearestSegment.p1, projectedPoint));
+        this.tryAddSegment(new Segment(projectedPoint, nearestSegment.p2));
+        return projectedPoint;
+    }
+
     getSegmentsWithPoint(point) {
         const segments = [];
         for (const segment of this.segments) {
@@ -93,7 +132,11 @@ class Graph {
         return segments;
     }
 
-    getShortestPath(startPoint, endPoint) {
+    getShortestPath(carCenter, targetCenter) {
+        // Add points to graph based on car and target center
+        const startPoint = this.interpolate(carCenter);
+        const endPoint = this.interpolate(targetCenter);
+
         // 'distances' map stores the distance of a point from the startPoint
         const distances = new Map();
         // 'previous' map stores the previous point in the shortest path 
@@ -142,42 +185,9 @@ class Graph {
             currentPoint = previous.get(currentPoint);
         }
 
-        return path;
-    }
-
-    getShortestPathV2(startPoint, endPoint) {
-        for (const point of this.points) {
-            point.distance = Number.MAX_SAFE_INTEGER;
-            point.visited = false;
-        }
-
-        let currentPoint = startPoint;
-        currentPoint.distance = 0;
-
-        while (!endPoint.visited) {
-            const segments = this.getSegmentsLeavingFromPoint(currentPoint);
-            for (const segment of segments) {
-                const neighborPoint = segment.p1.equals(currentPoint) ? segment.p2 : segment.p1;
-                if (currentPoint.distance + segment.length() < neighborPoint.distance) {
-                    neighborPoint.distance = currentPoint.distance + segment.length();
-                    neighborPoint.prev = currentPoint;
-                }
-            }
-            currentPoint.visited = true;
-
-            const unvisited = this.points.filter((p) => p.visited === false);
-            const dists = unvisited.map((p) => p.distance);
-            currentPoint = unvisited.find((p) => p.distance == Math.min(...dists));
-        }
-
-        // Backtracking
-        const path = [];
-        currentPoint = endPoint;
-        while (currentPoint) {
-            path.unshift(currentPoint);
-            currentPoint = currentPoint.prev;
-        }
-
+        // Cleanup
+        this.removePoint(startPoint);
+        this.removePoint(endPoint);
 
 
         return path;
