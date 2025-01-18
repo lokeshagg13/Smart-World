@@ -9,7 +9,8 @@ class StartEditor extends MarkingEditor {
             directionVector,
             this.world.settings.roadWidth * 0.4,
             this.world.settings.roadWidth / 4,
-            this.world.settings.isLHT
+            this.world.settings.isLHT,
+            false
         );
         return startMarking;
     }

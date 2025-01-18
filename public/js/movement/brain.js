@@ -62,9 +62,19 @@ class Brain {
         this.network.levels[1].weights[8][3] = 0.1;
     }
 
-    getControls({ frontReading = 0, leftReading = 0, rightReading = 0, speed = 0, stopSignReading = 0, trafficLightReading = 0, crossingSignReading = 0, yeildSignReading = 0, parkingSignReading = 0 } = {}) {
+    static getControls({
+        frontReading = 0,
+        leftReading = 0,
+        rightReading = 0,
+        speed = 0,
+        stopSignReading = 0,
+        trafficLightReading = 0,
+        crossingSignReading = 0,
+        yeildSignReading = 0,
+        parkingSignReading = 0
+    } = {}, network) {
         const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, leftReading, rightReading];
-        const outputs = NeuralNetwork.feedforward(inputs, this.network);
+        const outputs = NeuralNetwork.feedforward(inputs, network);
         const controls = {
             forward: outputs[0],
             reverse: outputs[1],

@@ -1,7 +1,8 @@
 class Car {
-    constructor(center, angle, controlType = "AI") {
+    constructor(center, angle, controlType = "AI", isSimulation = false) {
         this.center = center;
         this.angle = angle;
+        this.isSimulation = isSimulation;
 
         const settings = World.loadSettingsFromLocalStorage();
         this.maxSpeed = settings.carMaxSpeed;
@@ -169,13 +170,13 @@ class Car {
             }
 
             if (this.brain) {
-                this.controls = this.brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed });
+                this.controls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
             }
         }
     }
 
     draw(ctx) {
-        if (!this.damaged && this.showSensor && this.sensor) {
+        if (!this.damaged && this.showSensor && this.sensor && !this.isSimulation) {
             this.sensor.draw(ctx);
         }
 

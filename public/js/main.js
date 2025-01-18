@@ -39,9 +39,12 @@ function animate() {
         if (world.carToFollow) {
             viewport.setOffset(world.carToFollow.center);
         }
+        if (currentMode === "simulation" && editors['simulation'].running) {
+            checkForSimulationSuccess();
+        }
         const viewpoint = scale(viewport.getOffset(), -1);
         const renderRadius = viewport.getScreenRadius();
-        world.draw(ctx, viewpoint, renderRadius);
+        world.draw(ctx, viewpoint, renderRadius, currentMode);
         miniMap.load(world).draw(viewpoint);
     }
 
@@ -427,6 +430,22 @@ function showLoadOsmGraphModal() {
 
 function hideLoadOsmGraphModal() {
     document.getElementById('loadOsmGraphModal').style.display = "none";
+}
+
+function checkForSimulationSuccess() {
+    const successfulCarMarking = world.markings.find((m) =>
+        (m instanceof StartMarking) &&
+        (m.car.success === true)
+    );
+
+    if (successfulCarMarking) {
+        if (successfulCarMarking.car.brain) {
+            localStorage.setItem("bestBrain", JSON.stringify(successfulCarMarking.car.brain));
+        }
+        resetSimulation();
+        showSaveConfirmationModal(`The current simulation is successful and the car has learned to 
+            travel from the given start point towards the target of your world.`);
+    }
 }
 
 function saveSimulationResult() {

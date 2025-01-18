@@ -19,7 +19,8 @@ class SimulationEditor {
             directionVector,
             this.world.settings.roadWidth * 0.4,
             this.world.settings.roadWidth / 4,
-            this.world.settings.isLHT
+            this.world.settings.isLHT,
+            true
         );
     }
 
@@ -51,20 +52,33 @@ class SimulationEditor {
     #handleMouseDown(ev) {
         if (ev.button == 0) { // left click
             if (this.intent && !this.running) {
-                const bestBrainString = localStorage.getItem("bestBrain");
-                for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
-                    const startMarking = this.createMarking(
+                let currentTargetMarking = this.world.getTargetMarking();
+                if (currentTargetMarking.index >= 0) {
+                    currentTargetMarking = currentTargetMarking.element;
+                    const shortestPath = this.world.graph.getShortestPath(
                         this.intent.center,
-                        this.intent.directionVector,
-                        this.world.settings.isLHT
+                        currentTargetMarking.center
                     );
-                    if (bestBrainString) {
-                        startMarking.car.brain = JSON.parse(bestBrainString);
-                        if (i != 0) {
-                            NeuralNetwork.mutate(startMarking.car.brain, this.world.settings.simulationDiffFactor)
+                    const shortestPathBorders = this.world.generateCarPath(shortestPath);
+                    const bestBrainString = localStorage.getItem("bestBrain");
+                
+                    for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
+                        const startMarking = this.createMarking(
+                            this.intent.center,
+                            this.intent.directionVector,
+                            this.world.settings.isLHT
+                        );
+                        startMarking.car.target = currentTargetMarking;
+                        startMarking.car.path = shortestPath;
+                        startMarking.car.pathBorders = shortestPathBorders;
+                        if (bestBrainString) {
+                            startMarking.car.brain = JSON.parse(bestBrainString);
                         }
+                        if (i != 0) {
+                            NeuralNetwork.mutate(startMarking.car.brain.network, this.world.settings.simulationDiffFactor)
+                        }
+                        this.world.markings.push(startMarking);
                     }
-                    this.world.markings.push(startMarking);
                 }
                 this.running = true;
                 this.intent = null;

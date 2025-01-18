@@ -437,11 +437,14 @@ class World {
         return pathBorders;
     }
 
-    draw(ctx, viewpoint, renderRadius = 1000) {
+    draw(ctx, viewpoint, renderRadius = 1000, currentMode) {
         this.#removeDisconnectedMarkings();
         this.#updateTrafficLights();
         this.#updateCars();
-        this.#removeSuccessfulCars();
+
+        if (currentMode !== "simulation") {
+            this.#removeSuccessfulCars();
+        }
 
         this.frameCount++;
 

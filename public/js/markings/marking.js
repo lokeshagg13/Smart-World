@@ -46,7 +46,8 @@ class Marking {
                     directionVector,
                     info.width,
                     info.height,
-                    info.isLHT
+                    info.isLHT,
+                    false
                 );
             case "stop":
                 return new StopMarking(
