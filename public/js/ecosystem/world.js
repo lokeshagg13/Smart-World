@@ -24,6 +24,7 @@ class World {
         const world = new World(new Graph());
         world.graph = Graph.load(info.graph);
         world.settings = Settings.load(info.settings);
+        world.settings.save();
 
         world.roadPaths = info.roadPaths.map(
             (e) => Envelope.load(e)
@@ -115,7 +116,7 @@ class World {
             this.roadDividers = await this.#generateRoadDividers(progressTracker);
             this.buildings = await this.#generateBuildings(progressTracker);
             this.trees = await this.#generateTrees(progressTracker);
-            this.laneGuides = await this.#generateLaneGuides(progressTracker);
+            this.laneGuides.push(...await this.#generateLaneGuides(progressTracker));
         } catch (error) {
             console.log(error)
             console.error('Error generating the world: ' + error.message);
@@ -506,7 +507,7 @@ class World {
         }
 
         // Path for followed car
-        if (this.carToFollow && this.carToFollow.pathBorders) {
+        if (this.carToFollow && this.carToFollow.pathBorders.length > 0) {
             for (const segment of this.carToFollow.pathBorders) {
                 segment.draw(ctx, { color: "red", width: 4 });
             }

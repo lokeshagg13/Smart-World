@@ -790,6 +790,7 @@ function loadSettingsIntoDisplay() {
     // Reset Cars Section
     document.getElementById("carMaxSpeed").value = world.settings.carMaxSpeed; // Medium
     document.getElementById("carAcceleration").value = world.settings.carAcceleration; // Medium
+    document.getElementById("carControlType").value = world.settings.carControlType; // AI / KEYS
 
     // Reset Simulation Section
     document.getElementById("simulationNumCars").value = world.settings.simulationNumCars;
@@ -878,6 +879,8 @@ function saveSettings() {
     // Save Cars Section
     worldSettingsObj.carMaxSpeed = document.getElementById("carMaxSpeed").value; // Medium
     worldSettingsObj.carAcceleration = document.getElementById("carAcceleration").value; // Medium
+    worldSettingsObj.carControlType = document.getElementById("carControlType").value; // Medium
+    
 
     // Save Simulation Section
     worldSettingsObj.simulationNumCars = document.getElementById("simulationNumCars").value;

@@ -19,6 +19,7 @@ class Settings {
         brainNeuronCounts = [6, 4],
         carMaxSpeed = 3,
         carAcceleration = 0.2,
+        carControlType = "AI",
         roadFriction = 0.05
     ) {
         this.roadWidth = roadWidth;
@@ -40,6 +41,7 @@ class Settings {
         this.brainNeuronCounts = [sensorRayCount, ...brainNeuronCounts];
         this.carMaxSpeed = carMaxSpeed;
         this.carAcceleration = carAcceleration;
+        this.carControlType = carControlType;
         this.roadFriction = roadFriction;
     }
 
@@ -81,6 +83,7 @@ class Settings {
             settingsObj.brainNeuronCounts,
             tryParseInt(settingsObj.carMaxSpeed, 3),
             tryParseFloat(settingsObj.carAcceleration, 0.2),
+            settingsObj.carControlType,
             tryParseFloat(settingsObj.roadFriction, 0.05)
         );
     }
@@ -109,6 +112,7 @@ class Settings {
         this.brainNeuronCounts = [5, 6, 4];
         this.carMaxSpeed = 3;
         this.carAcceleration = 0.2;
+        this.carControlType = "AI";
         this.roadFriction = 0.05;
     }
 
@@ -137,6 +141,7 @@ class Settings {
         settingsObj.brainComplexity = this.brainComplexity;
         settingsObj.carMaxSpeed = "" + this.carMaxSpeed;
         settingsObj.carAcceleration = "" + this.carAcceleration;
+        settingsObj.carControlType = "" + this.carControlType;
         settingsObj.roadFriction = this.roadFriction;
         return settingsObj;
     }

@@ -69,7 +69,7 @@ class MiniMap {
             }
 
             // Draw path to target
-            if (this.world.carToFollow && this.world.carToFollow.path) {
+            if (this.world.carToFollow && this.world.carToFollow.path.length > 0) {
                 const path = this.world.carToFollow.path;
                 path[0].draw(this.ctx, { size: 250, color: "yellow", outline: true });
                 for (let i = 1; i < path.length; i++) {

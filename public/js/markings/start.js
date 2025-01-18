@@ -6,7 +6,7 @@ class StartMarking extends Marking {
         } else {
             this.angle = angle(directionVector) - Math.PI / 2;
         }
-        this.car = new Car(center, this.angle, "AI", isSimulation);
+        this.car = new Car(center, this.angle, isSimulation);
         this.type = "start";
     }
 

@@ -1,5 +1,5 @@
 class Car {
-    constructor(center, angle, controlType = "AI", isSimulation = false) {
+    constructor(center, angle, isSimulation = false) {
         this.center = center;
         this.angle = angle;
         this.isSimulation = isSimulation;
@@ -8,6 +8,7 @@ class Car {
         this.maxSpeed = settings.carMaxSpeed;
         this.acceleration = settings.carAcceleration;
         this.friction = settings.roadFriction;
+        this.controlType = settings.carControlType;
 
         this.damaged = false;
         this.speed = 0;
@@ -20,18 +21,15 @@ class Car {
         };
 
         this.target = null;
-        this.path = null;
-        this.pathBorders = null;
+        this.path = [];
+        this.pathBorders = [];
         this.success = false;    // becomes true when car reaches the target of the world
 
         this.showSensor = settings.showSensors;
         this.sensor = new Sensor();
 
-        if (controlType === "AI") {
-            this.brain = new Brain();
-        } else {
-            this.#addKeyboardListeners();
-        }
+        this.brain = new Brain();
+        this.#addKeyboardListeners();
 
         this.img = new Image();
         this.img.src = "images/cars/car_white.png";
@@ -48,6 +46,11 @@ class Car {
     }
 
     #handleKeyDown(ev) {
+        const settings = World.loadSettingsFromLocalStorage();
+        this.#updateSettings(settings);
+        if (this.controlType === "AI") {
+            return;
+        }
         ev.preventDefault();
         switch (ev.key) {
             case "ArrowLeft":
@@ -155,6 +158,15 @@ class Car {
         this.acceleration = settings.carAcceleration;
         this.friction = settings.roadFriction;
         this.showSensor = settings.showSensors;
+        if (this.controlType === "AI" && settings.carControlType === "KEYS") {
+            this.controls = {
+                forward: false,
+                left: false,
+                right: false,
+                reverse: false
+            };
+        }
+        this.controlType = settings.carControlType;
     }
 
     update(roadDividers, markings) {
@@ -181,7 +193,7 @@ class Car {
                 this.success = true;
             }
 
-            if (this.brain) {
+            if (this.controlType === "AI" && this.brain) {
                 this.controls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
             }
         }

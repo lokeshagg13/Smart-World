@@ -8,7 +8,7 @@ class ParkingEditor extends MarkingEditor {
             center,
             directionVector,
             this.world.settings.roadWidth / 2,
-            this.world.settings.roadWidth / 2, 
+            this.world.settings.roadWidth / 2,
             this.world.settings.isLHT
         );
     }
