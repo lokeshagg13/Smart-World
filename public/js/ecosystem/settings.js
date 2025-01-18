@@ -10,13 +10,7 @@ class Settings {
         isLHT = true,
         simulationNumCars = 100,
         simulationDiffFactor = 0.1,
-        sensorRayCount = 5,
-        sensorRaySpread = Math.PI / 2,
-        sensorRayLength = 100,
         showSensors = false,
-        brainComplexity = "low",
-        brainLevels = 3,
-        brainNeuronCounts = [6, 4],
         carMaxSpeed = 3,
         carAcceleration = 0.2,
         carControlType = "AI",
@@ -32,13 +26,7 @@ class Settings {
         this.isLHT = isLHT;
         this.simulationNumCars = simulationNumCars;
         this.simulationDiffFactor = simulationDiffFactor;
-        this.sensorRayCount = sensorRayCount;
-        this.sensorRaySpread = sensorRaySpread;
-        this.sensorRayLength = sensorRayLength;
         this.showSensors = showSensors;
-        this.brainComplexity = brainComplexity;
-        this.brainLevels = brainLevels;
-        this.brainNeuronCounts = [sensorRayCount, ...brainNeuronCounts];
         this.carMaxSpeed = carMaxSpeed;
         this.carAcceleration = carAcceleration;
         this.carControlType = carControlType;
@@ -46,23 +34,6 @@ class Settings {
     }
 
     static load(settingsObj) {
-        settingsObj.brainLevels = 3
-        settingsObj.brainNeuronCounts = [6, 4]
-        switch (settingsObj.brainComplexity) {
-            case "medium":
-                settingsObj.brainLevels = 4
-                settingsObj.brainNeuronCounts = [8, 6, 4]
-                break;
-            case "high":
-                settingsObj.brainLevels = 5
-                settingsObj.brainNeuronCounts = [6, 8, 6, 4]
-                break;
-            default:
-                settingsObj.brainLevels = 3
-                settingsObj.brainNeuronCounts = [6, 4]
-                break;
-        }
-
         return new Settings(
             tryParseInt(settingsObj.roadWidth, 100),
             tryParseInt(settingsObj.roadRoundness, 10),
@@ -74,13 +45,7 @@ class Settings {
             settingsObj.isLHT,
             tryParseInt(settingsObj.simulationNumCars, 100),
             tryParseFloat(settingsObj.simulationDiffFactor, 0.1),
-            tryParseInt(settingsObj.sensorRayCount, 5),
-            tryParseFloat(settingsObj.sensorRaySpread, Math.PI / 2),
-            tryParseInt(settingsObj.sensorRayLength, 100),
             settingsObj.showSensors,
-            settingsObj.brainComplexity,
-            settingsObj.brainLevels,
-            settingsObj.brainNeuronCounts,
             tryParseInt(settingsObj.carMaxSpeed, 3),
             tryParseFloat(settingsObj.carAcceleration, 0.2),
             settingsObj.carControlType,
@@ -103,13 +68,7 @@ class Settings {
         this.isLHT = true;
         this.simulationNumCars = 100;
         this.simulationDiffFactor = 0.1;
-        this.sensorRayCount = 5;
-        this.sensorRaySpread = Math.PI / 2;
-        this.sensorRayLength = 100;
         this.showSensors = false;
-        this.brainComplexity = "low";
-        this.brainLevels = 3;
-        this.brainNeuronCounts = [5, 6, 4];
         this.carMaxSpeed = 3;
         this.carAcceleration = 0.2;
         this.carControlType = "AI";
@@ -128,17 +87,7 @@ class Settings {
         settingsObj.isLHT = this.isLHT;
         settingsObj.simulationNumCars = "" + this.simulationNumCars;
         settingsObj.simulationDiffFactor = "" + this.simulationDiffFactor;
-        settingsObj.sensorRayCount = "" + this.sensorRayCount;
-
-        if (this.sensorRaySpread) {
-            settingsObj.sensorRaySpread = "" + ((180 * this.sensorRaySpread) / Math.PI);
-        } else {
-            settingsObj.sensorRaySpread = "90";
-        }
-
-        settingsObj.sensorRayLength = "" + this.sensorRayLength;
         settingsObj.showSensors = this.showSensors;
-        settingsObj.brainComplexity = this.brainComplexity;
         settingsObj.carMaxSpeed = "" + this.carMaxSpeed;
         settingsObj.carAcceleration = "" + this.carAcceleration;
         settingsObj.carControlType = "" + this.carControlType;

@@ -713,36 +713,6 @@ function addEventListeners() {
             }
             tempSettings.simulationDiffFactor = value || 0.1;
         });
-
-    document
-        .getElementById("sensorRayCount")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("sensorRayCount").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("sensorRayCount").value = tempSettings.sensorRayCount;
-                showTooltip('sensorRayCount');
-                return;
-            }
-            tempSettings.sensorRayCount = value;
-        });
-
-    document
-        .getElementById("sensorRayLength")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("sensorRayLength").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("sensorRayLength").value = tempSettings.sensorRayLength;
-                showTooltip('sensorRayLength');
-                return;
-            }
-            tempSettings.sensorRayLength = value;
-        });
 }
 
 function showWorldInfoPopover(inputId) {
@@ -797,15 +767,7 @@ function loadSettingsIntoDisplay() {
     document.getElementById("simulationDiffFactor").value = world.settings.simulationDiffFactor;
 
     // Reset Sensors Section
-    document.getElementById("sensorRayCount").value = world.settings.sensorRayCount;
-    document.getElementById("sensorRaySpread").value = convertRadiansToDegrees(
-        world.settings.sensorRaySpread
-    ); // 90º
-    document.getElementById("sensorRayLength").value = world.settings.sensorRayLength;
     document.getElementById("showSensors").checked = world.settings.showSensors;
-
-    // Reset Brain Section
-    document.getElementById("brainComplexity").value = world.settings.brainComplexity; // Low
 }
 
 function areValidSettings(settings) {
@@ -842,14 +804,6 @@ function areValidSettings(settings) {
         showErrorMessage('simulationDiffFactor')
         valid = false;
     }
-    if (!settings.sensorRayCount || (settings.sensorRayCount < 1 || settings.sensorRayCount > 100)) {
-        showErrorMessage('sensorRayCount')
-        valid = false;
-    }
-    if (!settings.sensorRayLength || (settings.sensorRayLength < 50 || settings.sensorRayLength > 200)) {
-        showErrorMessage('sensorRayLength')
-        valid = false;
-    }
     return valid;
 }
 
@@ -880,22 +834,13 @@ function saveSettings() {
     worldSettingsObj.carMaxSpeed = document.getElementById("carMaxSpeed").value; // Medium
     worldSettingsObj.carAcceleration = document.getElementById("carAcceleration").value; // Medium
     worldSettingsObj.carControlType = document.getElementById("carControlType").value; // Medium
-    
 
     // Save Simulation Section
     worldSettingsObj.simulationNumCars = document.getElementById("simulationNumCars").value;
     worldSettingsObj.simulationDiffFactor = document.getElementById("simulationDiffFactor").value;
 
     // Save Sensors Section
-    worldSettingsObj.sensorRayCount = document.getElementById("sensorRayCount").value;
-    worldSettingsObj.sensorRaySpread = convertDegreesToRadians(
-        document.getElementById("sensorRaySpread").value
-    ); // 90º
-    worldSettingsObj.sensorRayLength = document.getElementById("sensorRayLength").value;
     worldSettingsObj.showSensors = document.getElementById("showSensors").checked;
-
-    // Save Brain Section
-    worldSettingsObj.brainComplexity = document.getElementById("brainComplexity").value; // Low
 
     const newSettings = Settings.load(worldSettingsObj);
     if (areValidSettings(newSettings)) {
