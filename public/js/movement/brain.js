@@ -1,17 +1,14 @@
 class Brain {
     constructor() {
-        this.network = new NeuralNetwork([9, 9, 4]);
+        this.network = new NeuralNetwork([9, 6, 4]);
 
         // First Level - Biases
         this.network.levels[0].biases[0] = -0.9;
         this.network.levels[0].biases[1] = -0.5;  // Speed cap (to make smoother turns, keep this value bigger and to make sharp turns, make this closer to -1)
         this.network.levels[0].biases[2] = -0.9;
         this.network.levels[0].biases[3] = 0.85;
-        this.network.levels[0].biases[4] = 0.85;
-        this.network.levels[0].biases[5] = 0.85;
-        this.network.levels[0].biases[6] = 0.85;
-        this.network.levels[0].biases[7] = -0.3;
-        this.network.levels[0].biases[8] = 0.29;
+        this.network.levels[0].biases[4] = -0.3;  // Left turn
+        this.network.levels[0].biases[5] = 0.29;  // Right turn
         // First Level - Weights
         // For weights[x][y], x = 0 (frontReading), 
         //                        1 (speed), 
@@ -35,10 +32,10 @@ class Brain {
         this.network.levels[0].weights[5][3] = 1;
         this.network.levels[0].weights[6][2] = -1;
         this.network.levels[0].weights[6][3] = 1;
-        this.network.levels[0].weights[7][7] = -1;
-        this.network.levels[0].weights[7][8] = 1;
-        this.network.levels[0].weights[8][7] = 1;
-        this.network.levels[0].weights[8][8] = -1;
+        this.network.levels[0].weights[7][4] = -1; // Left sensor - Left turn
+        this.network.levels[0].weights[7][5] = 1;  // Left sensor - Right turn
+        this.network.levels[0].weights[8][4] = 1;  // Right sensor - Left turn
+        this.network.levels[0].weights[8][5] = -1; // Right sensor - Right turn
 
         // Second Level - Biases
         this.network.levels[1].biases[0] = 0.6;
@@ -48,18 +45,12 @@ class Brain {
         this.network.levels[1].weights[0][1] = -0.3;
         this.network.levels[1].weights[1][0] = 0.3;
         this.network.levels[1].weights[1][1] = -0.3;
-        this.network.levels[1].weights[2][0] = 0.05;
-        this.network.levels[1].weights[2][1] = -0.05;
-        this.network.levels[1].weights[3][0] = 0.05;
-        this.network.levels[1].weights[3][1] = -0.05;
-        this.network.levels[1].weights[4][0] = 0.05;
-        this.network.levels[1].weights[4][1] = -0.05;
-        this.network.levels[1].weights[5][0] = 0.05;
-        this.network.levels[1].weights[5][1] = -0.05;
-        this.network.levels[1].weights[6][0] = 0.05;
-        this.network.levels[1].weights[6][1] = -0.05;
-        this.network.levels[1].weights[7][2] = 0.1;
-        this.network.levels[1].weights[8][3] = 0.1;
+        this.network.levels[1].weights[2][0] = 0.1;
+        this.network.levels[1].weights[2][1] = -0.1;
+        this.network.levels[1].weights[3][0] = 0.1;
+        this.network.levels[1].weights[3][1] = -0.1;
+        this.network.levels[1].weights[4][2] = 0.1;
+        this.network.levels[1].weights[5][3] = 0.1;
     }
 
     static getControls({
@@ -108,22 +99,42 @@ class NeuralNetwork {
 
     static mutate(network, amount = 1) {
         network.levels.forEach(
-            level => {
-                for (let i = 0; i < level.biases.length; i++) {
-                    level.biases[i] = lerp(
-                        level.biases[i],
+            (level, index) => {
+                if (index === 0) {
+                    // For the level 0, biases at indices 4 and 5 control left and right turn respectively.
+                    level.biases[4] = lerp(
+                        level.biases[4],
                         Math.random() * 2 - 1,
                         amount
                     );
-                }
-                for (let i = 0; i < level.inputs.length; i++) {
-                    for (let j = 0; j < level.outputs.length; j++) {
-                        level.weights[i][j] = lerp(
-                            level.weights[i][j],
-                            Math.random() * 2 - 1,
-                            amount
-                        );
-                    }
+                    level.biases[5] = lerp(
+                        level.biases[4],
+                        Math.random() * 2 - 1,
+                        amount
+                    );
+
+                    // For the level 0, weights at {7,4}, {7,5}, {8,4}, {8,5} control the left/right sensor and
+                    // left/right turn relationship.
+                    level.weights[7][4] = lerp(
+                        level.weights[7][4],
+                        Math.random() * 2 - 1,
+                        amount
+                    );
+                    level.weights[7][5] = lerp(
+                        level.weights[7][5],
+                        Math.random() * 2 - 1,
+                        amount
+                    );
+                    level.weights[8][4] = lerp(
+                        level.weights[8][4],
+                        Math.random() * 2 - 1,
+                        amount
+                    );
+                    level.weights[8][5] = lerp(
+                        level.weights[8][5],
+                        Math.random() * 2 - 1,
+                        amount
+                    );
                 }
             }
         );

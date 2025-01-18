@@ -3,8 +3,9 @@ class World {
         this.graph = graph;
         this.settings = World.loadSettingsFromLocalStorage();
 
-        this.envelopes = [];
+        this.roadPaths = [];
         this.roadBorders = [];
+        this.roadDividers = [];
         this.buildings = [];
         this.trees = [];
         this.laneGuides = [];
@@ -24,7 +25,7 @@ class World {
         world.graph = Graph.load(info.graph);
         world.settings = Settings.load(info.settings);
 
-        world.envelopes = info.envelopes.map(
+        world.roadPaths = info.roadPaths.map(
             (e) => Envelope.load(e)
         );
         world.roadBorders = info.roadBorders.map(
@@ -35,6 +36,17 @@ class World {
                 ), new Point(
                     rb.p2.x,
                     rb.p2.y
+                )
+            )
+        );
+        world.roadDividers = info.roadDividers.map(
+            (rd) => new Segment(
+                new Point(
+                    rd.p1.x,
+                    rd.p1.y
+                ), new Point(
+                    rd.p2.x,
+                    rd.p2.y
                 )
             )
         );
@@ -67,8 +79,9 @@ class World {
         this.graph.dispose();
         this.settings = World.loadSettingsFromLocalStorage();
 
-        this.envelopes = [];
+        this.roadPaths = [];
         this.roadBorders = [];
+        this.roadDividers = [];
         this.buildings = [];
         this.trees = [];
         this.laneGuides = [];
@@ -95,24 +108,12 @@ class World {
         const progressTracker = new ProgressTracker();
         progressTracker.show();
         try {
-            this.envelopes.length = 0;
-
-            progressTracker.reset(this.graph.segments.length, 'Generating roads');
-            for (const segment of this.graph.segments) {
-                this.envelopes.push(
-                    new Envelope(segment, this.settings.roadWidth, this.settings.roadRoundness)
-                );
-                await progressTracker.updateProgress();
-                await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-
-            progressTracker.reset(100, 'Generating road borders');
-            this.roadBorders = await Polygon.unionAsync(this.envelopes.map((envelop) => envelop.polygon), progressTracker);
+            this.roadPaths = await this.#generateRoads(progressTracker);
+            this.roadBorders = await this.#generateRoadBorders(progressTracker);
+            this.roadDividers = await this.#generateRoadDividers(progressTracker);
             this.buildings = await this.#generateBuildings(progressTracker);
             this.trees = await this.#generateTrees(progressTracker);
-
-            this.laneGuides.length = 0;
-            this.laneGuides.push(...await this.#generateLaneGuides(progressTracker));
+            this.laneGuides = await this.#generateLaneGuides(progressTracker);
         } catch (error) {
             console.log(error)
             console.error('Error generating the world: ' + error.message);
@@ -122,92 +123,40 @@ class World {
         }
     }
 
-    async #generateLaneGuides(progressTracker) {
-        const tmpEnvelopes = [];
-        progressTracker.reset(this.graph.segments.length, 'Generating lane guides');
+    async #generateRoads(progressTracker) {
+        this.roadPaths.length = 0;
+        const roadPaths = []
+        progressTracker.reset(this.graph.segments.length, 'Generating roads');
         for (const segment of this.graph.segments) {
-            tmpEnvelopes.push(
-                new Envelope(
-                    segment,
-                    this.settings.roadWidth / 2,
-                    this.settings.roadRoundness
-                )
+            roadPaths.push(
+                new Envelope(segment, this.settings.roadWidth, this.settings.roadRoundness)
             );
             await progressTracker.updateProgress();
             await new Promise((resolve) => setTimeout(resolve, 0));
         }
-        const segments = await Polygon.unionAsync(tmpEnvelopes.map((e) => e.polygon), progressTracker);
-        return segments;
+        return roadPaths;
     }
 
-    async #generateTrees(progressTracker) {
-        const points = [
-            ...this.roadBorders.map((s) => [s.p1, s.p2]).flat(),
-            ...this.buildings.map((b) => b.base.points).flat()
-        ];
-        const left = Math.min(...points.map((p) => p.x));
-        const right = Math.max(...points.map((p) => p.x));
-        const top = Math.min(...points.map((p) => p.y));
-        const bottom = Math.max(...points.map((p) => p.y));
+    async #generateRoadBorders(progressTracker) {
+        progressTracker.reset(100, 'Generating road borders');
+        return await Polygon.unionAsync(this.roadPaths.map((envelope) => envelope.polygon), progressTracker);
+    }
 
-        const illegalPolygons = [
-            ...this.buildings.map((b) => b.base),
-            ...this.envelopes.map((e) => e.polygon)
-        ];
-
-        const trees = [];
-        let tryCount = 0;
-        progressTracker.reset(1000, 'Generating trees');
-        while (tryCount < 100 && trees.length < 1000) {
-            const p = new Point(
-                lerp(left, right, Math.random()),
-                lerp(bottom, top, Math.random())
-            );
-
-            // Check if tree is inside or nearby building or road
-            let keep = true;
-            for (const polygon of illegalPolygons) {
-                if (polygon.containsPoint(p) ||
-                    polygon.distanceToPoint(p) < this.settings.treeSize / 2) {
-                    keep = false;
-                    break;
-                }
+    async #generateRoadDividers(progressTracker) {
+        const roadDividers = []
+        progressTracker.reset(this.graph.segments.length, 'Generating road dividers');
+        for (const segment of this.graph.segments) {
+            if (segment.oneWay) {
+                continue;
             }
-
-            // Check if tree is too close to other trees
-            if (keep) {
-                for (const tree of trees) {
-                    if (distance(tree.center, p) < this.settings.treeSize) {
-                        keep = false;
-                        break
-                    }
-                }
-            }
-
-            // Check if tree is in the middle of nowhere
-            if (keep) {
-                let closeToSomething = false;
-                for (const polygon of illegalPolygons) {
-                    if (polygon.distanceToPoint(p) < this.settings.treeSize * 2) {
-                        closeToSomething = true;
-                        break;
-                    }
-                }
-                keep = closeToSomething
-            }
-
-            if (keep) {
-                trees.push(new Tree(p, this.settings.treeSize, this.settings.treeHeight));
-                tryCount = 0;
-                await progressTracker.updateProgress();
-                await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-            tryCount++;
+            const segmentAngle = angle(segment.directionVector());
+            const p1 = translate(segment.p1, segmentAngle, this.settings.roadWidth / 2);
+            const p2 = translate(segment.p2, segmentAngle, -this.settings.roadWidth / 2);
+            roadDividers.push(new Segment(p1, p2));
+            await progressTracker.updateProgress();
+            await new Promise((resolve) => setTimeout(resolve, 0));
         }
-        progressTracker.counter = progressTracker.maxCount;
-        await progressTracker.updateProgress();
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        return trees;
+        return roadDividers
     }
 
     async #generateBuildings(progressTracker) {
@@ -281,6 +230,95 @@ class World {
         }
 
         return buildingBases.map((base) => new Building(base));
+    }
+
+    async #generateTrees(progressTracker) {
+        const points = [
+            ...this.roadBorders.map((s) => [s.p1, s.p2]).flat(),
+            ...this.buildings.map((b) => b.base.points).flat()
+        ];
+        const left = Math.min(...points.map((p) => p.x));
+        const right = Math.max(...points.map((p) => p.x));
+        const top = Math.min(...points.map((p) => p.y));
+        const bottom = Math.max(...points.map((p) => p.y));
+
+        const illegalPolygons = [
+            ...this.buildings.map((b) => b.base),
+            ...this.roadPaths.map((e) => e.polygon)
+        ];
+
+        const trees = [];
+        let tryCount = 0;
+        progressTracker.reset(1000, 'Generating trees');
+        while (tryCount < 100 && trees.length < 1000) {
+            const p = new Point(
+                lerp(left, right, Math.random()),
+                lerp(bottom, top, Math.random())
+            );
+
+            // Check if tree is inside or nearby building or road
+            let keep = true;
+            for (const polygon of illegalPolygons) {
+                if (polygon.containsPoint(p) ||
+                    polygon.distanceToPoint(p) < this.settings.treeSize / 2) {
+                    keep = false;
+                    break;
+                }
+            }
+
+            // Check if tree is too close to other trees
+            if (keep) {
+                for (const tree of trees) {
+                    if (distance(tree.center, p) < this.settings.treeSize) {
+                        keep = false;
+                        break
+                    }
+                }
+            }
+
+            // Check if tree is in the middle of nowhere
+            if (keep) {
+                let closeToSomething = false;
+                for (const polygon of illegalPolygons) {
+                    if (polygon.distanceToPoint(p) < this.settings.treeSize * 2) {
+                        closeToSomething = true;
+                        break;
+                    }
+                }
+                keep = closeToSomething
+            }
+
+            if (keep) {
+                trees.push(new Tree(p, this.settings.treeSize, this.settings.treeHeight));
+                tryCount = 0;
+                await progressTracker.updateProgress();
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            }
+            tryCount++;
+        }
+        progressTracker.counter = progressTracker.maxCount;
+        await progressTracker.updateProgress();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        return trees;
+    }
+
+    async #generateLaneGuides(progressTracker) {
+        this.laneGuides.length = 0;
+        const tmpEnvelopes = [];
+        progressTracker.reset(this.graph.segments.length, 'Generating lane guides');
+        for (const segment of this.graph.segments) {
+            tmpEnvelopes.push(
+                new Envelope(
+                    segment,
+                    this.settings.roadWidth / 2,
+                    this.settings.roadRoundness
+                )
+            );
+            await progressTracker.updateProgress();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+        const segments = await Polygon.unionAsync(tmpEnvelopes.map((e) => e.polygon), progressTracker);
+        return segments;
     }
 
     // Intersections are graph points with two or more intersecting segments (or roads)
@@ -391,7 +429,7 @@ class World {
         for (let i = 0; i < this.markings.length; i++) {
             const markingCenter = this.markings[i].center;
             let isDisconnected = true;
-            for (const envelope of this.envelopes) {
+            for (const envelope of this.roadPaths) {
                 if (envelope.polygon.containsPoint(markingCenter)) {
                     isDisconnected = false;
                     break;
@@ -449,16 +487,16 @@ class World {
         this.frameCount++;
 
         // Road Paths
-        for (const envelope of this.envelopes) {
+        for (const envelope of this.roadPaths) {
             envelope.draw(ctx, { fill: "#BBB", stroke: "#BBB", lineWidth: 15 });
-        }
-        // Road Dividers
-        for (const segment of this.graph.segments) {
-            segment.draw(ctx, { color: "#FFF", width: 4, dash: [10, 10] });
         }
         // Road Borders
         for (const segment of this.roadBorders) {
             segment.draw(ctx, { color: "#FFF", width: 4 });
+        }
+        // Road Dividers 
+        for (const segment of this.roadDividers) {
+            segment.draw(ctx, { color: "#FFF", width: 4, dash: [10, 10] });
         }
         // Road Markings
         for (const marking of this.markings) {
