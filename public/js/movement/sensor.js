@@ -9,14 +9,27 @@ class RoadSensorRay {
         this.borderReading = null;
     }
 
-    detectRoadBorders(roadBorders) {
+    detectRoadBorders(pathBorders, roadDividers) {
         let minOffset = Number.MAX_SAFE_INTEGER;
-        for (const roadBorder of roadBorders) {
+        for (const pathBorder of pathBorders) {
             const touch = getIntersection(
                 this.startPoint,
                 this.endPoint,
-                roadBorder.p1,
-                roadBorder.p2
+                pathBorder.p1,
+                pathBorder.p2
+            );
+            if (touch && touch.offset < minOffset) {
+                minOffset = touch.offset;
+                this.borderReading = touch;
+            }
+        }
+
+        for (const roadDivider of roadDividers) {
+            const touch = getIntersection(
+                this.startPoint,
+                this.endPoint,
+                roadDivider.p1,
+                roadDivider.p2
             );
             if (touch && touch.offset < minOffset) {
                 minOffset = touch.offset;
@@ -252,12 +265,12 @@ class Sensor {
         };
     }
 
-    update(origin, baseAngle, roadBorders, markings) {
+    update(origin, baseAngle, pathBorders, roadDividers, markings) {
         this.#castRays(origin, baseAngle);
-        this.frontRay.detectRoadBorders(roadBorders);
+        this.frontRay.detectRoadBorders(pathBorders, roadDividers);
         this.frontRay.detectMarkings(markings);
-        this.leftRay.detectRoadBorders(roadBorders);
-        this.rightRay.detectRoadBorders(roadBorders);
+        this.leftRay.detectRoadBorders(pathBorders, roadDividers);
+        this.rightRay.detectRoadBorders(pathBorders, roadDividers);
     }
 
     draw(ctx) {

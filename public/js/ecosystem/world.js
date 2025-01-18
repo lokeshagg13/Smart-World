@@ -67,7 +67,9 @@ class World {
                 )
             )
         );
-        world.markings = info.markings.map(
+        world.markings = info.markings.filter(
+            (m) => m.type !== "start"
+        ).map(
             (m) => Marking.load(m)
         );
         world.zoom = info.zoom;
@@ -401,7 +403,7 @@ class World {
             );
 
         for (const car of cars) {
-            car.update(this.roadBorders, this.markings);
+            car.update(this.roadDividers, this.markings);
         }
 
         this.carToFollow = cars.find(

@@ -134,9 +134,15 @@ class Car {
         return new Polygon(points);
     }
 
-    #assessDamage() {
+    #assessDamage(roadDividers) {
         for (let i = 0; i < this.pathBorders.length; i++) {
             if (polygonSegmentIntersect(this.polygon, this.pathBorders[i])) {
+                return true;
+            }
+        }
+
+        for (let i = 0; i < roadDividers.length; i++) {
+            if (polygonSegmentIntersect(this.polygon, roadDividers[i])) {
                 return true;
             }
         }
@@ -151,7 +157,7 @@ class Car {
         this.showSensor = settings.showSensors;
     }
 
-    update(roadBorders, markings) {
+    update(roadDividers, markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
         if (!this.damaged) {
@@ -160,10 +166,16 @@ class Car {
                 this.fitness += 1;
             }
             this.polygon = this.#createPolygonAroundCar();
-            this.damaged = this.#assessDamage();
+            this.damaged = this.#assessDamage(roadDividers);
         }
         if (this.sensor) {
-            this.sensor.update(this.center, this.angle, roadBorders, markings);
+            this.sensor.update(
+                this.center,
+                this.angle,
+                this.pathBorders,
+                roadDividers,
+                markings
+            );
             const sensorReadings = this.sensor.getReadings();
             if (sensorReadings.targetSignReading > 0.7) {
                 this.success = true;
