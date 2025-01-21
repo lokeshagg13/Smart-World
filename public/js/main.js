@@ -1,11 +1,11 @@
-const myCanvas = document.getElementById('myCanvas');
-myCanvas.width = 600;
-myCanvas.height = 600;
+const mainCanvas = document.getElementById('mainCanvas');
+mainCanvas.width = 600;
+mainCanvas.height = 600;
 
-const ctx = myCanvas.getContext("2d");
+const mainCtx = mainCanvas.getContext("2d");
 
 let world = new World(new Graph());
-let viewport = new Viewport(myCanvas, world.zoom, world.offset);
+let viewport = new Viewport(mainCanvas, world.zoom, world.offset);
 let miniMap = new MiniMap(new MiniMapEditor(), world);
 
 let editors = {
@@ -44,7 +44,7 @@ function animate() {
         }
         const viewpoint = scale(viewport.getOffset(), -1);
         const renderRadius = viewport.getScreenRadius();
-        world.draw(ctx, viewpoint, renderRadius, currentMode);
+        world.draw(mainCtx, viewpoint, renderRadius, currentMode);
         miniMap.load(world).draw(viewpoint);
     }
 
@@ -54,7 +54,7 @@ function animate() {
 
 function clearCanvas() {
     world = new World(new Graph());
-    viewport = new Viewport(myCanvas, world.zoom, world.offset);
+    viewport = new Viewport(mainCanvas, world.zoom, world.offset);
     miniMap = new MiniMap(new MiniMapEditor(), world);
     editors = {
         graph: new GraphEditor(viewport, world),
@@ -83,6 +83,7 @@ function setMode(mode) {
     hideButtons();
     disableEditors();
     resetMarkingButtons();
+    resetHeaderControlWidth(mode);
     currentMode = mode;
     if (mode === "graph") {
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
@@ -92,16 +93,19 @@ function setMode(mode) {
         document.querySelector('#generateWorldBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.hide();
+        hideVisualizer();
     } else if (mode === "simulation") {
         document.querySelector('.simulator').style.display = "flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#exitSimulationModeBtn').style.display = "inline-flex";
+        document.querySelector('#visualizerBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.show();
     } else {
         document.querySelector('.markings').style.display = "flex";
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
+        document.querySelector('#visualizerBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
         document.querySelector('#saveWorldBtn').style.display = "inline-flex";
         document.querySelector('#disposeCarsBtn').style.display = "inline-flex";
@@ -115,6 +119,46 @@ function setMode(mode) {
             editors[mode].enable();
         }
         miniMap.show();
+    }
+}
+
+function resetHeaderControlWidth(mode) {
+    if (mode !== "graph" && mode !== "simulation") {
+        document.querySelector('.header .section').style.width= "20%";
+    } else {
+        document.querySelector('.header .section').style.width= "15%";
+    }
+}
+
+function isAdminSectionVisible() {
+    const adminSection = document.querySelector('.admin-only');
+    if (adminSection && adminSection.style.display === 'flex') {
+        return true;
+    }
+    return false;
+}
+
+function showVisualizer() {
+    document.querySelector('.app').style.display = 'flex';
+    document.querySelector('.admin-only').style.display = 'flex';
+    document.getElementById('visualizerBtn').setAttribute('title', 'Hide Visualizer');
+    document.getElementById('visualizerIcon').setAttribute('src', 'images/neural_no.svg');
+    document.getElementById('visualizerIcon').setAttribute('alt', 'Hide Visualizer');
+}
+
+function hideVisualizer() {
+    document.querySelector('.app').style.display = 'block';
+    document.querySelector('.admin-only').style.display = 'none';
+    document.getElementById('visualizerBtn').setAttribute('title', 'Show Visualizer');
+    document.getElementById('visualizerIcon').setAttribute('src', 'images/neural.svg');
+    document.getElementById('visualizerIcon').setAttribute('alt', 'Show Visualizer');
+}
+
+function toggleVisualizer() {
+    if (isAdminSectionVisible()) {
+        hideVisualizer();
+    } else {
+        showVisualizer();
     }
 }
 
@@ -152,7 +196,7 @@ async function generateWorld() {
 function saveWorldData() {
     world.zoom = viewport.zoom;
     world.offset = viewport.offset;
-    world.screenshot = myCanvas.toDataURL("image/png");
+    world.screenshot = mainCanvas.toDataURL("image/png");
 
     // Send the API request
     fetch("http://localhost:3000/api/save-world", {

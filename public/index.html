@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>AI Virtual World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
@@ -14,250 +15,270 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="header">
-      <h1>Lokesh's World</h1>
-      <div class="section">
-        <button
-          id="clearCanvasBtn"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Clear Canvas"
-        >
-          🗑️
-        </button>
-        <button
-          id="settingsBtn"
-          onclick="showSettingsModal()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="World Settings"
-        >
-          ⚙️
-        </button>
-      </div>
-    </div>
-    <div class="canvas-container">
-      <canvas id="myCanvas"></canvas>
-      <div id="miniMapContainer">
-        <button
-          class="maximize-icon"
-          id="maximizeMiniMapBtn"
-          onclick="maximizeMiniMap()"
-        >
-          ➕ Show Mini Map
-        </button>
-        <div id="maximizedMapContent">
+    <div class="app">
+      <div class="common">
+        <div class="header">
+          <h1>Lokesh's World</h1>
+          <div class="section">
+            <button
+              id="clearCanvasBtn"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Clear Canvas"
+            >
+              🗑️
+            </button>
+            <button
+              id="settingsBtn"
+              onclick="showSettingsModal()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="World Settings"
+            >
+              ⚙️
+            </button>
+            <button
+              id="visualizerBtn"
+              onclick="toggleVisualizer()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Show Visualizer"
+            >
+              <img
+                id="visualizerIcon"
+                src="images/neural.svg"
+                alt="Show Visualizer"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="main-container">
+          <canvas id="mainCanvas"></canvas>
+          <div id="miniMapContainer">
+            <button
+              class="maximize-icon"
+              id="maximizeMiniMapBtn"
+              onclick="maximizeMiniMap()"
+            >
+              ➕ Show Mini Map
+            </button>
+            <div id="maximizedMapContent">
+              <button
+                class="minimize-icon"
+                id="minimizeMiniMapBtn"
+                onclick="minimizeMiniMap()"
+              >
+                ➖
+              </button>
+              <canvas id="miniMapCanvas"></canvas>
+              <div class="resize-handle handle-left"></div>
+              <div class="resize-handle handle-bottom"></div>
+            </div>
+          </div>
+        </div>
+        <div class="markings">
           <button
-            class="minimize-icon"
-            id="minimizeMiniMapBtn"
-            onclick="minimizeMiniMap()"
+            id="stopBtn"
+            onclick="setMode('stop')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Stops Editor Mode"
           >
-            ➖
+            🛑
           </button>
-          <canvas id="miniMapCanvas"></canvas>
-          <div class="resize-handle handle-left"></div>
-          <div class="resize-handle handle-bottom"></div>
+          &nbsp;
+          <button
+            id="crossingBtn"
+            onclick="setMode('crossing')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Crossing Editor Mode"
+          >
+            🚶
+          </button>
+          &nbsp;
+          <button
+            id="startBtn"
+            onclick="setMode('start')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Car Editor Mode"
+          >
+            🚙
+          </button>
+          &nbsp;
+          <button
+            id="parkingBtn"
+            onclick="setMode('parking')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Parking Editor Mode"
+          >
+            🅿️
+          </button>
+          &nbsp;
+          <button
+            id="targetBtn"
+            onclick="setMode('target')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Target Editor Mode"
+          >
+            🎯
+          </button>
+          &nbsp;
+          <button
+            id="yieldBtn"
+            onclick="setMode('yield')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Yield Editor Mode"
+          >
+            ⚠️
+          </button>
+          &nbsp;
+          <button
+            id="trafficLightBtn"
+            onclick="setMode('trafficLight')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Light Editor Mode"
+          >
+            🚦
+          </button>
+        </div>
+        <div class="simulator">
+          <button
+            id="saveSimulationBtn"
+            onclick="saveSimulationResult()"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Save Simulation"
+          >
+            💾 🤖
+          </button>
+          &nbsp;
+          <button
+            id="resetSimulationBtn"
+            onclick="resetSimulation()"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Reset Simulation"
+          >
+            🔄 🤖
+          </button>
+          &nbsp; &nbsp; &nbsp; &nbsp;
+          <button
+            id="exitSimulationModeBtn"
+            onclick="exitSimulationMode()"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Exit Simulation Mode"
+          >
+            <span class="btn-text text-sm">Exit Simulation Mode</span>
+          </button>
+        </div>
+        <div class="controls">
+          <div class="section">
+            <button
+              id="loadWorldBtn"
+              onclick="showLoadWorldModal()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Load World"
+            >
+              📂
+              <span class="btn-text">Load World</span>
+            </button>
+            <button
+              id="saveWorldBtn"
+              onclick="saveWorldData()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Save World"
+            >
+              💾
+              <span class="btn-text">Save World</span>
+            </button>
+            <button
+              id="editWorldBtn"
+              onclick="setMode('world')"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="World Editor Mode"
+            >
+              🌐
+              <span class="btn-text">Edit World</span>
+            </button>
+          </div>
+          <div class="section">
+            <button
+              id="loadOsmGraphBtn"
+              onclick="showLoadOsmGraphModal()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Load Skeleton from OSM Data"
+            >
+              🗺️
+              <span class="btn-text text-sm">
+                <div>Load Skeleton</div>
+                <div>(using OSM data)</div>
+              </span>
+            </button>
+            <button
+              id="disposeCarsBtn"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Delete Cars"
+            >
+              🗑️
+              <span class="btn-text">Remove Cars</span>
+            </button>
+            <button
+              id="disposeMarkingsBtn"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Delete Markings"
+            >
+              🗑️
+              <span class="btn-text">Remove Markings</span>
+            </button>
+          </div>
+          <div class="section">
+            <button
+              id="generateWorldBtn"
+              onclick="generateWorld()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Generate World"
+            >
+              🌐
+              <span class="btn-text">Create World</span>
+            </button>
+            <button
+              id="editGraphBtn"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Skeleton Editor"
+            >
+              ⬟
+              <span class="btn-text">Edit Skeleton</span>
+            </button>
+            <button
+              id="simulationBtn"
+              onclick="setMode('simulation')"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Simulation Mode"
+            >
+              🤖
+              <span class="btn-text">Train Cars</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="markings">
-      <button
-        id="stopBtn"
-        onclick="setMode('stop')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Stops Editor Mode"
-      >
-        🛑
-      </button>
-      &nbsp;
-      <button
-        id="crossingBtn"
-        onclick="setMode('crossing')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Crossing Editor Mode"
-      >
-        🚶
-      </button>
-      &nbsp;
-      <button
-        id="startBtn"
-        onclick="setMode('start')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Car Editor Mode"
-      >
-        🚙
-      </button>
-      &nbsp;
-      <button
-        id="parkingBtn"
-        onclick="setMode('parking')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Parking Editor Mode"
-      >
-        🅿️
-      </button>
-      &nbsp;
-      <button
-        id="targetBtn"
-        onclick="setMode('target')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Target Editor Mode"
-      >
-        🎯
-      </button>
-      &nbsp;
-      <button
-        id="yieldBtn"
-        onclick="setMode('yield')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Yield Editor Mode"
-      >
-        ⚠️
-      </button>
-      &nbsp;
-      <button
-        id="trafficLightBtn"
-        onclick="setMode('trafficLight')"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Light Editor Mode"
-      >
-        🚦
-      </button>
-    </div>
-    <div class="simulator">
-      <button
-        id="saveSimulationBtn"
-        onclick="saveSimulationResult()"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Save Simulation"
-      >
-        💾 🤖
-      </button>
-      &nbsp;
-      <button
-        id="resetSimulationBtn"
-        onclick="resetSimulation()"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Reset Simulation"
-      >
-        🔄 🤖
-      </button>
-      &nbsp; &nbsp; &nbsp; &nbsp;
-      <button
-        id="exitSimulationModeBtn"
-        onclick="exitSimulationMode()"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Exit Simulation Mode"
-      >
-        <span class="btn-text text-sm">Exit Simulation Mode</span>
-      </button>
-    </div>
-    <div class="controls">
-      <div class="section">
-        <button
-          id="loadWorldBtn"
-          onclick="showLoadWorldModal()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Load World"
-        >
-          📂
-          <span class="btn-text">Load World</span>
-        </button>
-        <button
-          id="saveWorldBtn"
-          onclick="saveWorldData()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Save World"
-        >
-          💾
-          <span class="btn-text">Save World</span>
-        </button>
-        <button
-          id="editWorldBtn"
-          onclick="setMode('world')"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="World Editor Mode"
-        >
-          🌐
-          <span class="btn-text">Edit World</span>
-        </button>
-      </div>
-      <div class="section">
-        <button
-          id="loadOsmGraphBtn"
-          onclick="showLoadOsmGraphModal()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Load Skeleton from OSM Data"
-        >
-          🗺️
-          <span class="btn-text text-sm">
-            <div>Load Skeleton</div>
-            <div>(using OSM data)</div>
-          </span>
-        </button>
-        <button
-          id="disposeCarsBtn"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Delete Cars"
-        >
-          🗑️
-          <span class="btn-text">Remove Cars</span>
-        </button>
-        <button
-          id="disposeMarkingsBtn"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Delete Markings"
-        >
-          🗑️
-          <span class="btn-text">Remove Markings</span>
-        </button>
-      </div>
-      <div class="section">
-        <button
-          id="generateWorldBtn"
-          onclick="generateWorld()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Generate World"
-        >
-          🌐
-          <span class="btn-text">Create World</span>
-        </button>
-        <button
-          id="editGraphBtn"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Skeleton Editor"
-        >
-          ⬟
-          <span class="btn-text">Edit Skeleton</span>
-        </button>
-        <button
-          id="simulationBtn"
-          onclick="setMode('simulation')"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Simulation Mode"
-        >
-          🤖
-          <span class="btn-text">Train Cars</span>
-        </button>
+      <div class="admin-only">
+        <canvas id="visualizer-canvas"></canvas>
       </div>
     </div>
 
@@ -861,7 +882,7 @@
     <script src="js/osm/osm.js"></script>
     <script src="js/main.js"></script>
     <script>
-      const canvasWidth = myCanvas.offsetWidth;
+      const canvasWidth = mainCanvas.offsetWidth;
       document.querySelector(".header").style.width = `${canvasWidth}px`;
       document.querySelector(".controls").style.width = `${canvasWidth}px`;
     </script>

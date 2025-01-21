@@ -1,9 +1,51 @@
 body {
   background-color: black;
+}
+
+.app {
+  display: block;
+}
+
+.common {
   display: flex;
   flex-direction: column;
   margin-top: 5rem;
+  margin-left: 5rem;
   align-items: center;
+}
+
+.admin-only {
+  display: none;
+}
+
+@media (max-width: 1440px) {
+  .common {
+    width: 70%;
+  }
+
+  .admin-only {
+    width: 30%;
+  }
+}
+
+@media (max-width: 768px) {
+  .common {
+    width: 100%;
+  }
+
+  .admin-only {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .common {
+    width: 100%;
+  }
+
+  .admin-only {
+    width: 100%;
+  }
 }
 
 h1 {
@@ -11,13 +53,13 @@ h1 {
   font-family: Arial;
 }
 
-.canvas-container {
+.main-container {
   position: relative;
   width: 600px;
   height: 600px;
 }
 
-#myCanvas {
+#mainCanvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -100,6 +142,15 @@ button {
   justify-content: space-between;
   width: 15%;
   align-items: center;
+}
+
+#visualizerBtn {
+  padding: 9px 5px;
+}
+
+#visualizerBtn img {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .markings,
