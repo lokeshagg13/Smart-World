@@ -513,6 +513,13 @@ class World {
             }
         }
 
+        // Visualizer
+        if (this.carToFollow && this.carToFollow.brain) {
+            Visualizer.drawNetwork(this.carToFollow.brain.network);
+        } else {
+            Visualizer.drawNetwork(new Brain().network);
+        }
+
         // Buildings & Trees
         const items = [...this.buildings, ...this.trees].filter(
             (i) => i.base.distanceToPoint(viewpoint) < renderRadius

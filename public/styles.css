@@ -16,6 +16,7 @@ body {
 
 .admin-only {
   display: none;
+  margin-left: 2rem;
 }
 
 @media (max-width: 1440px) {
@@ -65,6 +66,10 @@ h1 {
   left: 0;
   z-index: 1;
   background-color: #2a5;
+}
+
+#visualizerCanvas {
+  background-color: rgb(68, 68, 68);
 }
 
 #miniMapContainer {

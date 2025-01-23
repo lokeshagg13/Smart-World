@@ -169,7 +169,7 @@ class MultiSensorRay extends RoadSensorRay {
         return farthestTouch;
     }
 
-    #drawReadingsForMarkings(markingReading, color) {
+    #drawReadingsForMarkings(ctx, markingReading, color) {
         if (!markingReading) {
             return;
         }
@@ -228,12 +228,12 @@ class MultiSensorRay extends RoadSensorRay {
 
     draw(ctx) {
         super.draw(ctx);
-        this.#drawReadingsForMarkings(this.parkingSignReading, "#FF5733"); // Vivid Orange
-        this.#drawReadingsForMarkings(this.trafficLightReading, "#33FF57"); // Bright Green
-        this.#drawReadingsForMarkings(this.crossingSignReading, "#3357FF"); // Deep Blue
-        this.#drawReadingsForMarkings(this.yeildSignReading, "#FFD433"); // Sunny Yellow
-        this.#drawReadingsForMarkings(this.stopSignReading, "#8E33FF"); // Vibrant Purple
-        this.#drawReadingsForMarkings(this.targetSignReading, "#FF33A8"); // Bold Pink
+        this.#drawReadingsForMarkings(ctx, this.parkingSignReading, "#FF5733"); // Vivid Orange
+        this.#drawReadingsForMarkings(ctx, this.trafficLightReading, "#33FF57"); // Bright Green
+        this.#drawReadingsForMarkings(ctx, this.crossingSignReading, "#3357FF"); // Deep Blue
+        this.#drawReadingsForMarkings(ctx, this.yeildSignReading, "#FFD433"); // Sunny Yellow
+        this.#drawReadingsForMarkings(ctx, this.stopSignReading, "#8E33FF"); // Vibrant Purple
+        this.#drawReadingsForMarkings(ctx, this.targetSignReading, "#FF33A8"); // Bold Pink
     }
 
 }

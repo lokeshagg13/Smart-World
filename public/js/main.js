@@ -1,12 +1,19 @@
 const mainCanvas = document.getElementById('mainCanvas');
 mainCanvas.width = 600;
 mainCanvas.height = 600;
+const visualizerCanvas = document.getElementById('visualizerCanvas');
+visualizerCanvas.width = 300;
+visualizerCanvas.height = 300;
 
 const mainCtx = mainCanvas.getContext("2d");
+const visualizerCtx = visualizerCanvas.getContext("2d");
 
 let world = new World(new Graph());
 let viewport = new Viewport(mainCanvas, world.zoom, world.offset);
 let miniMap = new MiniMap(new MiniMapEditor(), world);
+
+Visualizer.reset();
+Visualizer.addEventListeners();
 
 let editors = {
     graph: new GraphEditor(viewport, world),
@@ -33,9 +40,10 @@ addEventListeners();
 
 animate();
 
-function animate() {
+function animate(time) {
     viewport.reset();
     if (currentMode !== "graph") {
+        visualizerCtx.lineDashOffset = -time / 60;
         if (world.carToFollow) {
             viewport.setOffset(world.carToFollow.center);
         }
@@ -124,9 +132,9 @@ function setMode(mode) {
 
 function resetHeaderControlWidth(mode) {
     if (mode !== "graph" && mode !== "simulation") {
-        document.querySelector('.header .section').style.width= "20%";
+        document.querySelector('.header .section').style.width = "20%";
     } else {
-        document.querySelector('.header .section').style.width= "15%";
+        document.querySelector('.header .section').style.width = "15%";
     }
 }
 

@@ -1,6 +1,6 @@
 class Brain {
     constructor() {
-        this.network = new NeuralNetwork([9, 6, 4]);
+        this.network = new NeuralNetwork([9, 6, 4]); 
 
         // First Level - Biases
         this.network.levels[0].biases[0] = -0.9;

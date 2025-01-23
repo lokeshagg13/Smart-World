@@ -155,9 +155,9 @@ function polygonsIntersect(poly1, poly2) {
 }
 
 function getRGBA(value) {
-    const alpha = Math.abs(value);
+    const alpha = Math.abs(value) ** 0.4;
     const R = value < 0 ? 0 : 255;
-    const G = R;
     const B = value > 0 ? 0 : 255;
+    const G = Math.floor(R * 0.7) + Math.floor(B * 0.5);
     return "rgba(" + R + "," + G + "," + B + "," + alpha + ")";
 }
