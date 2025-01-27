@@ -428,6 +428,15 @@ class World {
         );
     }
 
+    #removeDamagedCars() {
+        this.markings = this.markings.filter(m => !(m instanceof StartMarking) ||
+            (
+                (m instanceof StartMarking) &&
+                (m.car.damaged === false)
+            )
+        );
+    }
+
     #removeDisconnectedMarkings() {
         for (let i = 0; i < this.markings.length; i++) {
             const markingCenter = this.markings[i].center;
@@ -485,6 +494,7 @@ class World {
 
         if (currentMode !== "simulation") {
             this.#removeSuccessfulCars();
+            this.#removeDamagedCars();
         }
 
         this.frameCount++;
