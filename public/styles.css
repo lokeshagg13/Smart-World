@@ -16,7 +16,14 @@ body {
 
 .admin-only {
   display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-left: 12rem;
+}
+
+.admin-controls {
+  margin: 2rem 0;
 }
 
 @media (max-width: 1440px) {

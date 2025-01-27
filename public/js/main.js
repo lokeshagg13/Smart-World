@@ -2,7 +2,7 @@ const mainCanvas = document.getElementById('mainCanvas');
 mainCanvas.width = 600;
 mainCanvas.height = 600;
 const visualizerCanvas = document.getElementById('visualizerCanvas');
-visualizerCanvas.width = 400;
+visualizerCanvas.width = 500;
 visualizerCanvas.height = 600;
 
 const mainCtx = mainCanvas.getContext("2d");
@@ -84,6 +84,13 @@ function disposeMarkings() {
 
 function disposeCars() {
     world.markings = world.markings.filter((m) => !(m instanceof StartMarking));
+}
+
+function resetCarBrain() {
+    const tempBrain = new Brain();
+    tempBrain.resetToDefault();
+    tempBrain.save();
+    Visualizer.brain = tempBrain;
 }
 
 function setMode(mode) {
