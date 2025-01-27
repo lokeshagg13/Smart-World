@@ -12,10 +12,7 @@ class StartEditor extends MarkingEditor {
             this.world.settings.isLHT,
             false
         );
-        const bestBrainString = localStorage.getItem("bestBrain");
-        if (bestBrainString) {
-            startMarking.car.brain = JSON.parse(bestBrainString);
-        }
+        startMarking.car.brain = new Brain();
         return startMarking;
     }
 }

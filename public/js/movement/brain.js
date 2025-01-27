@@ -1,7 +1,15 @@
 class Brain {
     constructor() {
-        this.network = new NeuralNetwork([9, 6, 4]); 
+        this.network = new NeuralNetwork([9, 6, 4]);
+        const bestBrainString = localStorage.getItem('bestBrain');
+        if (bestBrainString) {
+            this.network = JSON.parse(bestBrainString).network;
+        } else {
+            this.resetToDefault();
+        }
+    }
 
+    resetToDefault() {
         // First Level - Biases
         this.network.levels[0].biases[0] = -0.9;
         this.network.levels[0].biases[1] = -0.9;  // Speed cap (to make smoother turns, keep this value bigger and to make sharp turns, make this closer to -1)
@@ -51,6 +59,20 @@ class Brain {
         this.network.levels[1].weights[3][1] = -0.1;
         this.network.levels[1].weights[4][2] = 0.1;
         this.network.levels[1].weights[5][3] = 0.1;
+    }
+
+    setWeight(weight, levelIndex, fromNodeIndex, toNodeIndex) {
+        this.network.levels[levelIndex].weights[fromNodeIndex][toNodeIndex] = weight;
+        this.save();
+    }
+
+    setBias(bias, levelIndex, atNodeIndex) {
+        this.network.levels[levelIndex].biases[atNodeIndex] = bias;
+        this.save();
+    }
+
+    save() {
+        localStorage.setItem("bestBrain", JSON.stringify(this));
     }
 
     static getControls({

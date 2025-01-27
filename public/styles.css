@@ -16,7 +16,7 @@ body {
 
 .admin-only {
   display: none;
-  margin-left: 2rem;
+  margin-left: 12rem;
 }
 
 @media (max-width: 1440px) {

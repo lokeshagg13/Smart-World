@@ -2,8 +2,8 @@ const mainCanvas = document.getElementById('mainCanvas');
 mainCanvas.width = 600;
 mainCanvas.height = 600;
 const visualizerCanvas = document.getElementById('visualizerCanvas');
-visualizerCanvas.width = 300;
-visualizerCanvas.height = 300;
+visualizerCanvas.width = 400;
+visualizerCanvas.height = 600;
 
 const mainCtx = mainCanvas.getContext("2d");
 const visualizerCtx = visualizerCanvas.getContext("2d");
@@ -492,7 +492,7 @@ function checkForSimulationSuccess() {
 
     if (successfulCarMarking) {
         if (successfulCarMarking.car.brain) {
-            localStorage.setItem("bestBrain", JSON.stringify(successfulCarMarking.car.brain));
+            successfulCarMarking.car.brain.save();
         }
         resetSimulation();
         showSaveConfirmationModal(`The current simulation is successful and the car has learned to 
@@ -502,7 +502,7 @@ function checkForSimulationSuccess() {
 
 function saveSimulationResult() {
     if (world.carToFollow && world.carToFollow.brain) {
-        localStorage.setItem("bestBrain", JSON.stringify(world.carToFollow.brain));
+        world.carToFollow.brain.save();
         showSaveConfirmationModal("Simulation saved successfully.");
         // Remove all simulation cars
         resetSimulation();

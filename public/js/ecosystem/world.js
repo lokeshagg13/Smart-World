@@ -515,9 +515,9 @@ class World {
 
         // Visualizer
         if (this.carToFollow && this.carToFollow.brain) {
-            Visualizer.drawNetwork(this.carToFollow.brain.network);
+            Visualizer.display(this.carToFollow.brain);
         } else {
-            Visualizer.drawNetwork(new Brain().network);
+            Visualizer.display(new Brain());
         }
 
         // Buildings & Trees
