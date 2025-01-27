@@ -128,7 +128,7 @@ class World {
 
     async #generateRoads(progressTracker) {
         this.roadPaths.length = 0;
-        const roadPaths = []
+        const roadPaths = [];
         progressTracker.reset(this.graph.segments.length, 'Generating roads');
         for (const segment of this.graph.segments) {
             roadPaths.push(
@@ -475,12 +475,15 @@ class World {
 
     generateCarPath(path) {
         const pathSegments = [];
-
         for (let i = 1; i < path.length; i++) {
-            pathSegments.push(new Segment(path[i - 1], path[i]));
+            const segment = new Segment(path[i - 1], path[i]);
+            const roadAngle = angle(perpendicular(segment.directionVector()))
+            const p1 = translate(path[i - 1], roadAngle, -this.settings.roadWidth * 0.25);
+            const p2 = translate(path[i], roadAngle, -this.settings.roadWidth * 0.25);
+            pathSegments.push(new Segment(p1, p2));
         }
         const tmpEnvelopes = pathSegments.map(
-            (s) => new Envelope(s, this.settings.roadWidth, this.settings.roadRoundness)
+            (s) => new Envelope(s, this.settings.roadWidth * 0.5, this.settings.roadRoundness)
         );
 
         const pathBorders = Polygon.union(tmpEnvelopes.map((e) => e.polygon));
