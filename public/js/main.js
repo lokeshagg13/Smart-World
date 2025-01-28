@@ -42,6 +42,7 @@ animate();
 
 function animate(time) {
     viewport.reset();
+    const viewpoint = scale(viewport.getOffset(), -1);
     if (currentMode !== "graph") {
         visualizerCtx.lineDashOffset = -time / 60;
         if (world.carToFollow) {
@@ -50,10 +51,21 @@ function animate(time) {
         if (currentMode === "simulation" && editors['simulation'].running) {
             checkForSimulationSuccess();
         }
-        const viewpoint = scale(viewport.getOffset(), -1);
         const renderRadius = viewport.getScreenRadius();
         world.draw(mainCtx, viewpoint, renderRadius, currentMode);
         miniMap.load(world).draw(viewpoint);
+    } else if (!world.graph || world.graph.points.length === 0) {
+        viewpoint.draw(mainCtx, { size: mainCanvas.width / 2, color: "rgba(0,0,0,0.1)" });
+        mainCtx.beginPath();
+        mainCtx.textAlign = "center";
+        mainCtx.textBaseline = "middle";
+        mainCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
+        mainCtx.font = "100px Arial";
+        mainCtx.fillText(
+            "REF",
+            viewpoint.x,
+            viewpoint.y
+        );
     }
 
     editors[currentMode]?.display();

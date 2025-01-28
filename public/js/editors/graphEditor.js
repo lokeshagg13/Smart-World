@@ -107,9 +107,9 @@ class GraphEditor {
         if (this.selectedPoint) {
             const intent = this.nearestPoint ? this.nearestPoint : this.hoveredPoint;
             if (!this.nearestPoint) {
-                new Point(intent.x, intent.y).draw(ctx, { color: "rgba(0,0,0,0.5)" });
+                new Point(intent.x, intent.y).draw(this.ctx, { color: "rgba(0,0,0,0.5)" });
             }
-            new Segment(this.selectedPoint, intent).draw(ctx, { dash: [3, 3] });
+            new Segment(this.selectedPoint, intent).draw(this.ctx, { dash: [3, 3] });
             this.selectedPoint.draw(this.ctx, { outline: true });
         }
     }
