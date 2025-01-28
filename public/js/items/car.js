@@ -137,15 +137,9 @@ class Car {
         return new Polygon(points);
     }
 
-    #assessDamage(roadDividers) {
+    #assessDamage() {
         for (let i = 0; i < this.pathBorders.length; i++) {
             if (polygonSegmentIntersect(this.polygon, this.pathBorders[i])) {
-                return true;
-            }
-        }
-
-        for (let i = 0; i < roadDividers.length; i++) {
-            if (polygonSegmentIntersect(this.polygon, roadDividers[i])) {
                 return true;
             }
         }
@@ -158,18 +152,22 @@ class Car {
         this.acceleration = settings.carAcceleration;
         this.friction = settings.roadFriction;
         this.showSensor = settings.showSensors;
-        if (this.controlType === "AI" && settings.carControlType === "KEYS") {
-            this.controls = {
-                forward: false,
-                left: false,
-                right: false,
-                reverse: false
-            };
+        if (this.isSimulation) {
+            this.controlType = "AI";
+        } else {
+            if (this.controlType === "AI" && settings.carControlType === "KEYS") {
+                this.controls = {
+                    forward: false,
+                    left: false,
+                    right: false,
+                    reverse: false
+                };
+            }
+            this.controlType = settings.carControlType;
         }
-        this.controlType = settings.carControlType;
     }
 
-    update(roadDividers, markings) {
+    update(markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
         if (!this.damaged) {
@@ -178,14 +176,13 @@ class Car {
                 this.fitness += 1;
             }
             this.polygon = this.#createPolygonAroundCar();
-            this.damaged = this.#assessDamage(roadDividers);
+            this.damaged = this.#assessDamage();
         }
         if (this.sensor) {
             this.sensor.update(
                 this.center,
                 this.angle,
                 this.pathBorders,
-                roadDividers,
                 markings
             );
             const sensorReadings = this.sensor.getReadings();

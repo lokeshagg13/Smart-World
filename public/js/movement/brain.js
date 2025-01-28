@@ -15,8 +15,8 @@ class Brain {
         this.network.levels[0].biases[1] = -0.9;  // Speed cap (to make smoother turns, keep this value bigger and to make sharp turns, make this closer to -1)
         this.network.levels[0].biases[2] = -0.9;
         this.network.levels[0].biases[3] = 0.85;
-        this.network.levels[0].biases[4] = -0.1;  // Left turn
-        this.network.levels[0].biases[5] = 0.09;  // Right turn
+        this.network.levels[0].biases[4] = 0;  // Left turn
+        this.network.levels[0].biases[5] = 0;  // Right turn
         // First Level - Weights
         // For weights[x][y], x = 0 (frontReading), 
         //                        1 (speed), 

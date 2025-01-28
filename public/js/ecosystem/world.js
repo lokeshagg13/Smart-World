@@ -404,7 +404,7 @@ class World {
             );
 
         for (const car of cars) {
-            car.update(this.roadDividers, this.markings);
+            car.update(this.markings);
         }
 
         this.carToFollow = cars.find(
@@ -432,6 +432,7 @@ class World {
         this.markings = this.markings.filter(m => !(m instanceof StartMarking) ||
             (
                 (m instanceof StartMarking) &&
+                (m.car.isSimulation === false) &&
                 (m.car.damaged === false)
             )
         );
@@ -473,11 +474,11 @@ class World {
         }
     }
 
-    generateCarPath(path) {
+    generateCarPath(carCenter, carAngle, path) {
         const pathSegments = [];
         for (let i = 1; i < path.length; i++) {
             const segment = new Segment(path[i - 1], path[i]);
-            const roadAngle = angle(perpendicular(segment.directionVector()))
+            const roadAngle = angle(perpendicular(segment.directionVector()));
             const p1 = translate(path[i - 1], roadAngle, -this.settings.roadWidth * 0.25);
             const p2 = translate(path[i], roadAngle, -this.settings.roadWidth * 0.25);
             pathSegments.push(new Segment(p1, p2));
@@ -486,6 +487,25 @@ class World {
             (s) => new Envelope(s, this.settings.roadWidth * 0.5, this.settings.roadRoundness)
         );
 
+        const isUturnNeeded = !tmpEnvelopes.find(
+            (envelope) => envelope.polygon.containsPoint(
+                carCenter
+            )
+        );
+        if (isUturnNeeded) {
+            const uturnCenter = translate(
+                carCenter,
+                carAngle,
+                this.settings.roadWidth * 0.25
+            );
+            tmpEnvelopes.push(
+                new Envelope(
+                    new Segment(uturnCenter, uturnCenter),
+                    this.settings.roadWidth,
+                    this.settings.roadRoundness
+                )
+            );
+        }
         const pathBorders = Polygon.union(tmpEnvelopes.map((e) => e.polygon));
         return pathBorders;
     }

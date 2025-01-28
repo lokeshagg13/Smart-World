@@ -99,7 +99,7 @@ class Graph {
         this.tryAddPoint(projectedPoint);
         this.tryAddSegment(new Segment(nearestSegment.p1, projectedPoint));
         this.tryAddSegment(new Segment(projectedPoint, nearestSegment.p2));
-        return projectedPoint;
+        return { projectedPoint, nearestSegment };
     }
 
     getSegmentsWithPoint(point) {
@@ -134,8 +134,13 @@ class Graph {
 
     getShortestPath(carCenter, targetCenter) {
         // Add points to graph based on car and target center
-        const startPoint = this.interpolate(carCenter);
-        const endPoint = this.interpolate(targetCenter);
+        const { projectedPoint: startPoint, nearestSegment: startSegment } = this.interpolate(carCenter);
+        const { projectedPoint: endPoint, nearestSegment: endSegment } = this.interpolate(targetCenter);
+
+        // If start point and end point lie on same segment
+        if (startSegment.equals(endSegment)) {
+            this.tryAddSegment(new Segment(startPoint, endPoint));
+        }
 
         // 'distances' map stores the distance of a point from the startPoint
         const distances = new Map();

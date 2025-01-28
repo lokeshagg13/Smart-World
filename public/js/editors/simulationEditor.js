@@ -59,7 +59,11 @@ class SimulationEditor {
                         this.intent.center,
                         currentTargetMarking.center
                     );
-                    const shortestPathBorders = this.world.generateCarPath(shortestPath);
+                    const shortestPathBorders = this.world.generateCarPath(
+                        this.intent.center,
+                        this.intent.angle,
+                        shortestPath
+                    );
                     const bestBrain = new Brain();
 
                     for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
@@ -71,9 +75,7 @@ class SimulationEditor {
                         startMarking.car.target = currentTargetMarking;
                         startMarking.car.path = shortestPath;
                         startMarking.car.pathBorders = shortestPathBorders;
-                        if (bestBrainString) {
-                            startMarking.car.brain = bestBrain;
-                        }
+                        startMarking.car.brain = bestBrain;
                         if (i != 0) {
                             NeuralNetwork.mutate(startMarking.car.brain.network, this.world.settings.simulationDiffFactor)
                         }
