@@ -2,7 +2,8 @@ class MiniMapEditor {
     constructor() {
         this.minSize = 100;
         this.maxSize = 250;
-
+        this.zoom = 0.05;
+        this.zoomRange = [0.005, 0.4];
         this.container = document.getElementById('miniMapContainer');
         this.canvas = document.getElementById('miniMapCanvas');
         this.resizeHandles = document.querySelectorAll('.resize-handle');
@@ -31,12 +32,15 @@ class MiniMapEditor {
             resizeHandle.boundMouseDown = this.#handleMouseDown.bind(this);
             resizeHandle.addEventListener("mousedown", resizeHandle.boundMouseDown);
         });
+        this.canvas.boundMouseWheel = this.#handleMouseWheel.bind(this);
+        this.canvas.addEventListener("mousewheel", this.canvas.boundMouseWheel);
     }
 
     #removeEventListeners() {
         this.resizeHandles.forEach((resizeHandle) => {
             resizeHandle.removeEventListener("mousedown", resizeHandle.boundMouseDown);
         });
+        this.canvas.removeEventListener("mousewheel", this.canvas.boundMouseWheel);
     }
 
     #handleMouseDown(ev) {
@@ -71,6 +75,14 @@ class MiniMapEditor {
         this.container.style.height = `${newSize}px`;
         this.canvas.width = newSize;
         this.canvas.height = newSize;
+    }
+
+    #handleMouseWheel(ev) {
+        ev.preventDefault();
+        const dir = Math.sign(ev.deltaY);
+        const step = 0.005;
+        this.zoom += dir * step;
+        this.zoom = Math.max(this.zoomRange[0], Math.min(this.zoomRange[1], this.zoom));
     }
 
     #stopResize() {
