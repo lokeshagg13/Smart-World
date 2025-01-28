@@ -476,11 +476,12 @@ class World {
 
     generateCarPath(carCenter, carAngle, path) {
         const pathSegments = [];
+        const trafficSideFactor = this.settings.isLHT ? -1 : 1;
         for (let i = 1; i < path.length; i++) {
             const segment = new Segment(path[i - 1], path[i]);
             const roadAngle = angle(perpendicular(segment.directionVector()));
-            const p1 = translate(path[i - 1], roadAngle, -this.settings.roadWidth * 0.25);
-            const p2 = translate(path[i], roadAngle, -this.settings.roadWidth * 0.25);
+            const p1 = translate(path[i - 1], roadAngle, trafficSideFactor * this.settings.roadWidth * 0.25);
+            const p2 = translate(path[i], roadAngle, trafficSideFactor * this.settings.roadWidth * 0.25);
             pathSegments.push(new Segment(p1, p2));
         }
         const tmpEnvelopes = pathSegments.map(
@@ -496,7 +497,7 @@ class World {
             const uturnCenter = translate(
                 carCenter,
                 carAngle,
-                this.settings.roadWidth * 0.25
+                -trafficSideFactor * this.settings.roadWidth * 0.25
             );
             tmpEnvelopes.push(
                 new Envelope(
