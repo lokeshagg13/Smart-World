@@ -217,13 +217,14 @@ async function generateWorld() {
         return;
     }
     await world.generate();
+    viewport.setMaxZoom();
     viewport.setOffset(world.graph.getCenter());
     setMode('world');
 }
 
 function saveWorldData() {
     world.zoom = viewport.zoom;
-    world.offset = viewport.offset;
+    world.offset = scale(viewport.offset, -1);
     world.screenshot = mainCanvas.toDataURL("image/png");
 
     // Send the API request
@@ -244,7 +245,7 @@ function saveWorldData() {
             }
             return response.json();
         })
-        .then((data) => {
+        .then(() => {
             showSaveConfirmationModal("World saved successfully.");
         })
         .catch((error) => {
@@ -284,7 +285,8 @@ function loadWorldData(worldId) {
             setTimeout(() => {
                 hideLoadingModal();
                 setMode('world');
-                viewport.setOffset(world.graph.getCenter());
+                viewport.setOffset(world.offset || world.graph.getCenter());
+                viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
             }, 3000);
         })
         .catch((error) => {

@@ -74,7 +74,7 @@ class World {
             (m) => Marking.load(m)
         );
         world.zoom = info.zoom;
-        world.offset = info.offset;
+        world.offset = new Point(info.offset.x, info.offset.y);
         return world;
     }
 

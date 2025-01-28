@@ -46,6 +46,14 @@ class Viewport {
         }
     }
 
+    setCustomZoom(zoomVal) {
+        this.zoom = Math.max(this.zoomRange[0], Math.min(this.zoomRange[1], zoomVal))
+    }
+
+    setMaxZoom() {
+        this.zoom = this.zoomRange[1];
+    }
+
     getScreenRadius() {
         const factor = normalizeValue(viewport.zoom, this.zoomRange[0], this.zoomRange[1], 0.6, 2.5);
         return 2 * this.canvas.width * factor;
