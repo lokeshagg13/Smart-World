@@ -484,6 +484,14 @@ class World {
             const p2 = translate(path[i], roadAngle, trafficSideFactor * this.settings.roadWidth * 0.25);
             pathSegments.push(new Segment(p1, p2));
         }
+        for (let i = 1; i < pathSegments.length; i++) {
+            const segment1 = pathSegments[i - 1];
+            const segment2 = pathSegments[i];
+            const intersection = getIntersection(segment1.p1, segment1.p2, segment2.p1, segment2.p2, true);
+            if (intersection) {
+                segment1.p2 = segment2.p1 = new Point(intersection.x, intersection.y);
+            }
+        }
         const tmpEnvelopes = pathSegments.map(
             (s) => new Envelope(s, this.settings.roadWidth * 0.5, this.settings.roadRoundness)
         );
