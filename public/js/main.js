@@ -120,6 +120,7 @@ function setMode(mode) {
         document.querySelector('.markings').style.display = "flex";
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
+        document.querySelector('#manualOverrideBtn').style.display = "inline-flex";
         document.querySelector('#visualizerBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
         document.querySelector('#saveWorldBtn').style.display = "inline-flex";
@@ -139,7 +140,7 @@ function setMode(mode) {
 
 function resetHeaderControlWidth(mode) {
     if (mode !== "graph" && mode !== "simulation") {
-        document.querySelector('.header .section').style.width = "20%";
+        document.querySelector('.header .section').style.width = "25%";
     } else {
         document.querySelector('.header .section').style.width = "15%";
     }
@@ -175,6 +176,18 @@ function toggleVisualizer() {
     } else {
         showVisualizer();
     }
+}
+
+function toggleCarControlType() {
+    const currentType = world.settings.carControlType;
+    if (currentType === "AI") {
+        world.settings.carControlType = "KEYS";
+        document.getElementById("manualOverrideBtn").style.backgroundColor = "rgb(0, 85, 255)";
+    } else {
+        world.settings.carControlType = "AI";
+        document.getElementById("manualOverrideBtn").style.backgroundColor = "white";
+    }
+    world.settings.save();
 }
 
 function hideToolboxes() {
