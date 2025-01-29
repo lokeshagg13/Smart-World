@@ -102,7 +102,7 @@ class GraphEditor {
     display() {
         this.world.graph.draw(this.ctx);
         if (this.nearestPoint) {
-            this.nearestPoint.draw(this.ctx, { fill: true })
+            this.nearestPoint.draw(this.ctx, { innerFill: true, innerFillColor: "yellow" })
         }
         if (this.selectedPoint) {
             const intent = this.nearestPoint ? this.nearestPoint : this.hoveredPoint;

@@ -40,6 +40,15 @@ class Graph {
         return nearestSegment;
     }
 
+    static projectPointOnNearestSegment(point, segments) {
+        const nearestSegment = Graph.getNearestSegment(point, segments);
+        let projectedPoint = nearestSegment.projectPoint(point);
+        if (projectedPoint) {
+            projectedPoint = projectedPoint.point;
+        }
+        return { projectedPoint, nearestSegment };
+    }
+
     hash() {
         return JSON.stringify(this);
     }
@@ -91,11 +100,7 @@ class Graph {
     }
 
     interpolate(point) {
-        const nearestSegment = Graph.getNearestSegment(point, this.segments);
-        let projectedPoint = nearestSegment.projectPoint(point);
-        if (projectedPoint) {
-            projectedPoint = projectedPoint.point;
-        }
+        const { projectedPoint, nearestSegment } = Graph.projectPointOnNearestSegment(point, this.segments);
         this.tryAddPoint(projectedPoint);
         this.tryAddSegment(new Segment(nearestSegment.p1, projectedPoint));
         this.tryAddSegment(new Segment(projectedPoint, nearestSegment.p2));

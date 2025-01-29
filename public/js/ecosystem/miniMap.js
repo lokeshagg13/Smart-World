@@ -60,7 +60,7 @@ class MiniMap {
             if (targetMarking.index >= 0) {
                 targetMarking = targetMarking.element;
                 new Point(targetMarking.center.x, targetMarking.center.y)
-                    .draw(this.ctx, { size: 12.5 / scaler, color: "red", outline: true });
+                    .draw(this.ctx, { size: 12.5 / scaler, color: "red", outline: true, outlineColor: "black" });
                 new Point(targetMarking.center.x, targetMarking.center.y)
                     .draw(this.ctx, { size: 7.5 / scaler, color: "white", outline: true });
                 new Point(targetMarking.center.x, targetMarking.center.y)
@@ -78,21 +78,32 @@ class MiniMap {
                 }
             }
 
-            // Draw path to target
-            if (this.world.carToFollow && this.world.carToFollow.path.length > 0) {
-                const path = this.world.carToFollow.path;
-                path[0].draw(this.ctx, { size: 12.5 / scaler, color: "yellow", outline: true });
-                for (let i = 1; i < path.length; i++) {
-                    new Segment(path[i - 1], path[i]).draw(this.ctx, { width: 2 / scaler, color: "cyan" });
+            // Draw current position of car and its path to target
+            if (this.world.carToFollow) {
+                let pathSegments = [];
+                if (this.world.carToFollow.path.length > 0) {
+                    // Draw Path
+                    const path = this.world.carToFollow.path;
+                    path[0].draw(this.ctx, { size: 12.5 / scaler, color: "yellow", outline: true, outlineColor: "white" });
+                    for (let i = 1; i < path.length; i++) {
+                        const segment = new Segment(path[i - 1], path[i]);
+                        segment.draw(this.ctx, { width: 2 / scaler, color: "cyan" });
+                        pathSegments.push(segment);
+                    }
+                }
+
+                const carProjection = Graph.projectPointOnNearestSegment(
+                    this.world.carToFollow.center,
+                    pathSegments.length > 0 ? pathSegments : this.world.graph.segments
+                );
+                if (carProjection) {
+                    carProjection.projectedPoint.draw(this.ctx, { size: 12.5 / scaler, color: "blue", outline: true, outlineColor: "white" });
+                } else {
+                    this.world.carToFollow.center.draw(this.ctx, { size: 12.5 / scaler, color: "blue", outline: true, outlineColor: "white" });
                 }
             }
 
-            // Draw car 
             this.ctx.restore();
-            if (this.world.carToFollow) {
-                new Point(width / 2, height / 2)
-                    .draw(this.ctx, { color: "blue", outline: true });
-            }
         }
     }
 }
