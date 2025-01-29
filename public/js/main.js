@@ -18,6 +18,8 @@ Visualizer.addEventListeners();
 let editors = {
     graph: new GraphEditor(viewport, world),
     simulation: new SimulationEditor(viewport, world),
+    world: new WorldEditor(viewport, world),
+    select: new SelectEditor(viewport, world),
     start: new StartEditor(viewport, world),
     stop: new StopEditor(viewport, world),
     yield: new YieldEditor(viewport, world),
@@ -45,7 +47,7 @@ function animate(time) {
     const viewpoint = scale(viewport.getOffset(), -1);
     if (currentMode !== "graph") {
         visualizerCtx.lineDashOffset = -time / 60;
-        if (world.carToFollow) {
+        if (currentMode === "world" && world.carToFollow) {
             viewport.setOffset(world.carToFollow.center);
         }
         if (currentMode === "simulation" && editors['simulation'].running) {
@@ -69,7 +71,12 @@ function animate(time) {
     }
 
     editors[currentMode]?.display();
+
     requestAnimationFrame(animate);
+}
+
+function hideAllPopovers() {
+    $('.btn-world-info, #startBtn, #targetBtn').popover('hide');
 }
 
 function clearCanvas() {
@@ -79,6 +86,8 @@ function clearCanvas() {
     editors = {
         graph: new GraphEditor(viewport, world),
         simulation: new SimulationEditor(viewport, world),
+        world: new WorldEditor(viewport, world),
+        select: new SelectEditor(viewport, world),
         start: new StartEditor(viewport, world),
         stop: new StopEditor(viewport, world),
         yield: new YieldEditor(viewport, world),
@@ -92,10 +101,18 @@ function clearCanvas() {
 
 function disposeMarkings() {
     world.markings.length = 0;
+    setMode('world');
 }
 
 function disposeCars() {
-    world.markings = world.markings.filter((m) => !(m instanceof StartMarking));
+    // Remove all cars and their targets
+    world.markings = world.markings.filter(
+        (m) => !(
+            (m instanceof StartMarking) ||
+            (m instanceof TargetMarking)
+        )
+    );
+    setMode('world');
 }
 
 function resetCarBrain() {
@@ -106,6 +123,19 @@ function resetCarBrain() {
 }
 
 function setMode(mode) {
+    if (mode !== "graph" && mode !== "simulation" && mode !== "world" && mode === currentMode) {
+        mode = "world"
+    }
+    if (mode === "target") {
+        if (!world.markings.find(m => m instanceof StartMarking)) {
+            showMustAddCarPopover("Add the car first before adding its target");
+            return;
+        }
+        if (world.carToFollow === null) {
+            showMustAddCarPopover("Select the car first before adding/changing its target");
+            return;
+        }
+    }
     hideToolboxes();
     hideButtons();
     disableEditors();
@@ -142,12 +172,35 @@ function setMode(mode) {
         document.querySelector('#simulationBtn').style.display = "inline-flex";
 
         if (mode !== "world") {
-            const modeBtn = document.getElementById(mode + 'Btn');
-            modeBtn.classList.add('clicked');
-            editors[mode].enable();
+            document
+                .getElementById(mode + 'Btn')
+                .classList
+                .add('clicked');
         }
+        editors[mode].enable();
         miniMap.show();
     }
+}
+
+function hideToolboxes() {
+    document.querySelector('.markings').style.display = "none";
+    document.querySelector('.simulator').style.display = "none";
+}
+
+function hideButtons() {
+    [...document.querySelectorAll('.header button, .controls button')].map((btn) => btn.style.display = "none");
+}
+
+function disableEditors() {
+    for (const editor of Object.values(editors)) {
+        editor.disable();
+    }
+}
+
+function resetMarkingButtons() {
+    document.querySelectorAll('.markings button.clicked').forEach((btn) => {
+        btn.classList.remove('clicked')
+    });
 }
 
 function resetHeaderControlWidth(mode) {
@@ -200,27 +253,6 @@ function toggleCarControlType() {
         document.getElementById("manualOverrideBtn").style.backgroundColor = "white";
     }
     world.settings.save();
-}
-
-function hideToolboxes() {
-    document.querySelector('.markings').style.display = "none";
-    document.querySelector('.simulator').style.display = "none";
-}
-
-function hideButtons() {
-    [...document.querySelectorAll('.header button, .controls button')].map((btn) => btn.style.display = "none");
-}
-
-function disableEditors() {
-    for (const editor of Object.values(editors)) {
-        editor.disable();
-    }
-}
-
-function resetMarkingButtons() {
-    document.querySelectorAll('.markings button.clicked').forEach((btn) => {
-        btn.classList.remove('clicked')
-    });
 }
 
 async function generateWorld() {
@@ -285,6 +317,8 @@ function loadWorldData(worldId) {
             editors = {
                 graph: new GraphEditor(viewport, world),
                 simulation: new SimulationEditor(viewport, world),
+                world: new WorldEditor(viewport, world),
+                select: new SelectEditor(viewport, world),
                 start: new StartEditor(viewport, world),
                 stop: new StopEditor(viewport, world),
                 yield: new YieldEditor(viewport, world),
@@ -371,6 +405,33 @@ function cancelTrafficSideChange() {
     document.getElementById("trafficSideChangeModal").style.display =
         "none";
     isTrafficSideChangedConfirmed = false;
+}
+
+function showMustAddCarPopover(popoverContent) {
+    hideAllPopovers();
+    document.getElementById('startBtn').setAttribute('data-toggle', 'popover');
+    document.getElementById('startBtn').setAttribute('data-trigger', 'manual');
+    document.getElementById('startBtn').setAttribute('data-content', popoverContent);
+    $('#startBtn').popover('show');
+    setTimeout(() => {
+        hideAllPopovers();
+        document.getElementById('startBtn').setAttribute('data-toggle', 'tooltip');
+        document.getElementById('startBtn').setAttribute('data-trigger', 'hover');
+        document.getElementById('startBtn').setAttribute('title', 'Car Editor Mode.');
+    }, 4000);
+}
+
+function showMustAddTargetPopover() {
+    hideAllPopovers();
+    document.getElementById('targetBtn').setAttribute('data-toggle', 'popover');
+    document.getElementById('targetBtn').setAttribute('data-trigger', 'manual');
+    $('#targetBtn').popover('show');
+    setTimeout(() => {
+        hideAllPopovers();
+        document.getElementById('targetBtn').setAttribute('data-toggle', 'tooltip');
+        document.getElementById('targetBtn').setAttribute('data-trigger', 'hover');
+        document.getElementById('targetBtn').setAttribute('title', 'Target Editor Mode.');
+    }, 4000);
 }
 
 function minimizeMiniMap() {
@@ -506,7 +567,7 @@ function showLoadWorldModal() {
 }
 
 function hideLoadWorldModal() {
-    hideWorldInfoPopovers();
+    hideAllPopovers();
     document.getElementById("loadWorldModal").style.display = "none";
 }
 
@@ -802,14 +863,10 @@ function addEventListeners() {
 }
 
 function showWorldInfoPopover(inputId) {
-    hideWorldInfoPopovers();
+    hideAllPopovers();
     clearTimeout(tooltipTimeout);
     $('#' + inputId).popover('show');
-    tooltipTimeout = setTimeout(() => hideWorldInfoPopovers(), 5000);
-}
-
-function hideWorldInfoPopovers() {
-    $('.btn-world-info').popover('hide');
+    tooltipTimeout = setTimeout(() => hideAllPopovers(), 5000);
 }
 
 function showTooltip(inputId) {

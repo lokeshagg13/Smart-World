@@ -20,6 +20,7 @@ class Car {
             reverse: false
         };
 
+        this.targetMarkingIndex = -1;
         this.target = null;
         this.path = [];
         this.pathBorders = [];
@@ -170,6 +171,12 @@ class Car {
     update(markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
+
+        // If car is AI controlled and target does not exist, Cars will not move unless a target is added.
+        if (this.controlType === "AI" && this.target === null) {
+            return;
+        }
+        // If car is not already damaged, it will move and damage is checked.
         if (!this.damaged) {
             this.#move();
             if (this.controls.forward && !this.controls.reverse) {
@@ -178,6 +185,7 @@ class Car {
             this.polygon = this.#createPolygonAroundCar();
             this.damaged = this.#assessDamage();
         }
+        // If car has sensors, update sensor readings and if car is of type AI, update controls based on it.
         if (this.sensor) {
             this.sensor.update(
                 this.center,
@@ -186,7 +194,7 @@ class Car {
                 markings
             );
             const sensorReadings = this.sensor.getReadings();
-            if (sensorReadings.targetSignReading > 0.7) {
+            if (this.target && this.target.polygon.containsPoint(this.center)) {
                 this.success = true;
             }
 

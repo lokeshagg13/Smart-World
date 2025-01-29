@@ -55,35 +55,12 @@ class MiniMap {
                 segment.draw(this.ctx, { width: 3 / scaler, color: "white" });
             }
 
-            // Draw target
-            let targetMarking = this.world.getCurrentTargetMarking();
-            if (targetMarking.index >= 0) {
-                targetMarking = targetMarking.element;
-                new Point(targetMarking.center.x, targetMarking.center.y)
-                    .draw(this.ctx, { size: 12.5 / scaler, color: "red", outline: true, outlineColor: "black" });
-                new Point(targetMarking.center.x, targetMarking.center.y)
-                    .draw(this.ctx, { size: 7.5 / scaler, color: "white", outline: true });
-                new Point(targetMarking.center.x, targetMarking.center.y)
-                    .draw(this.ctx, { size: 2.5 / scaler, color: "red", outline: true });
-
-                const scaledTargetpoint = scale(targetMarking.center, -scaler)
-                // Check if target is outside the minimap range
-                const distanceToTarget = distance(scaledViewpoint, scaledTargetpoint);
-
-                if (distanceToTarget > this.ctx.canvas.width / 2) {
-                    const angleToTarget = angle(subtract(scaledViewpoint, scaledTargetpoint));
-                    const targetPointer = translate(viewpoint, angleToTarget, width / (2 * scaler));
-                    new Arrow(targetPointer, angleToTarget, 20 / scaler, 15 / scaler)
-                        .draw(this.ctx, { color: "red", width: 5 / scaler });
-                }
-            }
-
-            // Draw current position of car and its path to target
+            // Draw Current position of car, its Target and the Path to itstarget
             if (this.world.carToFollow) {
+                // Draw Path to target
                 let pathSegments = [];
-                if (this.world.carToFollow.path.length > 0) {
-                    // Draw Path
-                    const path = this.world.carToFollow.path;
+                const path = this.world.carToFollow.path;
+                if (path.length > 0) {
                     path[0].draw(this.ctx, { size: 12.5 / scaler, color: "yellow", outline: true, outlineColor: "white" });
                     for (let i = 1; i < path.length; i++) {
                         const segment = new Segment(path[i - 1], path[i]);
@@ -92,6 +69,28 @@ class MiniMap {
                     }
                 }
 
+                // Draw Target
+                const targetMarking = this.world.carToFollow.target;
+                if (targetMarking) {
+                    new Point(targetMarking.center.x, targetMarking.center.y)
+                        .draw(this.ctx, { size: 12.5 / scaler, color: "red", outline: true, outlineColor: "black" });
+                    new Point(targetMarking.center.x, targetMarking.center.y)
+                        .draw(this.ctx, { size: 7.5 / scaler, color: "white", outline: true, outlineColor: "white" });
+                    new Point(targetMarking.center.x, targetMarking.center.y)
+                        .draw(this.ctx, { size: 2.5 / scaler, color: "red", outline: true, outlineColor: "red" });
+
+                    // Draw Target Pointer if Target not visible on the minimap
+                    const scaledTargetpoint = scale(targetMarking.center, -scaler)
+                    const distanceToTarget = distance(scaledViewpoint, scaledTargetpoint);
+                    if (distanceToTarget > this.ctx.canvas.width / 2) {
+                        const angleToTarget = angle(subtract(scaledViewpoint, scaledTargetpoint));
+                        const targetPointer = translate(viewpoint, angleToTarget, width / (2 * scaler));
+                        new Arrow(targetPointer, angleToTarget, 20 / scaler, 15 / scaler)
+                            .draw(this.ctx, { color: "red", width: 5 / scaler });
+                    }
+                }
+
+                // Draw Current position of car
                 const carProjection = Graph.projectPointOnNearestSegment(
                     this.world.carToFollow.center,
                     pathSegments.length > 0 ? pathSegments : this.world.graph.segments

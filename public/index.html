@@ -111,6 +111,8 @@
             onclick="setMode('start')"
             data-toggle="tooltip"
             data-placement="top"
+            data-trigger="hover"
+            data-content=""
             title="Car Editor Mode"
           >
             🚙
@@ -131,6 +133,8 @@
             onclick="setMode('target')"
             data-toggle="tooltip"
             data-placement="top"
+            data-trigger="hover"
+            data-content="Add the target to be followed by this car."
             title="Target Editor Mode"
           >
             🎯
@@ -154,6 +158,18 @@
             title="Light Editor Mode"
           >
             🚦
+          </button>
+          &nbsp; &nbsp; &nbsp; &nbsp;
+          <button
+            id="selectBtn"
+            onclick="setMode('select')"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Select Car"
+          >
+            <div class="car-select-icon">
+              <img src="images/car_select.png" alt="Select Car" />
+            </div>
           </button>
         </div>
         <div class="simulator">
@@ -437,8 +453,9 @@
           </div>
           <div class="modal-body">
             <p>
-              The rules of <b>Left hand driving</b> and <b>Right hand driving</b> are
-              different. Are you sure you want to continue with this change?
+              The rules of <b>Left hand driving</b> and
+              <b>Right hand driving</b> are different. Are you sure you want to
+              continue with this change?
             </p>
           </div>
           <div class="modal-footer">
@@ -882,6 +899,8 @@
     <script src="js/markings/trafficLight.js"></script>
     <script src="js/editors/graphEditor.js"></script>
     <script src="js/editors/simulationEditor.js"></script>
+    <script src="js/editors/worldEditor.js"></script>
+    <script src="js/editors/selectEditor.js"></script>
     <script src="js/editors/markingEditor.js"></script>
     <script src="js/editors/startEditor.js"></script>
     <script src="js/editors/stopEditor.js"></script>

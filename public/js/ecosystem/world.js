@@ -69,7 +69,7 @@ class World {
             )
         );
         world.markings = info.markings.filter(
-            (m) => m.type !== "start"
+            (m) => (m.type !== "start" && m.type !== "target")
         ).map(
             (m) => Marking.load(m)
         );
@@ -407,25 +407,55 @@ class World {
             car.update(this.markings);
         }
 
-        this.carToFollow = cars.find(
-            car => (
-                car.fitness === (
-                    Math.max(
-                        ...cars.map(c => c.fitness)
+        if (currentMode === "simulation") {
+            this.carToFollow = cars.find(
+                car => (
+                    car.fitness === (
+                        Math.max(
+                            ...cars.map(c => c.fitness)
+                        )
                     )
                 )
-            )
-        );
-
+            );
+        }
+        else if (this.carToFollow) {
+            if (this.carToFollow.success) {
+                this.carToFollow = null;
+                return;
+            }
+            const checkMarking = this.markings.find(
+                m =>
+                    (m instanceof StartMarking) &&
+                    (m.car === this.carToFollow)
+            );
+            if (!checkMarking) {
+                this.carToFollow = null;
+            }
+        }
     }
 
     #removeSuccessfulCars() {
-        this.markings = this.markings.filter(m => !(m instanceof StartMarking) ||
-            (
+        const indicesToRemove = [];
+        const wasteTargetElements = [];
+        this.markings.forEach((m, index) => {
+            if (
                 (m instanceof StartMarking) &&
-                (m.car.success === false)
-            )
-        );
+                (m.car.success === true)
+            ) {
+                indicesToRemove.push(index);
+                if (m.car.target) {
+                    wasteTargetElements.push(m.car.target);
+                }
+            }
+        });
+
+        this.markings.forEach((m, index) => {
+            if (wasteTargetElements.includes(m)) {
+                indicesToRemove.push(index);
+            }
+        });
+
+        this.markings = this.markings.filter((_, index) => !indicesToRemove.includes(index));
     }
 
     #removeDamagedCars() {
@@ -438,23 +468,6 @@ class World {
         );
     }
 
-    #removeDisconnectedMarkings() {
-        for (let i = 0; i < this.markings.length; i++) {
-            const markingCenter = this.markings[i].center;
-            let isDisconnected = true;
-            for (const envelope of this.roadPaths) {
-                if (envelope.polygon.containsPoint(markingCenter)) {
-                    isDisconnected = false;
-                    break;
-                }
-            }
-            if (isDisconnected) {
-                this.markings.splice(i, 1);
-                i--;
-            }
-        }
-    }
-
     #generateRandomPedestrians() {
         if (Math.floor(this.frameCount % 120) !== 0) {
             return;
@@ -465,13 +478,6 @@ class World {
         }
         const randomCrossing = crossings[Math.floor(Math.random() * crossings.length)];
         randomCrossing.pedCount += 1;
-    }
-
-    getTargetMarking() {
-        return {
-            index: this.markings.findIndex(m => m instanceof TargetMarking),
-            element: this.markings.find(m => m instanceof TargetMarking)
-        }
     }
 
     generateCarPath(carCenter, carAngle, path) {
@@ -520,9 +526,10 @@ class World {
     }
 
     draw(ctx, viewpoint, renderRadius = 1000, currentMode) {
-        this.#removeDisconnectedMarkings();
         this.#updateTrafficLights();
-        this.#updateCars();
+        if (currentMode !== "select") {
+            this.#updateCars();
+        }
 
         if (currentMode !== "simulation") {
             this.#removeSuccessfulCars();
@@ -543,13 +550,32 @@ class World {
         for (const segment of this.roadDividers) {
             segment.draw(ctx, { color: "#FFF", width: 4, dash: [10, 10] });
         }
-        // Road Markings
+        // All Markings except target, cars and traffic lights
         for (const marking of this.markings) {
-            marking.draw(ctx);
+            if (
+                !(marking instanceof TargetMarking) &&
+                !(marking instanceof TrafficLightMarking) &&
+                !(marking instanceof StartMarking)
+            ) {
+                marking.draw(ctx);
+            }
+        }
+        // Cars
+        for (const marking of this.markings) {
+            if (marking instanceof StartMarking) {
+                marking.draw(ctx);
+            }
+        }
+        // Traffic Lights
+        for (const marking of this.markings) {
+            if (marking instanceof TrafficLightMarking) {
+                marking.draw(ctx);
+            }
         }
 
-        // Path for followed car
-        if (this.carToFollow && this.carToFollow.pathBorders.length > 0) {
+        // Target and Path for followed car 
+        if (this.carToFollow && this.carToFollow.target) {
+            this.carToFollow.target.draw(ctx);
             for (const segment of this.carToFollow.pathBorders) {
                 segment.draw(ctx, { color: "red", width: 4 });
             }

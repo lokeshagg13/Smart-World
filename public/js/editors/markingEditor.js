@@ -51,9 +51,30 @@ class MarkingEditor {
         }
         if (ev.button == 2) { // right click
             for (let i = 0; i < this.world.markings.length; i++) {
-                const polygon = this.world.markings[i].polygon;
-                if (polygon.containsPoint(this.hoveredPoint)) {
-                    this.world.markings.splice(i, 1);
+                const marking = this.world.markings[i];
+                if (
+                    (
+                        !(marking instanceof StartMarking) &&
+                        marking.polygon.containsPoint(this.hoveredPoint)
+                    ) ||
+                    (
+                        marking instanceof StartMarking &&
+                        marking.car.polygon &&
+                        marking.car.polygon.containsPoint(this.hoveredPoint)
+                    )
+                ) {
+                    let indicesToRemove = [i]
+                    // Remove associated target marking
+                    if (marking instanceof StartMarking && marking.car.target) {
+                        this.world.markings.forEach((m, index) => {
+                            if (m === marking.car.target) {
+                                indicesToRemove.push(index);
+                            }
+                        });
+                    }
+                    this.world.markings = this.world.markings.filter(
+                        (_, idx) => !indicesToRemove.includes(idx)
+                    );
                     return;
                 }
             }
@@ -74,6 +95,19 @@ class MarkingEditor {
                     projection.point,
                     nearestSegment.directionVector()
                 );
+
+                // Check for overlapping markings
+                if (
+                    !(this.intent instanceof StartMarking) &&
+                    !(this.intent instanceof TargetMarking)
+                ) {
+                    const overlappingMarking = this.world.markings.find(
+                        (m) => m.polygon.intersectsPolygon(this.intent.polygon)
+                    );
+                    if (overlappingMarking) {
+                        this.intent = null;
+                    }
+                }
             } else {
                 this.intent = null;
             }
@@ -84,42 +118,54 @@ class MarkingEditor {
 
     #addMarkingToWorld() {
         if (this.intent instanceof TargetMarking) {
-            const currentTargetMarking = this.world.getCurrentTargetMarking();
-            if (currentTargetMarking.index >= 0) {
-                this.world.markings.splice(currentTargetMarking.index, 1);
-            }
-            for (const marking of this.world.markings) {
-                if (marking instanceof StartMarking) {
-                    marking.car.target = this.intent;
-                    marking.car.path = this.world.graph.getShortestPath(
-                        marking.car.center,
-                        this.intent.center
-                    );
-                    marking.car.pathBorders = this.world.generateCarPath(
-                        marking.car.center,
-                        marking.car.angle,
-                        marking.car.path
-                    );
+            if (this.world.carToFollow) {
+                // Removal of any unused targets
+                if (this.world.carToFollow.target) {
+                    let targetInUse = false;
+                    for (const marking of this.world.markings) {
+                        if (
+                            marking instanceof StartMarking &&
+                            marking.car !== this.world.carToFollow &&
+                            marking.car.targetMarkingIndex === this.world.carToFollow.targetMarkingIndex
+                        ) {
+                            targetInUse = true;
+                        }
+                    }
+                    if (!targetInUse) {
+                        this.world.markings.splice(this.world.carToFollow.targetMarkingIndex, 1);
+                    }
                 }
+                // Update the target of the current car being followed
+                this.world.carToFollow.targetMarkingIndex = this.world.markings.length;
+                this.world.carToFollow.target = this.intent;
+                this.world.carToFollow.path = this.world.graph.getShortestPath(
+                    this.world.carToFollow.center,
+                    this.intent.center
+                );
+                this.world.carToFollow.pathBorders = this.world.generateCarPath(
+                    this.world.carToFollow.center,
+                    this.world.carToFollow.angle,
+                    this.world.carToFollow.path
+                );
+                this.world.markings.push(this.intent);
+                setMode('world');
+            } else {
+                if (!this.world.markings.find(m => m instanceof StartMarking)) {
+                    showMustAddCarPopover("Add the car first before adding its target");
+                } else {
+                    showMustAddCarPopover("Select the car first before adding/changing its target");
+                }
+                setMode('world');
             }
         }
-        if (this.intent instanceof StartMarking) {
-            let currentTargetMarking = this.world.getCurrentTargetMarking();
-            if (currentTargetMarking.index >= 0) {
-                currentTargetMarking = currentTargetMarking.element;
-                this.intent.car.target = currentTargetMarking;
-                this.intent.car.path = this.world.graph.getShortestPath(
-                    this.intent.car.center,
-                    currentTargetMarking.center
-                );
-                this.intent.car.pathBorders = this.world.generateCarPath(
-                    this.intent.car.center,
-                    this.intent.car.angle,
-                    this.intent.car.path
-                );
-            }
+        else if (this.intent instanceof StartMarking) {
+            showMustAddTargetPopover();
+            this.world.markings.push(this.intent);
+            this.world.carToFollow = this.intent.car;
+            setMode('target');
+        } else {
+            this.world.markings.push(this.intent);
         }
-        this.world.markings.push(this.intent);
     }
 
     display() {
