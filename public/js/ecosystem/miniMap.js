@@ -56,7 +56,7 @@ class MiniMap {
             }
 
             // Draw target
-            let targetMarking = this.world.getTargetMarking();
+            let targetMarking = this.world.getCurrentTargetMarking();
             if (targetMarking.index >= 0) {
                 targetMarking = targetMarking.element;
                 new Point(targetMarking.center.x, targetMarking.center.y)

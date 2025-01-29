@@ -52,7 +52,7 @@ class SimulationEditor {
     #handleMouseDown(ev) {
         if (ev.button == 0) { // left click
             if (this.intent && !this.running) {
-                let currentTargetMarking = this.world.getTargetMarking();
+                let currentTargetMarking = this.world.getCurrentTargetMarking();
                 if (currentTargetMarking.index >= 0) {
                     currentTargetMarking = currentTargetMarking.element;
                     const shortestPath = this.world.graph.getShortestPath(

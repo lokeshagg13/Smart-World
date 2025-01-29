@@ -84,7 +84,7 @@ class MarkingEditor {
 
     #addMarkingToWorld() {
         if (this.intent instanceof TargetMarking) {
-            const currentTargetMarking = this.world.getTargetMarking();
+            const currentTargetMarking = this.world.getCurrentTargetMarking();
             if (currentTargetMarking.index >= 0) {
                 this.world.markings.splice(currentTargetMarking.index, 1);
             }
@@ -104,7 +104,7 @@ class MarkingEditor {
             }
         }
         if (this.intent instanceof StartMarking) {
-            let currentTargetMarking = this.world.getTargetMarking();
+            let currentTargetMarking = this.world.getCurrentTargetMarking();
             if (currentTargetMarking.index >= 0) {
                 currentTargetMarking = currentTargetMarking.element;
                 this.intent.car.target = currentTargetMarking;
