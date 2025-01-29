@@ -126,17 +126,16 @@ class MarkingEditor {
                         if (
                             marking instanceof StartMarking &&
                             marking.car !== this.world.carToFollow &&
-                            marking.car.targetMarkingIndex === this.world.carToFollow.targetMarkingIndex
+                            marking.car.target === this.world.carToFollow.target
                         ) {
                             targetInUse = true;
                         }
                     }
                     if (!targetInUse) {
-                        this.world.markings.splice(this.world.carToFollow.targetMarkingIndex, 1);
+                        this.world.markings = this.world.markings.filter(m => m !== this.world.carToFollow.target);
                     }
                 }
                 // Update the target of the current car being followed
-                this.world.carToFollow.targetMarkingIndex = this.world.markings.length;
                 this.world.carToFollow.target = this.intent;
                 this.world.carToFollow.path = this.world.graph.getShortestPath(
                     this.world.carToFollow.center,

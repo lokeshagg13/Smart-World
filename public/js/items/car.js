@@ -20,7 +20,6 @@ class Car {
             reverse: false
         };
 
-        this.targetMarkingIndex = -1;
         this.target = null;
         this.path = [];
         this.pathBorders = [];
