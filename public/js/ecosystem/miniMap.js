@@ -69,12 +69,12 @@ class MiniMap {
                 const scaledTargetpoint = scale(targetMarking.center, -scaler)
                 // Check if target is outside the minimap range
                 const distanceToTarget = distance(scaledViewpoint, scaledTargetpoint);
-                
+
                 if (distanceToTarget > this.ctx.canvas.width / 2) {
                     const angleToTarget = angle(subtract(scaledViewpoint, scaledTargetpoint));
                     const targetPointer = translate(viewpoint, angleToTarget, width / (2 * scaler));
                     new Arrow(targetPointer, angleToTarget, 20 / scaler, 15 / scaler)
-                        .draw(this.ctx, { color: "red" });
+                        .draw(this.ctx, { color: "red", width: 5 / scaler });
                 }
             }
 

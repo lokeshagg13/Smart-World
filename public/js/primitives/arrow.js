@@ -6,7 +6,7 @@ class Arrow {
         this.headSize = headSize;
     }
 
-    draw(ctx, { color = "black" }) {
+    draw(ctx, { color = "black", width = 20 }) {
         // Calculate the start of the arrow (opposite direction from the angle)
         const startX = this.center.x - Math.cos(this.angle) * this.length;
         const startY = this.center.y - Math.sin(this.angle) * this.length;
@@ -29,6 +29,7 @@ class Arrow {
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.fillStyle = color;
+        ctx.lineWidth = width;
         ctx.moveTo(startX, startY); // Arrow body start
         ctx.lineTo(this.center.x, this.center.y); // Arrow body end
         ctx.stroke();
