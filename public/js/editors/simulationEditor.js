@@ -10,6 +10,8 @@ class SimulationEditor {
         this.intent = null;
         this.running = false;
 
+        this.targetMarking = null;
+
         this.targetSegments = world.laneGuides;
     }
 
@@ -29,6 +31,7 @@ class SimulationEditor {
     }
 
     disable() {
+        this.targetMarking = null;
         this.#removeEventListeners();
     }
 
@@ -52,35 +55,31 @@ class SimulationEditor {
     #handleMouseDown(ev) {
         if (ev.button == 0) { // left click
             if (this.intent && !this.running) {
-                let currentTargetMarking = this.world.getCurrentTargetMarking();
-                if (currentTargetMarking.index >= 0) {
-                    currentTargetMarking = currentTargetMarking.element;
-                    const shortestPath = this.world.graph.getShortestPath(
+                this.targetMarking = this.world.getRandomTargetMarking();
+                const shortestPath = this.world.graph.getShortestPath(
+                    this.intent.center,
+                    this.targetMarking.center
+                );
+                const shortestPathBorders = this.world.generateCarPath(
+                    this.intent.center,
+                    this.intent.angle,
+                    shortestPath
+                );
+                for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
+                    const startMarking = this.createMarking(
                         this.intent.center,
-                        currentTargetMarking.center
+                        this.intent.directionVector,
+                        this.world.settings.isLHT
                     );
-                    const shortestPathBorders = this.world.generateCarPath(
-                        this.intent.center,
-                        this.intent.angle,
-                        shortestPath
-                    );
+                    startMarking.car.target = this.targetMarking;
+                    startMarking.car.path = shortestPath;
+                    startMarking.car.pathBorders = shortestPathBorders;
                     const bestBrain = new Brain();
-
-                    for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
-                        const startMarking = this.createMarking(
-                            this.intent.center,
-                            this.intent.directionVector,
-                            this.world.settings.isLHT
-                        );
-                        startMarking.car.target = currentTargetMarking;
-                        startMarking.car.path = shortestPath;
-                        startMarking.car.pathBorders = shortestPathBorders;
-                        startMarking.car.brain = bestBrain;
-                        if (i != 0) {
-                            NeuralNetwork.mutate(startMarking.car.brain.network, this.world.settings.simulationDiffFactor)
-                        }
-                        this.world.markings.push(startMarking);
+                    if (i != 0) {
+                        NeuralNetwork.mutate(bestBrain.network, this.world.settings.simulationDiffFactor);
                     }
+                    startMarking.car.brain = bestBrain;
+                    this.world.markings.push(startMarking);
                 }
                 this.running = true;
                 this.intent = null;
@@ -115,6 +114,9 @@ class SimulationEditor {
     }
 
     display() {
+        if (this.targetMarking) {
+            this.targetMarking.draw(this.ctx)
+        };
         if (this.intent) {
             this.intent.draw(this.ctx);
         }

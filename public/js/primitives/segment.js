@@ -33,6 +33,18 @@ class Segment {
         return Math.acos(dot(dirSegment1, dirSegment2) / (magnitude(dirSegment1) * magnitude(dirSegment2)));
     }
 
+    randomPoint(minOffset = 0, maxOffset = 1) {
+        minOffset = Math.max(0, Math.min(1, minOffset));
+        maxOffset = Math.max(0, Math.min(1, maxOffset));
+        if (minOffset > maxOffset) {
+            minOffset = 0;
+            maxOffset = 1;
+        }
+
+        const randomOffset = Math.random() * (maxOffset - minOffset) + minOffset;
+        return add(this.p1, scale(subtract(this.p2, this.p1), randomOffset));
+    }
+
     distanceToPoint(point) {
         const proj = this.projectPoint(point);
         if (proj.offset > 0 && proj.offset < 1) {

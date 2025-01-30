@@ -121,6 +121,15 @@ function resetCarBrain() {
     tempBrain.resetToDefault();
     tempBrain.save();
     Visualizer.brain = tempBrain;
+    world.markings.forEach(m => {
+        if (
+            m instanceof StartMarking &&
+            m.car &&
+            m.car.brain
+        ) {
+            m.car.brain = tempBrain;
+        }
+    })
 }
 
 function setMode(mode) {
@@ -623,6 +632,7 @@ function resetSimulation() {
         return !m.car.isSimulation;
     });
     editors["simulation"].running = false;
+    editors["simulation"].targetMarking = null;
 }
 
 function exitSimulationMode() {

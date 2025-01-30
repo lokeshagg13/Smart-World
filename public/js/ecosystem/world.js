@@ -480,6 +480,18 @@ class World {
         randomCrossing.pedCount += 1;
     }
 
+    getRandomTargetMarking() {
+        const segment = this.graph.segments[Math.floor(Math.random() * this.graph.segments.length)];
+        const randomPoint = segment.randomPoint(0.3, 0.7);
+        return new TargetMarking(
+            randomPoint,
+            segment.directionVector(),
+            this.settings.roadWidth,
+            this.settings.roadWidth / 2,
+            this.settings.isLHT
+        );
+    }
+
     generateCarPath(carCenter, carAngle, path) {
         const pathSegments = [];
         const trafficSideFactor = this.settings.isLHT ? -1 : 1;
