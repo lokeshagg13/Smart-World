@@ -16,7 +16,7 @@ class Brain {
         this.network.levels[0].biases[2] = -0.9;
         this.network.levels[0].biases[3] = 0.85;
         this.network.levels[0].biases[4] = 0;  // Left turn
-        this.network.levels[0].biases[5] = 0;  // Right turn
+        this.network.levels[0].biases[5] = 0.01;  // Right turn
         // First Level - Weights
         // For weights[x][y], x = 0 (frontReading), 
         //                        1 (speed), 
@@ -77,6 +77,8 @@ class Brain {
 
     static getControls({
         frontReading = 0,
+        dLeftReading = 0,
+        dRightReading = 0,
         leftReading = 0,
         rightReading = 0,
         speed = 0,
@@ -86,13 +88,22 @@ class Brain {
         yeildSignReading = 0,
         parkingSignReading = 0
     } = {}, network) {
-        const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, leftReading, rightReading];
+        const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, dLeftReading, dRightReading];
         const outputs = NeuralNetwork.feedforward(inputs, network);
         const controls = {
             forward: outputs[0],
             reverse: outputs[1],
             left: outputs[2],
             right: outputs[3]
+        }
+        const turnLimitFactor = 1 - world.settings.roadWidth / (4 * 200);
+        if (controls.left === 1 && leftReading > turnLimitFactor) {
+            controls.left = false;
+            controls.right = false;
+        }
+        if (controls.right === 1 && rightReading > turnLimitFactor) {
+            controls.left = false;
+            controls.right = false;
         }
         return controls;
     }

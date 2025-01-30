@@ -24,14 +24,14 @@ class Envelope {
         const alpha_cw = alpha + Math.PI / 2;
         const points = [];
         const step = Math.PI / Math.max(1, roundness);
-        const eps = step / 2
+        const eps = step / 2;
         for (let i = alpha_ccw; i <= alpha_cw + eps; i += step) {
             points.push(translate(p1, i, radius));
         }
         for (let i = alpha_ccw; i <= alpha_cw + eps; i += step) {
             points.push(translate(p2, Math.PI + i, radius));
         }
-        return new Polygon(points)
+        return new Polygon(points);
     }
 
     draw(ctx, options) {

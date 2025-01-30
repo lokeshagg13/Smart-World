@@ -53,6 +53,7 @@ function animate(time) {
         if (currentMode === "simulation" && editors['simulation'].running) {
             checkForSimulationSuccess();
         }
+        changeManualOverrideButtonState();
         const renderRadius = viewport.getScreenRadius();
         world.draw(mainCtx, viewpoint, renderRadius, currentMode);
         miniMap.load(world).draw(viewpoint);
@@ -240,6 +241,15 @@ function toggleVisualizer() {
         hideVisualizer();
     } else {
         showVisualizer();
+    }
+}
+
+function changeManualOverrideButtonState() {
+    const currentType = world.settings.carControlType;
+    if (currentType === "AI") {
+        document.getElementById("manualOverrideBtn").style.backgroundColor = "white";
+    } else {
+        document.getElementById("manualOverrideBtn").style.backgroundColor = "rgb(0, 85, 255)";
     }
 }
 

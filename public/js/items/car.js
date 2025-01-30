@@ -167,7 +167,7 @@ class Car {
         }
     }
 
-    update(markings) {
+    update(roadBorders, markings) {
         const settings = World.loadSettingsFromLocalStorage();
         this.#updateSettings(settings);
 
@@ -189,6 +189,7 @@ class Car {
             this.sensor.update(
                 this.center,
                 this.angle,
+                roadBorders,
                 this.pathBorders,
                 markings
             );
@@ -197,8 +198,11 @@ class Car {
                 this.success = true;
             }
 
-            if (this.controlType === "AI" && this.brain) {
-                this.controls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
+            if (this.brain) {
+                const calculatedControls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
+                if (this.controlType === "AI") {
+                    this.controls = calculatedControls;
+                }
             }
         }
     }

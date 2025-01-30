@@ -404,7 +404,7 @@ class World {
             );
 
         for (const car of cars) {
-            car.update(this.markings);
+            car.update(this.roadBorders, this.markings);
         }
 
         if (currentMode === "simulation") {

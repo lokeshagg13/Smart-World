@@ -22,6 +22,17 @@ class Segment {
         return this.p1.equals(point) || this.p2.equals(point);
     }
 
+    angle(segment) {
+        let dirSegment1 = this.directionVector();
+        let dirSegment2 = segment.directionVector();
+        if (this.p1.equals(segment.p2)) {
+            dirSegment1 = scale(dirSegment1, -1);
+        } else if (this.p2.equals(segment.p1)) {
+            dirSegment2 = scale(dirSegment2, -1);
+        }
+        return Math.acos(dot(dirSegment1, dirSegment2) / (magnitude(dirSegment1) * magnitude(dirSegment2)));
+    }
+
     distanceToPoint(point) {
         const proj = this.projectPoint(point);
         if (proj.offset > 0 && proj.offset < 1) {

@@ -1,4 +1,5 @@
 class RoadSensorRay {
+    // turnLimitFactor is dependent on rayLength values, so change carefully
     constructor(startPoint, angle, rayLength = 200) {
         this.startPoint = startPoint;
         this.rayLength = rayLength;
@@ -9,7 +10,7 @@ class RoadSensorRay {
         this.borderReading = null;
     }
 
-    detectRoadBorders(pathBorders) {
+    detectRoadBorders(roadBorders, pathBorders) {
         let minOffset = Number.MAX_SAFE_INTEGER;
         for (const pathBorder of pathBorders) {
             const touch = getIntersection(
@@ -17,6 +18,18 @@ class RoadSensorRay {
                 this.endPoint,
                 pathBorder.p1,
                 pathBorder.p2
+            );
+            if (touch && touch.offset < minOffset) {
+                minOffset = touch.offset;
+                this.borderReading = touch;
+            }
+        }
+        for (const roadBorder of roadBorders) {
+            const touch = getIntersection(
+                this.startPoint,
+                this.endPoint,
+                roadBorder.p1,
+                roadBorder.p2
             );
             if (touch && touch.offset < minOffset) {
                 minOffset = touch.offset;
@@ -228,19 +241,25 @@ class MultiSensorRay extends RoadSensorRay {
 class Sensor {
     constructor() {
         this.frontRay = null;
-        this.leftRay = null;
-        this.rightRay = null;
+        this.dLeftRay = null; // Diagonally Left
+        this.dRightRay = null; // Diagonally Right
+        this.leftRay = null; // Left
+        this.rightRay = null; // Right
     }
 
     #castRays(origin, baseAngle) {
-        this.leftRay = new RoadSensorRay(origin, baseAngle - Math.PI / 4);
         this.frontRay = new MultiSensorRay(origin, baseAngle);
-        this.rightRay = new RoadSensorRay(origin, baseAngle + Math.PI / 4);
+        this.dLeftRay = new RoadSensorRay(origin, baseAngle - Math.PI / 4);
+        this.dRightRay = new RoadSensorRay(origin, baseAngle + Math.PI / 4);
+        this.leftRay = new RoadSensorRay(origin, baseAngle - Math.PI / 2);
+        this.rightRay = new RoadSensorRay(origin, baseAngle + Math.PI / 2)
     }
 
     getReadings() {
         return {
             frontReading: this.frontRay.borderReading ? 1 - this.frontRay.borderReading.offset : 0,
+            dLeftReading: this.dLeftRay.borderReading ? 1 - this.dLeftRay.borderReading.offset : 0,
+            dRightReading: this.dRightRay.borderReading ? 1 - this.dRightRay.borderReading.offset : 0,
             leftReading: this.leftRay.borderReading ? 1 - this.leftRay.borderReading.offset : 0,
             rightReading: this.rightRay.borderReading ? 1 - this.rightRay.borderReading.offset : 0,
             stopSignReading: this.frontRay.stopSignReading ? 1 - this.frontRay.stopSignReading.offset : 0,
@@ -252,19 +271,23 @@ class Sensor {
         };
     }
 
-    update(origin, baseAngle, pathBorders, markings) {
+    update(origin, baseAngle, roadBorders, pathBorders, markings) {
         this.#castRays(origin, baseAngle);
-        this.frontRay.detectRoadBorders(pathBorders);
+        this.frontRay.detectRoadBorders(roadBorders, pathBorders);
         this.frontRay.detectMarkings(markings);
-        this.leftRay.detectRoadBorders(pathBorders);
-        this.rightRay.detectRoadBorders(pathBorders);
+        this.dLeftRay.detectRoadBorders(roadBorders, pathBorders);
+        this.dRightRay.detectRoadBorders(roadBorders, pathBorders);
+        this.leftRay.detectRoadBorders(roadBorders, pathBorders);
+        this.rightRay.detectRoadBorders(roadBorders, pathBorders);
     }
 
     draw(ctx) {
-        if (!this.frontRay || !this.leftRay || !this.rightRay) {
+        if (!this.frontRay || !this.dLeftRay || !this.dRightRay || !this.leftRay || !this.rightRay) {
             return;
         }
         this.frontRay.draw(ctx);
+        this.dLeftRay.draw(ctx);
+        this.dRightRay.draw(ctx);
         this.leftRay.draw(ctx);
         this.rightRay.draw(ctx);
     }
