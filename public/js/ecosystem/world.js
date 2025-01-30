@@ -11,7 +11,8 @@ class World {
         this.laneGuides = [];
 
         this.markings = [];
-        this.carToFollow = null;
+        this.selectedCar = null;
+        this.followedCar = null;
 
         this.frameCount = 0;
 
@@ -90,7 +91,8 @@ class World {
         this.laneGuides = [];
 
         this.markings = [];
-        this.carToFollow = null;
+        this.selectedCar = null;    // For non-simulation mode
+        this.followedCar = null;    // For simulation mode
 
         this.frameCount = 0;
     }
@@ -397,7 +399,7 @@ class World {
                 (marking) => (
                     (marking instanceof StartMarking) &&
                     (!marking.car.damaged) &&
-                    (marking.car.sensor)
+                    (currentMode !== "simulation" || marking.car.isSimulation)
                 )
             ).map(
                 (marking) => marking.car
@@ -408,7 +410,7 @@ class World {
         }
 
         if (currentMode === "simulation") {
-            this.carToFollow = cars.find(
+            this.followedCar = cars.find(
                 car => (
                     car.fitness === (
                         Math.max(
@@ -418,18 +420,18 @@ class World {
                 )
             );
         }
-        else if (this.carToFollow) {
-            if (this.carToFollow.success) {
-                this.carToFollow = null;
+        else if (this.selectedCar) {
+            if (this.selectedCar.success) {
+                this.selectedCar = null;
                 return;
             }
             const checkMarking = this.markings.find(
                 m =>
                     (m instanceof StartMarking) &&
-                    (m.car === this.carToFollow)
+                    (m.car === this.selectedCar)
             );
             if (!checkMarking) {
-                this.carToFollow = null;
+                this.selectedCar = null;
             }
         }
     }
@@ -537,7 +539,7 @@ class World {
         return pathBorders;
     }
 
-    draw(ctx, viewpoint, renderRadius = 1000, currentMode) {
+    draw(ctx, viewpoint, renderRadius = 1000) {
         this.#updateTrafficLights();
         if (currentMode !== "select") {
             this.#updateCars();
@@ -572,12 +574,17 @@ class World {
                 marking.draw(ctx);
             }
         }
+
         // Cars
         for (const marking of this.markings) {
             if (marking instanceof StartMarking) {
+                if (currentMode === "simulation" && !marking.car.isSimulation) {
+                    continue;
+                }
                 marking.draw(ctx);
             }
         }
+
         // Traffic Lights
         for (const marking of this.markings) {
             if (marking instanceof TrafficLightMarking) {
@@ -586,16 +593,18 @@ class World {
         }
 
         // Target and Path for followed car 
-        if (this.carToFollow && this.carToFollow.target) {
-            this.carToFollow.target.draw(ctx);
-            for (const segment of this.carToFollow.pathBorders) {
-                segment.draw(ctx, { color: "red", width: 4 });
+        if (currentMode !== "simulation") {
+            if (this.selectedCar && this.selectedCar.target) {
+                this.selectedCar.target.draw(ctx);
+                for (const segment of this.selectedCar.pathBorders) {
+                    segment.draw(ctx, { color: "red", width: 4 });
+                }
             }
         }
 
         // Visualizer
-        if (this.carToFollow && this.carToFollow.brain) {
-            Visualizer.display(this.carToFollow.brain);
+        if (this.selectedCar && this.selectedCar.brain) {
+            Visualizer.display(this.selectedCar.brain);
         } else {
             Visualizer.display(new Brain());
         }

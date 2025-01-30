@@ -118,33 +118,33 @@ class MarkingEditor {
 
     #addMarkingToWorld() {
         if (this.intent instanceof TargetMarking) {
-            if (this.world.carToFollow) {
+            if (this.world.selectedCar) {
                 // Removal of any unused targets
-                if (this.world.carToFollow.target) {
+                if (this.world.selectedCar.target) {
                     let targetInUse = false;
                     for (const marking of this.world.markings) {
                         if (
                             marking instanceof StartMarking &&
-                            marking.car !== this.world.carToFollow &&
-                            marking.car.target === this.world.carToFollow.target
+                            marking.car !== this.world.selectedCar &&
+                            marking.car.target === this.world.selectedCar.target
                         ) {
                             targetInUse = true;
                         }
                     }
                     if (!targetInUse) {
-                        this.world.markings = this.world.markings.filter(m => m !== this.world.carToFollow.target);
+                        this.world.markings = this.world.markings.filter(m => m !== this.world.selectedCar.target);
                     }
                 }
                 // Update the target of the current car being followed
-                this.world.carToFollow.target = this.intent;
-                this.world.carToFollow.path = this.world.graph.getShortestPath(
-                    this.world.carToFollow.center,
+                this.world.selectedCar.target = this.intent;
+                this.world.selectedCar.path = this.world.graph.getShortestPath(
+                    this.world.selectedCar.center,
                     this.intent.center
                 );
-                this.world.carToFollow.pathBorders = this.world.generateCarPath(
-                    this.world.carToFollow.center,
-                    this.world.carToFollow.angle,
-                    this.world.carToFollow.path
+                this.world.selectedCar.pathBorders = this.world.generateCarPath(
+                    this.world.selectedCar.center,
+                    this.world.selectedCar.angle,
+                    this.world.selectedCar.path
                 );
                 this.world.markings.push(this.intent);
                 setMode('world');
@@ -160,7 +160,7 @@ class MarkingEditor {
         else if (this.intent instanceof StartMarking) {
             showMustAddTargetPopover();
             this.world.markings.push(this.intent);
-            this.world.carToFollow = this.intent.car;
+            this.world.selectedCar = this.intent.car;
             setMode('target');
         } else {
             this.world.markings.push(this.intent);

@@ -47,10 +47,13 @@ function animate(time) {
     const viewpoint = scale(viewport.getOffset(), -1);
     if (currentMode !== "graph") {
         visualizerCtx.lineDashOffset = -time / 60;
-        if (currentMode === "world" && world.carToFollow) {
-            viewport.setOffset(world.carToFollow.center);
+        if (currentMode === "world" && world.selectedCar) {
+            viewport.setOffset(world.selectedCar.center);
         }
         if (currentMode === "simulation" && editors['simulation'].running) {
+            if (world.followedCar) {
+                viewport.setOffset(world.followedCar.center);
+            }
             checkForSimulationSuccess();
         }
         changeManualOverrideButtonState();
@@ -141,7 +144,7 @@ function setMode(mode) {
             showMustAddCarPopover("Add the car first before adding its target");
             return;
         }
-        if (world.carToFollow === null) {
+        if (world.selectedCar === null) {
             showMustAddCarPopover("Select the car first before adding/changing its target");
             return;
         }
@@ -601,6 +604,7 @@ function hideLoadOsmGraphModal() {
 function checkForSimulationSuccess() {
     const successfulCarMarking = world.markings.find((m) =>
         (m instanceof StartMarking) &&
+        (m.car.isSimulation === true) &&
         (m.car.success === true)
     );
 
@@ -615,8 +619,8 @@ function checkForSimulationSuccess() {
 }
 
 function saveSimulationResult() {
-    if (world.carToFollow && world.carToFollow.brain) {
-        world.carToFollow.brain.save();
+    if (world.followedCar && world.followedCar.brain) {
+        world.followedCar.brain.save();
         showSaveConfirmationModal("Simulation saved successfully.");
         // Remove all simulation cars
         resetSimulation();
@@ -631,6 +635,7 @@ function resetSimulation() {
         }
         return !m.car.isSimulation;
     });
+    world.followedCar = null;
     editors["simulation"].running = false;
     editors["simulation"].targetMarking = null;
 }

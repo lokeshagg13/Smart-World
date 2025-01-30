@@ -11,19 +11,27 @@ class SimulationEditor {
         this.running = false;
 
         this.targetMarking = null;
-
-        this.targetSegments = world.laneGuides;
     }
 
-    createMarking(center, directionVector) {
-        return new StartMarking(
-            center,
-            directionVector,
-            this.world.settings.roadWidth * 0.4,
-            this.world.settings.roadWidth / 4,
-            this.world.settings.isLHT,
-            true
-        );
+    createMarking(type, center, directionVector) {
+        if (type === "start") {
+            return new StartMarking(
+                center,
+                directionVector,
+                this.world.settings.roadWidth * 0.4,
+                this.world.settings.roadWidth / 4,
+                this.world.settings.isLHT,
+                true
+            );
+        } else {
+            return new TargetMarking(
+                center,
+                directionVector,
+                this.world.settings.roadWidth,
+                this.world.settings.roadWidth * 0.5,
+                this.world.settings.isLHT
+            );
+        }
     }
 
     enable() {
@@ -55,34 +63,41 @@ class SimulationEditor {
     #handleMouseDown(ev) {
         if (ev.button == 0) { // left click
             if (this.intent && !this.running) {
-                this.targetMarking = this.world.getRandomTargetMarking();
-                const shortestPath = this.world.graph.getShortestPath(
-                    this.intent.center,
-                    this.targetMarking.center
-                );
-                const shortestPathBorders = this.world.generateCarPath(
-                    this.intent.center,
-                    this.intent.angle,
-                    shortestPath
-                );
-                for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
-                    const startMarking = this.createMarking(
-                        this.intent.center,
-                        this.intent.directionVector,
-                        this.world.settings.isLHT
-                    );
-                    startMarking.car.target = this.targetMarking;
-                    startMarking.car.path = shortestPath;
-                    startMarking.car.pathBorders = shortestPathBorders;
-                    const bestBrain = new Brain();
-                    if (i != 0) {
-                        NeuralNetwork.mutate(bestBrain.network, this.world.settings.simulationDiffFactor);
-                    }
-                    startMarking.car.brain = bestBrain;
-                    this.world.markings.push(startMarking);
+                if (this.intent instanceof TargetMarking) {
+                    this.targetMarking = this.intent;
                 }
-                this.running = true;
-                this.intent = null;
+                else {
+                    if (!this.targetMarking) {
+                        this.targetMarking = this.world.getRandomTargetMarking();
+                    }
+                    const shortestPath = this.world.graph.getShortestPath(
+                        this.intent.center,
+                        this.targetMarking.center
+                    );
+                    const shortestPathBorders = this.world.generateCarPath(
+                        this.intent.center,
+                        this.intent.angle,
+                        shortestPath
+                    );
+                    for (let i = 0; i < this.world.settings.simulationNumCars; i++) {
+                        const startMarking = this.createMarking(
+                            "start",
+                            this.intent.center,
+                            this.intent.directionVector
+                        );
+                        startMarking.car.target = this.targetMarking;
+                        startMarking.car.path = shortestPath;
+                        startMarking.car.pathBorders = shortestPathBorders;
+                        const bestBrain = new Brain();
+                        if (i != 0) {
+                            NeuralNetwork.mutate(bestBrain.network, this.world.settings.simulationDiffFactor);
+                        }
+                        startMarking.car.brain = bestBrain;
+                        this.world.markings.push(startMarking);
+                    }
+                    this.running = true;
+                    this.intent = null;
+                }
             }
         }
     }
@@ -94,16 +109,17 @@ class SimulationEditor {
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
         const nearestSegment = Graph.getNearestSegment(
             this.hoveredPoint,
-            this.targetSegments,
+            this.targetMarking ? this.world.laneGuides : this.world.graph.segments,
             12 * this.viewport.zoom
         );
         if (nearestSegment) {
             const projection = nearestSegment.projectPoint(this.hoveredPoint);
             if (projection.offset >= 0 && projection.offset <= 1) {
+                let type = this.targetMarking ? "start" : "target";
                 this.intent = this.createMarking(
+                    type,
                     projection.point,
-                    nearestSegment.directionVector(),
-                    this.world.settings.isLHT
+                    nearestSegment.directionVector()
                 );
             } else {
                 this.intent = null;
@@ -114,6 +130,11 @@ class SimulationEditor {
     }
 
     display() {
+        if (this.world.followedCar) {
+            for (const segment of this.world.followedCar.pathBorders) {
+                segment.draw(this.ctx, { color: "red", width: 4 });
+            }
+        }
         if (this.targetMarking) {
             this.targetMarking.draw(this.ctx)
         };

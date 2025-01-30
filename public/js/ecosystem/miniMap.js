@@ -55,11 +55,17 @@ class MiniMap {
                 segment.draw(this.ctx, { width: 3 / scaler, color: "white" });
             }
 
+            // Selected which car to focus on the minimap based on world's mode
+            let focusedCar = this.world.selectedCar;
+            if (currentMode === "simulation") {
+                focusedCar = this.world.followedCar;
+            }
+
             // Draw Current position of car, its Target and the Path to itstarget
-            if (this.world.carToFollow) {
+            if (focusedCar) {
                 // Draw Path to target
                 let pathSegments = [];
-                const path = this.world.carToFollow.path;
+                const path = focusedCar.path;
                 if (path.length > 0) {
                     path[0].draw(this.ctx, { size: 12.5 / scaler, color: "yellow", outline: true, outlineColor: "white" });
                     for (let i = 1; i < path.length; i++) {
@@ -70,7 +76,7 @@ class MiniMap {
                 }
 
                 // Draw Target
-                const targetMarking = this.world.carToFollow.target;
+                const targetMarking = focusedCar.target;
                 if (targetMarking) {
                     new Point(targetMarking.center.x, targetMarking.center.y)
                         .draw(this.ctx, { size: 12.5 / scaler, color: "red", outline: true, outlineColor: "black" });
@@ -92,13 +98,13 @@ class MiniMap {
 
                 // Draw Current position of car
                 const carProjection = Graph.projectPointOnNearestSegment(
-                    this.world.carToFollow.center,
+                    focusedCar.center,
                     pathSegments.length > 0 ? pathSegments : this.world.graph.segments
                 );
                 if (carProjection) {
                     carProjection.projectedPoint.draw(this.ctx, { size: 12.5 / scaler, color: "blue", outline: true, outlineColor: "white" });
                 } else {
-                    this.world.carToFollow.center.draw(this.ctx, { size: 12.5 / scaler, color: "blue", outline: true, outlineColor: "white" });
+                    focusedCar.center.draw(this.ctx, { size: 12.5 / scaler, color: "blue", outline: true, outlineColor: "white" });
                 }
             }
 

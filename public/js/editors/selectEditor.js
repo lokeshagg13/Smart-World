@@ -40,7 +40,7 @@ class SelectEditor {
     #handleMouseDown(ev) {
         if (ev.button == 0) {   // Left click
             if (this.nearestCar) {
-                this.world.carToFollow = this.nearestCar;
+                this.world.selectedCar = this.nearestCar;
                 setMode("world");
             }
         }
