@@ -33,6 +33,7 @@ const progressTracker = new ProgressTracker();
 let currentMode;
 let popoverTimeout;
 let confirmBtnEventListener = null;
+let submitBtnEventListener = null;
 let isTrafficSideChangedConfirmed = false;
 let tempSettings = JSON.parse(JSON.stringify(world.settings));
 
@@ -677,42 +678,6 @@ function showPopoverByID(inputId, timeout = 3000) {
 
 // #region - Showing and Hiding Modals
 
-function showSaveConfirmationModal(message) {
-    document.getElementById("saveConfirmationModal").style.display = "flex";
-    document.querySelector("#saveConfirmationModal .modal-body").innerHTML =
-        "<p>" + message + "</p>";;
-}
-
-function hideSaveConfirmationModal() {
-    document.getElementById("saveConfirmationModal").style.display = "none";
-}
-
-function showErrorModal(message) {
-    document.querySelector("#errorModal .modal-body").innerHTML =
-        "<p>" + message + "</p>";
-    document.getElementById("errorModal").style.display = "flex";
-}
-
-function hideErrorModal() {
-    document.getElementById("errorModal").style.display = "none";
-}
-
-function showConfirmingModal(title = "", body = "", confirmBtnText = "", onConfirm = null) {
-    document.querySelector('#confirmingModal .modal-title').innerText = title;
-    document.querySelector('#confirmingModal .modal-body').innerHTML = body;
-    document.querySelector('#confirmingModal .modal-footer .btn-primary').innerText = confirmBtnText;
-    if (confirmBtnEventListener) {
-        document.querySelector('#confirmingModal .modal-footer .btn-primary').removeEventListener('click', confirmBtnEventListener);
-    }
-    confirmBtnEventListener = onConfirm;
-    document.querySelector('#confirmingModal .modal-footer .btn-primary').addEventListener('click', onConfirm);
-    document.getElementById('confirmingModal').style.display = "flex";
-}
-
-function hideConfirmingModal() {
-    document.getElementById('confirmingModal').style.display = "none";
-}
-
 function showLoadingModal() {
     document.getElementById("loadingModal").style.display = "flex";
 }
@@ -808,6 +773,59 @@ function showLoadOsmGraphModal() {
 
 function hideLoadOsmGraphModal() {
     document.getElementById('loadOsmGraphModal').style.display = "none";
+}
+
+function showSaveConfirmationModal(message) {
+    document.getElementById("saveConfirmationModal").style.display = "flex";
+    document.querySelector("#saveConfirmationModal .modal-body").innerHTML =
+        "<p>" + message + "</p>";;
+}
+
+function hideSaveConfirmationModal() {
+    document.getElementById("saveConfirmationModal").style.display = "none";
+}
+
+function showErrorModal(message) {
+    document.querySelector("#errorModal .modal-body").innerHTML =
+        "<p>" + message + "</p>";
+    document.getElementById("errorModal").style.display = "flex";
+}
+
+function hideErrorModal() {
+    document.getElementById("errorModal").style.display = "none";
+}
+
+function showConfirmingModal(title = "", body = "", confirmBtnText = "", onConfirm = null) {
+    document.querySelector('#confirmingModal .modal-title').innerText = title;
+    document.querySelector('#confirmingModal .modal-body').innerHTML = body;
+    document.querySelector('#confirmingModal .modal-footer .btn-primary').innerText = confirmBtnText;
+    if (confirmBtnEventListener) {
+        document.querySelector('#confirmingModal .modal-footer .btn-primary').removeEventListener('click', confirmBtnEventListener);
+    }
+    confirmBtnEventListener = onConfirm;
+    document.querySelector('#confirmingModal .modal-footer .btn-primary').addEventListener('click', onConfirm);
+    document.getElementById('confirmingModal').style.display = "flex";
+}
+
+function hideConfirmingModal() {
+    document.getElementById('confirmingModal').style.display = "none";
+}
+
+function showPromptModal(title = "", body = "", submitBtnText = "", onSubmit = null) {
+    document.querySelector('#promptModal .modal-title').innerText = title;
+    document.querySelector('#promptModal .modal-body').innerHTML = body;
+    document.querySelector('#promptModal .modal-footer .btn-primary').innerText = submitBtnText;
+    if (submitBtnEventListener) {
+        document.querySelector('#promptModal .modal-footer .btn-primary').removeEventListener('click', submitBtnEventListener);
+    }
+    submitBtnEventListener = onSubmit;
+    document.querySelector('#promptModal .modal-footer .btn-primary').addEventListener('click', onSubmit);
+    document.getElementById('promptModal').style.display = "flex";
+}
+
+function hidePromptModal() {
+    document.getElementById('adminPassword').value = "";
+    document.getElementById('promptModal').style.display = "none";
 }
 
 // #endregion
@@ -1022,12 +1040,126 @@ function hideVisualizer() {
     document.getElementById('visualizerIcon').setAttribute('alt', 'Show Visualizer');
 }
 
-function toggleVisualizer() {
-    if (isAdminSectionVisible()) {
-        hideVisualizer();
-    } else {
-        showVisualizer();
+function showAdminSection() {
+    showVisualizer();
+}
+
+function hideAdminSection() {
+    hideVisualizer();
+}
+
+function showAdminLoginModal(prompt) {
+    const handleSubmit = async (ev) => {
+        ev.preventDefault();
+        const password = document.getElementById('adminPassword').value;
+        if (!password) {
+            document.getElementById('adminPasswordError').innerText = 'No password entered. Access denied!';
+            document.getElementById('adminPasswordError').style.display = 'block';
+            return;
+        }
+
+        try {
+            const isValid = await adminLogin(password);
+            if (isValid) {
+                showAdminSection();
+                hidePromptModal();
+            } else {
+                document.getElementById('adminPasswordError').innerText = 'Invalid password entered. Access denied!';
+                document.getElementById('adminPasswordError').style.display = 'block';
+            }
+        } catch (error) {
+            document.getElementById('adminPasswordError').innerText = 'Invalid password entered. Access denied!';
+            document.getElementById('adminPasswordError').style.display = 'block';
+        }
+    };
+
+    showPromptModal(
+        'Admin Password',
+        `
+            <form>
+                <div class="form-group">
+                    <label for="adminPassword">${prompt}</label>
+                    <input
+                        type="password"
+                        id="adminPassword"
+                        class="form-control"
+                        placeholder="Enter Admin Password"
+                        required
+                    />
+                    <small id="adminPasswordError" class="error-message form-text">
+                    </small>
+                </div>
+            </form>      
+        `,
+        'Submit',
+        handleSubmit)
+}
+
+async function adminLogin(password) {
+    try {
+        const response = await fetch("http://localhost:3000/api/admin/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                password
+            }),
+        });
+
+        if (!response.ok) {
+            return false;
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            localStorage.setItem('adminAccessToken', data.token);
+            return true;
+        }
+        return false;
+
+    } catch (error) {
+        return false;
     }
+}
+
+async function toggleAdminSection() {
+    if (isAdminSectionVisible()) {
+        hideAdminSection();
+        return;
+    }
+
+    const accessToken = localStorage.getItem('adminAccessToken');
+    // Access Token exists, so verify it first and then perform login only if it is invalid/expired.
+    if (accessToken) {
+        try {
+            const response = await fetch("http://localhost:3000/api/admin/verify", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    token: accessToken,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Admin access expired");
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                showAdminSection();
+            }
+
+        } catch (error) {
+            showAdminLoginModal('Your previous admin login must have been expired. Reenter the admin password.');
+        }
+        return;
+    }
+
+    // Access Token do not exist, so login must be performed
+    showAdminLoginModal('Enter the admin password.');
 }
 
 // #endregion

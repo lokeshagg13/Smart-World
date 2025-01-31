@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 const app = express();
 
 const { encryptId, decryptId } = require('./utils/security');
@@ -9,8 +10,10 @@ const { encryptId, decryptId } = require('./utils/security');
 require('dotenv').config();
 
 // Parse the secret key and IV from the environment
-const secretKey = Buffer.from(process.env.SECRET_KEY, 'hex');
-const iv = Buffer.from(process.env.IV, 'hex');
+const ENCRYTION_SECRET = Buffer.from(process.env.SECRET_KEY, 'hex');
+const ENCRYTION_IV = Buffer.from(process.env.IV, 'hex');
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_PASSWORD_HASH = encryptId(process.env.ADMIN_PASSWORD, ENCRYTION_SECRET, ENCRYTION_IV);
 
 // Middleware
 app.use(express.json({ limit: '100mb' }));
@@ -48,11 +51,11 @@ app.post('/api/save-world', async (req, res) => {
         let worldDataString = fs.readFileSync(worldJSONPath, 'utf8');
         const worlds = worldDataString !== '' ? JSON.parse(worldDataString) : [];
         worldToSave.createdOn = new Date();
-        worldToSave.id = encryptId(worldToSave.createdOn.getTime(), secretKey, iv);
+        worldToSave.id = encryptId(worldToSave.createdOn.getTime(), ENCRYTION_SECRET, ENCRYTION_IV);
 
         // Save screenshot file
         const base64Data = worldToSave.screenshot.replace(/^data:image\/png;base64,/, '');
-        const screenshotPath = path.join(worldScreenshotsFolderPath, 'World_' + decryptId(worldToSave.id, secretKey, iv) + '.png')
+        const screenshotPath = path.join(worldScreenshotsFolderPath, 'World_' + decryptId(worldToSave.id, ENCRYTION_SECRET, ENCRYTION_IV) + '.png')
         fs.writeFileSync(screenshotPath, base64Data, 'base64');
 
         // Add textual data to the json file
@@ -71,7 +74,7 @@ app.post('/api/get-worlds', async (req, res) => {
         let worldDataString = fs.readFileSync(worldJSONPath, 'utf8');
         let worlds = worldDataString !== '' ? JSON.parse(worldDataString) : [];
         worlds = worlds.map((world) => ({
-            id: decryptId(world.id, secretKey, iv),
+            id: decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV),
             screenshot: world.screenshot,
             createdOn: world.createdOn
         }));
@@ -93,12 +96,12 @@ app.get('/api/load-world/:worldId', async (req, res) => {
         }
 
         const worldId = req.params['worldId'];
-        let world = worlds.filter((world) => decryptId(world.id, secretKey, iv) === worldId);
+        let world = worlds.filter((world) => decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV) === worldId);
         if (world.length == 0) {
             return res.status(404).json({ message: 'World not found' })
         }
         world = world[0]
-        world.id = decryptId(world.id, secretKey, iv);
+        world.id = decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV);
         return res.status(200).json({ message: 'World retrieved successfully', world: world });
     } catch (error) {
         console.log(error)
@@ -119,7 +122,7 @@ app.delete('/api/delete-world/:worldId', async (req, res) => {
         const worldId = req.params['worldId'];
         const worldsRemaining = [];
         for (const world of worlds) {
-            const decryptedID = decryptId(world.id, secretKey, iv);
+            const decryptedID = decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV);
             if (decryptedID === worldId) {
                 const screenshotPath = path.join(worldScreenshotsFolderPath, 'World_' + decryptedID + '.png')
                 if (fs.existsSync(screenshotPath)) {
@@ -137,28 +140,49 @@ app.delete('/api/delete-world/:worldId', async (req, res) => {
     }
 });
 
-// Fetch a random car image from a folder
-app.get('/api/random-car', (req, res) => {
+// Check for Admin Access
+app.post('/api/admin/login', (req, res) => {
+    const { password } = req.body;
+
     try {
-        const carImagesDir = path.join(__dirname, 'car-images'); // Ensure a folder named 'car-images' exists
-        const fs = require('fs');
+        if (!password) {
+            return res.status(401).json({ success: false, message: 'Invalid password' });
+        }
 
-        fs.readdir(carImagesDir, (err, files) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error reading car images directory', details: err.message });
-            }
+        // Hash the incoming password and compare with the stored hash
+        const hashedPassword = encryptId(password, ENCRYTION_SECRET, ENCRYTION_IV);
 
-            if (files.length === 0) {
-                return res.status(404).json({ error: 'No car images found' });
-            }
-
-            const randomImage = files[Math.floor(Math.random() * files.length)];
-            res.sendFile(path.join(carImagesDir, randomImage));
-        });
+        if (hashedPassword === ADMIN_PASSWORD_HASH) {
+            // Create a JWT token
+            const token = jwt.sign({ user: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
+            console.log('valid')
+            
+            return res.status(200).json({ success: true, token });
+        } else {
+            console.log('invalid')
+            return res.status(401).json({ success: false, message: 'Invalid password' });
+        }
     } catch (error) {
-        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        console.log('invalid')
+        return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 });
+
+// Verify access token
+app.post('/api/admin/verify', (req, res) => {
+    const { token } = req.body;
+
+    try {
+        if (!token) {
+            return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return res.status(200).json({ success: true, decoded });
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    }
+});
+
 
 // Start Server
 app.listen(process.env.PORT, () => {
