@@ -590,15 +590,28 @@
                 <div id="worldSettingsForm">
                   <div id="worldSettingsDisclaimer">
                     <small>
-                      Note: World settings can only be modified during the
-                      skeleton editing mode. To modify these settings, select
+                      Note: Settings related to the World Design can only be
+                      modified during the skeleton editing mode. To modify these
+                      settings, select
                       <b>'Edit Skeleton'</b> and
                       <b>Regenerate the World</b> after modifying these
                       settings.
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="roadWidth">Road Width</label>
+                    <label for="roadWidth">
+                      Road Width &nbsp;
+                      <span
+                        id="roadWidthHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -616,7 +629,19 @@
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="buildingWidth">Building Width</label>
+                    <label for="buildingWidth">
+                      Building Width &nbsp;
+                      <span
+                        id="buildingWidthHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -638,7 +663,17 @@
                   </div>
                   <div class="form-group">
                     <label for="buildingMinLength">
-                      Building Minimum Length
+                      Building Minimum Length &nbsp;
+                      <span
+                        id="buildingMinLengthHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
                     </label>
                     <input
                       type="number"
@@ -660,7 +695,19 @@
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="spacing">Spacing</label>
+                    <label for="spacing">
+                      Spacing &nbsp;
+                      <span
+                        id="spacingHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -678,7 +725,19 @@
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="treeSize">Tree size</label>
+                    <label for="treeSize">
+                      Tree size &nbsp;
+                      <span
+                        id="treeSizeHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -696,7 +755,19 @@
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="treeHeight">Tree height</label>
+                    <label for="treeHeight">
+                      Tree height &nbsp;
+                      <span
+                        id="treeHeightHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -714,7 +785,19 @@
                     </small>
                   </div>
                   <div class="form-group flex">
-                    <label for="trafficToggle"> Left Hand Traffic </label>
+                    <label for="trafficToggle">
+                      Left Hand Traffic &nbsp;
+                      <span
+                        id="leftHandTrafficHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="bottom"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                     <input
                       type="checkbox"
                       id="trafficToggle"
@@ -724,7 +807,19 @@
                       data-on="RHT"
                       data-onstyle="info"
                     />
-                    <label for="trafficToggle"> Right Hand Traffic </label>
+                    <label for="trafficToggle">
+                      Right Hand Traffic &nbsp;
+                      <span
+                        id="rightHandTrafficHint"
+                        class="hint"
+                        data-toggle="popover"
+                        data-placement="bottom"
+                        data-trigger="manual"
+                        data-html="true"
+                      >
+                        <img src="images/info-icon.svg" alt="Info" />
+                      </span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -735,7 +830,19 @@
               <div class="form-group">
                 <legend>Cars</legend>
                 <div class="form-group">
-                  <label for="carMaxSpeed">Max Speed</label>
+                  <label for="carMaxSpeed">
+                    Max Speed &nbsp;
+                    <span
+                      id="carMaxSpeedHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                   <select class="form-control" id="carMaxSpeed">
                     <option value="2">Slow</option>
                     <option value="3" selected>Medium</option>
@@ -744,7 +851,19 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="carAcceleration">Acceleration</label>
+                  <label for="carAcceleration">
+                    Acceleration &nbsp;
+                    <span
+                      id="carAccelerationHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                   <select class="form-control" id="carAcceleration">
                     <option value="0.2">Low</option>
                     <option value="0.3" selected>Medium</option>
@@ -752,7 +871,19 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="carControlType">Control Type</label>
+                  <label for="carControlType">
+                    Control Type &nbsp;
+                    <span
+                      id="carControlTypeHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                   <select class="form-control" id="carControlType">
                     <option value="AI" selected>AI</option>
                     <option value="KEYS">KEYS</option>
@@ -766,7 +897,19 @@
               <div class="form-group">
                 <legend>Simulation</legend>
                 <div class="form-group">
-                  <label for="simulationNumCars">Number of cars</label>
+                  <label for="simulationNumCars">
+                    Number of cars &nbsp;
+                    <span
+                      id="simulationNumCarsHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                   <input
                     type="number"
                     class="form-control"
@@ -788,9 +931,19 @@
                   </small>
                 </div>
                 <div class="form-group">
-                  <label for="simulationDiffFactor"
-                    >Differentiation Factor</label
-                  >
+                  <label for="simulationDiffFactor">
+                    Differentiation Factor &nbsp;
+                    <span
+                      id="simulationDiffFactorHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                   <input
                     type="number"
                     class="form-control"
@@ -819,12 +972,24 @@
               <div class="form-group">
                 <legend>Sensors</legend>
                 <div class="form-group flex">
-                  <label for="showSensors">Show Sensors</label>
                   <input
                     type="checkbox"
                     class="form-check-input"
                     id="showSensors"
                   />
+                  <label>
+                    Show Sensors &nbsp;
+                    <span
+                      id="showSensorsHint"
+                      class="hint"
+                      data-toggle="popover"
+                      data-placement="left"
+                      data-trigger="manual"
+                      data-html="true"
+                    >
+                      <img src="images/info-icon.svg" alt="Info" />
+                    </span>
+                  </label>
                 </div>
               </div>
               <br />

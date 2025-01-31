@@ -156,6 +156,13 @@ function addEventListeners() {
         });
 
     document
+        .getElementById("roadWidthHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('roadWidthHint')
+        );
+
+    document
         .getElementById("buildingWidth")
         .addEventListener("input", (ev) => {
             const value = document.getElementById("buildingWidth").value;
@@ -169,6 +176,13 @@ function addEventListeners() {
             }
             tempSettings.buildingWidth = value;
         });
+
+    document
+        .getElementById("buildingWidthHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('buildingWidthHint')
+        );
 
     document
         .getElementById("buildingMinLength")
@@ -186,6 +200,13 @@ function addEventListeners() {
         });
 
     document
+        .getElementById("buildingMinLengthHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('buildingMinLengthHint')
+        );
+
+    document
         .getElementById("spacing")
         .addEventListener("input", (ev) => {
             const value = document.getElementById("spacing").value;
@@ -199,6 +220,13 @@ function addEventListeners() {
             }
             tempSettings.spacing = value;
         });
+
+    document
+        .getElementById("spacingHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('spacingHint')
+        );
 
     document
         .getElementById("treeSize")
@@ -216,6 +244,13 @@ function addEventListeners() {
         });
 
     document
+        .getElementById("treeSizeHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('treeSizeHint')
+        );
+
+    document
         .getElementById("treeHeight")
         .addEventListener("input", (ev) => {
             const value = document.getElementById("treeHeight").value;
@@ -229,6 +264,48 @@ function addEventListeners() {
             }
             tempSettings.treeHeight = value;
         });
+
+    document
+        .getElementById("treeHeightHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('treeHeightHint')
+        );
+
+    document
+        .getElementById("leftHandTrafficHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('leftHandTrafficHint')
+        );
+
+    document
+        .getElementById("rightHandTrafficHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('rightHandTrafficHint')
+        );
+
+    document
+        .getElementById("carMaxSpeedHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('carMaxSpeedHint')
+        );
+
+    document
+        .getElementById("carAccelerationHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('carAccelerationHint')
+        );
+
+    document
+        .getElementById("carControlTypeHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('carControlTypeHint')
+        );
 
     document
         .getElementById("simulationNumCars")
@@ -251,6 +328,13 @@ function addEventListeners() {
         });
 
     document
+        .getElementById("simulationNumCarsHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('simulationNumCarsHint')
+        );
+
+    document
         .getElementById("simulationDiffFactor")
         .addEventListener("input", (ev) => {
             const value = document.getElementById("simulationDiffFactor").value;
@@ -269,14 +353,184 @@ function addEventListeners() {
             }
             tempSettings.simulationDiffFactor = value || 0.1;
         });
+
+    document
+        .getElementById("simulationDiffFactorHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('simulationDiffFactorHint')
+        );
+
+    document
+        .getElementById("showSensorsHint")
+        .addEventListener(
+            'click',
+            () => showPopoverByID('showSensorsHint')
+        );
+
+
 }
 
 function fillVariableHtmlData() {
+    // Info Popovers
+    document
+        .getElementById('roadWidthHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.roadWidthRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.roadWidthRange[1]}<br>
+            <b>Purpose: </b>Controls the width of roads in the world.<br> 
+            `
+        );
+
+    document
+        .getElementById('buildingWidthHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.buildingWidthRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.buildingWidthRange[1]}<br>
+            <b>Purpose: </b>Controls the width of buildings <i>(measured in the direction perpendicular to the roads)</i>.<br> 
+            `
+        );
+
+    document
+        .getElementById('buildingMinLengthHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.buildingMinLengthRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.buildingMinLengthRange[1]}<br>
+            <b>Purpose: </b>Minimum Length for a building to be generated along the direction of the roads.<br> 
+            `
+        );
+
+    document
+        .getElementById('spacingHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.spacingRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.spacingRange[1]}<br>
+            <b>Purpose: </b>Controls the spacing around the buildings and roads.<br> 
+            `
+        );
+
+    document
+        .getElementById('treeSizeHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.treeSizeRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.treeSizeRange[1]}<br>
+            <b>Purpose: </b>Controls the area taken by each tree.<br> 
+            `
+        );
+
+    document
+        .getElementById('treeHeightHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.treeHeightRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.treeHeightRange[1]}<br>
+            <b>Purpose: </b>Controls the height of trees.<br> 
+            `
+        );
+
+    document
+        .getElementById('leftHandTrafficHint')
+        .setAttribute(
+            'data-content',
+            `
+            In the <b>Left Hand Traffic System</b>, <br>
+            <ul style="padding-left: 5px;">
+                <li>Cars travel on left side on the road. </li>
+                <li>Cars overtake from right hand side. </li>
+                <li>Steering wheel is located on right side of vehicle. </li>
+            </ul>
+            `
+        );
+
+    document
+        .getElementById('rightHandTrafficHint')
+        .setAttribute(
+            'data-content',
+            `
+            In the <b>Right Hand Traffic System</b>, <br>
+            <ul style="padding-left: 5px;">
+                <li>Cars travel on right side on the road. </li>
+                <li>Cars overtake from left hand side. </li>
+                <li>Steering wheel is located on left side of vehicle. </li>
+            </ul>
+            `
+        );
+
+    document
+        .getElementById('carMaxSpeedHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Purpose: </b>Controls the maximum speed that the cars in the world can reach.<br> 
+            `
+        );
+
+    document
+        .getElementById('carAccelerationHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Purpose: </b>Controls the acceleration level of cars on single press of accelerator (forward key).<br> 
+            `
+        );
+
+    document
+        .getElementById('carControlTypeHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Purpose: </b>Cars can be shifted to manual override mode by selecting <b>KEYS</b>.<br> 
+            `
+        );
+
+    document
+        .getElementById('simulationNumCarsHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.simulationNumCarsRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.simulationNumCarsRange[1]}<br>
+            <b>Purpose: </b>Sets the number of cars to be used for simulation in the simulation mode.<br>
+            <small><b>Disclaimer: Higher values might make the simulation slower.</b></small> 
+            `
+        );
+
+    document
+        .getElementById('simulationDiffFactorHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Minimum Value: </b>${Settings.simulationDiffFactorRange[0]}<br>
+            <b>Maximum Value: </b>${Settings.simulationDiffFactorRange[1]}<br>
+            <b>Purpose: </b>Higher value of Simulation Differentiation Factor ensures higher
+             variation in the learning behaviour of simulated cars.<br> 
+            `
+        );
+
+    document
+        .getElementById('showSensorsHint')
+        .setAttribute(
+            'data-content',
+            `
+            <b>Purpose: </b>Check it to view the sensor of the cars and how AI cars sense roads, markings 
+            and targets.<br> 
+            `
+        );
 
 
 
-
-    // Error Tooltips
+    // Error Popovers
     document
         .getElementById('roadWidth')
         .setAttribute(
@@ -359,7 +613,7 @@ function fillVariableHtmlData() {
 
 // #region - Popovers and Tooltips
 
-const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn'];
+const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn', '.hint'];
 
 function hideAllPopovers() {
     $(popoverSelectors.join(', ')).popover('hide');
@@ -489,7 +743,7 @@ function showLoadWorldModal() {
                             data-trigger="click"
                             data-html="true"
                             data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
-                        >ℹ️</button>
+                        ><img src="images/info-icon.svg" alt="Info" /></button>
                         <button
                             class="btn-world-delete"
                             id="world-delete-${worldId}"
@@ -1219,6 +1473,7 @@ function showSettingsModal() {
 function hideSettingsModal() {
     document.getElementById("settingsModal").style.display = "none";
     hideErrorMessages();
+    hideAllPopovers();
 }
 
 // #endregion
