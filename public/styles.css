@@ -293,6 +293,21 @@ button {
   justify-content: space-around;
 }
 
+#settingsModal .form-group label {
+  display: inline-flex;
+}
+
+#settingsModal span.hint {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+#settingsModal span.hint img {
+  width: 1rem;
+}
+
 #worldSettingsDisclaimer {
   border: 1px solid;
   padding: 0.6rem;

@@ -31,16 +31,520 @@ let editors = {
 const progressTracker = new ProgressTracker();
 
 let currentMode;
-let tooltipTimeout;
+let popoverTimeout;
 let confirmBtnEventListener = null;
 let isTrafficSideChangedConfirmed = false;
 let tempSettings = JSON.parse(JSON.stringify(world.settings));
+
+
+
+// Initial Function Calls
 
 setMode("graph");
 
 addEventListeners();
 
+fillVariableHtmlData();
+
 animate();
+
+
+
+
+// #region - Regions helper shortcuts
+// (Command + K then Command + zero) to hide all regions
+// #endregion
+
+
+
+// #region - HTML Helpers
+
+function addEventListeners() {
+    $('#trafficToggle').change((ev) => {
+        tempSettings.isLHT = !ev.target.checked;
+    });
+
+    document
+        .getElementById('clearCanvasBtn')
+        .addEventListener('click', () => {
+            showConfirmingModal(
+                'Clear Canvas',
+                `<p>
+                Are you sure you want to clear the canvas area?
+                <br />
+                <br />
+                <small>(Note: This action is unrecoverable.)</small>
+                </p>`,
+                'Clear',
+                () => {
+                    clearCanvas();
+                    hideConfirmingModal();
+                }
+            );
+        });
+
+    document
+        .getElementById('disposeCarsBtn')
+        .addEventListener('click', () => {
+            showConfirmingModal(
+                'Remove Cars',
+                `<p>
+                Are you sure you want to remove all the cars from the world?
+                <br />
+                <br />
+                <small>(Note: This action is unrecoverable.)</small>
+                </p>`,
+                'Continue',
+                () => {
+                    disposeCars();
+                    hideConfirmingModal();
+                }
+            );
+        });
+
+    document
+        .getElementById('disposeMarkingsBtn')
+        .addEventListener('click', () => {
+            showConfirmingModal(
+                'Remove Markings',
+                `<p>
+                Are you sure you want to remove all the markings from the world?
+                <br />
+                <br />
+                <small>(Note: This action is unrecoverable and will need you to create all markings <b>(including cars)</b> on the world.)</small>
+                </p>`,
+                'Continue',
+                () => {
+                    disposeMarkings();
+                    hideConfirmingModal();
+                }
+            );
+        });
+
+    document
+        .getElementById('editGraphBtn')
+        .addEventListener('click', () => {
+            showConfirmingModal(
+                'Edit Skeleton',
+                `<p>
+                Are you sure you want to change to <b>Edit Skeleton</b> mode for this world?
+                <br />
+                <br />
+                <small>(Note: This action is unrecoverable and will need you to regenerate & redecorate the world.</small>
+                </p>`,
+                'Continue',
+                () => {
+                    setMode('graph');
+                    hideConfirmingModal();
+                }
+            );
+        });
+
+    document
+        .getElementById("roadWidth")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("roadWidth").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("roadWidth").value = tempSettings.roadWidth;
+                showPopoverByID('roadWidth');
+                return;
+            }
+            tempSettings.roadWidth = value;
+        });
+
+    document
+        .getElementById("buildingWidth")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("buildingWidth").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("buildingWidth").value = tempSettings.buildingWidth;
+                showPopoverByID('buildingWidth');
+                return;
+            }
+            tempSettings.buildingWidth = value;
+        });
+
+    document
+        .getElementById("buildingMinLength")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("buildingMinLength").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("buildingMinLength").value = tempSettings.buildingMinLength;
+                showPopoverByID('buildingMinLength');
+                return;
+            }
+            tempSettings.buildingMinLength = value;
+        });
+
+    document
+        .getElementById("spacing")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("spacing").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("spacing").value = tempSettings.spacing;
+                showPopoverByID('spacing');
+                return;
+            }
+            tempSettings.spacing = value;
+        });
+
+    document
+        .getElementById("treeSize")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("treeSize").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("treeSize").value = tempSettings.treeSize;
+                showPopoverByID('treeSize');
+                return;
+            }
+            tempSettings.treeSize = value;
+        });
+
+    document
+        .getElementById("treeHeight")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("treeHeight").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("treeHeight").value = tempSettings.treeHeight;
+                showPopoverByID('treeHeight');
+                return;
+            }
+            tempSettings.treeHeight = value;
+        });
+
+    document
+        .getElementById("simulationNumCars")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("simulationNumCars").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-', '.'].includes(ev.data)) {
+                document.getElementById("simulationNumCars").value = tempSettings.simulationNumCars;
+                showPopoverByID('simulationNumCars');
+                return;
+            }
+            if (parseInt(value, 10) < 1) {
+                document.getElementById("simulationNumCars").value = tempSettings.simulationNumCars;
+                showPopoverByID('simulationNumCars');
+                return;
+            }
+            tempSettings.simulationNumCars = value;
+        });
+
+    document
+        .getElementById("simulationDiffFactor")
+        .addEventListener("input", (ev) => {
+            const value = document.getElementById("simulationDiffFactor").value;
+            if (value === "" && ev.data === null) {
+                return;
+            }
+            if (['+', '-'].includes(ev.data)) {
+                document.getElementById("simulationDiffFactor").value = tempSettings.simulationDiffFactor;
+                showPopoverByID('simulationDiffFactor');
+                return;
+            }
+            if (parseFloat(value, 10) < 0 || parseFloat(value, 10) > 1) {
+                document.getElementById("simulationDiffFactor").value = tempSettings.simulationDiffFactor;
+                showPopoverByID('simulationDiffFactor');
+                return;
+            }
+            tempSettings.simulationDiffFactor = value || 0.1;
+        });
+}
+
+function fillVariableHtmlData() {
+
+
+
+
+    // Error Tooltips
+    document
+        .getElementById('roadWidth')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.roadWidthRange[0]} and ${Settings.roadWidthRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('buildingWidth')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.buildingWidthRange[0]} and ${Settings.buildingWidthRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('buildingMinLength')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.buildingMinLengthRange[0]} and ${Settings.buildingMinLengthRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('spacing')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.spacingRange[0]} and ${Settings.spacingRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('treeSize')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.treeSizeRange[0]} and ${Settings.treeSizeRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('treeHeight')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.treeHeightRange[0]} and ${Settings.treeHeightRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('simulationNumCars')
+        .setAttribute(
+            'data-content',
+            `Whole number between ${Settings.simulationNumCarsRange[0]} and ${Settings.simulationNumCarsRange[1]} (inclusive) required.`
+        );
+
+    document
+        .getElementById('simulationDiffFactor')
+        .setAttribute('data-content', `Keep the differentiation factor between ${Settings.simulationDiffFactorRange[0]} and ${Settings.simulationDiffFactorRange[1]} (inclusive) required.`
+        );
+
+
+
+    // Min Max Settings in Error Messages
+
+    [...document.querySelectorAll('span.roadWidthMin')].map(el => el.innerText = Settings.roadWidthRange[0]);
+    [...document.querySelectorAll('span.roadWidthMax')].map(el => el.innerText = Settings.roadWidthRange[1]);
+    [...document.querySelectorAll('span.buildingWidthMin')].map(el => el.innerText = Settings.buildingWidthRange[0]);
+    [...document.querySelectorAll('span.buildingWidthMax')].map(el => el.innerText = Settings.buildingWidthRange[1]);
+    [...document.querySelectorAll('span.buildingMinLengthMin')].map(el => el.innerText = Settings.buildingMinLengthRange[0]);
+    [...document.querySelectorAll('span.buildingMinLengthMax')].map(el => el.innerText = Settings.buildingMinLengthRange[1]);
+    [...document.querySelectorAll('span.spacingMin')].map(el => el.innerText = Settings.spacingRange[0]);
+    [...document.querySelectorAll('span.spacingMax')].map(el => el.innerText = Settings.spacingRange[1]);
+    [...document.querySelectorAll('span.treeSizeMin')].map(el => el.innerText = Settings.treeSizeRange[0]);
+    [...document.querySelectorAll('span.treeSizeMax')].map(el => el.innerText = Settings.treeSizeRange[1]);
+    [...document.querySelectorAll('span.treeHeightMin')].map(el => el.innerText = Settings.treeHeightRange[0]);
+    [...document.querySelectorAll('span.treeHeightMax')].map(el => el.innerText = Settings.treeHeightRange[1]);
+    [...document.querySelectorAll('span.simulationNumCarsMin')].map(el => el.innerText = Settings.simulationNumCarsRange[0]);
+    [...document.querySelectorAll('span.simulationNumCarsMax')].map(el => el.innerText = Settings.simulationNumCarsRange[1]);
+    [...document.querySelectorAll('span.simulationDiffFactorMin')].map(el => el.innerText = Settings.simulationDiffFactorRange[0]);
+    [...document.querySelectorAll('span.simulationDiffFactorMax')].map(el => el.innerText = Settings.simulationDiffFactorRange[1]);
+}
+
+// #endregion
+
+
+
+// #region - Popovers and Tooltips
+
+const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn'];
+
+function hideAllPopovers() {
+    $(popoverSelectors.join(', ')).popover('hide');
+}
+
+function showMustAddCarPopover(popoverContent) {
+    clearTimeout(popoverTimeout);
+    hideAllPopovers();
+    document.getElementById('startBtn').setAttribute('data-toggle', 'popover');
+    document.getElementById('startBtn').setAttribute('data-trigger', 'manual');
+    document.getElementById('startBtn').setAttribute('data-content', popoverContent);
+    $('#startBtn').popover('show');
+    popoverTimeout = setTimeout(() => {
+        hideAllPopovers();
+        document.getElementById('startBtn').setAttribute('data-toggle', 'tooltip');
+        document.getElementById('startBtn').setAttribute('data-trigger', 'hover');
+        document.getElementById('startBtn').setAttribute('title', 'Car Editor Mode.');
+    }, 4000);
+}
+
+function showMustAddTargetPopover() {
+    clearTimeout(popoverTimeout);
+    hideAllPopovers();
+    document.getElementById('targetBtn').setAttribute('data-toggle', 'popover');
+    document.getElementById('targetBtn').setAttribute('data-trigger', 'manual');
+    $('#targetBtn').popover('show');
+    popoverTimeout = setTimeout(() => {
+        hideAllPopovers();
+        document.getElementById('targetBtn').setAttribute('data-toggle', 'tooltip');
+        document.getElementById('targetBtn').setAttribute('data-trigger', 'hover');
+        document.getElementById('targetBtn').setAttribute('title', 'Target Editor Mode.');
+    }, 4000);
+}
+
+function showPopoverByID(inputId, timeout = 3000) {
+    clearTimeout(popoverTimeout);
+    hideAllPopovers();
+    $('#' + inputId).popover('show');
+    popoverTimeout = setTimeout(() => hideAllPopovers(), timeout);
+}
+
+// #endregion
+
+
+
+// #region - Showing and Hiding Modals
+
+function showSaveConfirmationModal(message) {
+    document.getElementById("saveConfirmationModal").style.display = "flex";
+    document.querySelector("#saveConfirmationModal .modal-body").innerHTML =
+        "<p>" + message + "</p>";;
+}
+
+function hideSaveConfirmationModal() {
+    document.getElementById("saveConfirmationModal").style.display = "none";
+}
+
+function showErrorModal(message) {
+    document.querySelector("#errorModal .modal-body").innerHTML =
+        "<p>" + message + "</p>";
+    document.getElementById("errorModal").style.display = "flex";
+}
+
+function hideErrorModal() {
+    document.getElementById("errorModal").style.display = "none";
+}
+
+function showConfirmingModal(title = "", body = "", confirmBtnText = "", onConfirm = null) {
+    document.querySelector('#confirmingModal .modal-title').innerText = title;
+    document.querySelector('#confirmingModal .modal-body').innerHTML = body;
+    document.querySelector('#confirmingModal .modal-footer .btn-primary').innerText = confirmBtnText;
+    if (confirmBtnEventListener) {
+        document.querySelector('#confirmingModal .modal-footer .btn-primary').removeEventListener('click', confirmBtnEventListener);
+    }
+    confirmBtnEventListener = onConfirm;
+    document.querySelector('#confirmingModal .modal-footer .btn-primary').addEventListener('click', onConfirm);
+    document.getElementById('confirmingModal').style.display = "flex";
+}
+
+function hideConfirmingModal() {
+    document.getElementById('confirmingModal').style.display = "none";
+}
+
+function showLoadingModal() {
+    document.getElementById("loadingModal").style.display = "flex";
+}
+
+function hideLoadingModal() {
+    document.getElementById("loadingModal").style.display = "none";
+}
+
+function showLoadWorldModal() {
+    // Fetch the list of worlds from the server
+    fetch("http://localhost:3000/api/get-worlds", {
+        method: "POST",
+    })
+        .then((response) => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    throw new Error(data.details || "Failed to fetch worlds");
+                });
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const worldListContainer = document.getElementById("worldList");
+            worldListContainer.innerHTML = ""; // Clear existing content
+
+            if (data.worlds && data.worlds.length > 0) {
+                data.worlds.forEach((world, index) => {
+                    // Create elements to display the world
+                    const worldItem = document.createElement("div");
+                    const worldId = index + 1;
+                    worldItem.classList.add("world-item");
+                    worldItem.setAttribute("id", world.id + "")
+                    worldItem.innerHTML = `
+                  <img src="${world.screenshot}" alt="World ${worldId}" />
+                  <div class="world-info">
+                    <h4>World ${worldId}</h4>
+                    <div class="world-controls">
+                        <button 
+                            class="btn-world-info" 
+                            id="world-info-${worldId}"
+                            onclick="showPopoverByID('world-info-${worldId}', 5000)"
+                            data-toggle="popover"
+                            data-placement="top"
+                            data-trigger="click"
+                            data-html="true"
+                            data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
+                        >ℹ️</button>
+                        <button
+                            class="btn-world-delete"
+                            id="world-delete-${worldId}"
+                            onclick="showConfirmingModal(
+                                'Delete world', 
+                                '<p>Are you sure you want to delete <b>World ${worldId}</b> from the list of saved worlds?</p>', 
+                                'Delete',
+                                () => deleteWorldData('${world.id}')
+                            )"
+                        >🗑️</button>
+                    </div>
+                  </div>
+                `;
+
+                    // Add event listener to handle world selection
+                    worldItem.querySelector('img').addEventListener("click", () => {
+                        loadWorldData(world.id);
+                    });
+
+                    worldItem.querySelector('h4').addEventListener("click", () => {
+                        loadWorldData(world.id);
+                    });
+
+                    // Append the world item to the container
+                    worldListContainer.appendChild(worldItem);
+                });
+            } else {
+                worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
+            }
+            document.getElementById("loadWorldModal").style.display = "flex";
+        })
+        .catch((error) => {
+            console.error("Error fetching worlds:", error);
+            showErrorModal("Error fetching the saved worlds.");
+        });
+}
+
+function hideLoadWorldModal() {
+    hideAllPopovers();
+    document.getElementById("loadWorldModal").style.display = "none";
+}
+
+function showLoadOsmGraphModal() {
+    document.getElementById('loadOsmGraphModal').style.display = "flex";
+}
+
+function hideLoadOsmGraphModal() {
+    document.getElementById('loadOsmGraphModal').style.display = "none";
+}
+
+// #endregion
+
+
+
+// #region - World Animator
 
 function animate(time) {
     viewport.reset();
@@ -79,9 +583,11 @@ function animate(time) {
     requestAnimationFrame(animate);
 }
 
-function hideAllPopovers() {
-    $('.btn-world-info, #startBtn, #targetBtn').popover('hide');
-}
+// #endregion
+
+
+
+// #region - Clear Canvas, Markings or Cars
 
 function clearCanvas() {
     world = new World(new Graph());
@@ -119,21 +625,11 @@ function disposeCars() {
     setMode('world');
 }
 
-function resetCarBrain() {
-    const tempBrain = new Brain();
-    tempBrain.resetToDefault();
-    tempBrain.save();
-    Visualizer.brain = tempBrain;
-    world.markings.forEach(m => {
-        if (
-            m instanceof StartMarking &&
-            m.car &&
-            m.car.brain
-        ) {
-            m.car.brain = tempBrain;
-        }
-    })
-}
+// #endregion
+
+
+
+// #region - Mode Set and Helper Functions
 
 function setMode(mode) {
     if (mode !== "graph" && mode !== "simulation" && mode !== "world" && mode === currentMode) {
@@ -224,6 +720,12 @@ function resetHeaderControlWidth(mode) {
     }
 }
 
+// #endregion
+
+
+
+// #region - Admin Section
+
 function isAdminSectionVisible() {
     const adminSection = document.querySelector('.admin-only');
     if (adminSection && adminSection.style.display === 'flex') {
@@ -256,6 +758,12 @@ function toggleVisualizer() {
     }
 }
 
+// #endregion
+
+
+
+// #region - Manual Overriding of Cars
+
 function changeManualOverrideButtonState() {
     const currentType = world.settings.carControlType;
     if (currentType === "AI") {
@@ -276,6 +784,12 @@ function toggleCarControlType() {
     }
     world.settings.save();
 }
+
+// #endregion
+
+
+
+// #region - World generation, saving, loading and deletion as well as Open Street Map Handler
 
 async function generateWorld() {
     if (world.graph.points.length === 0) {
@@ -395,7 +909,7 @@ function deleteWorldData(worldId) {
 function loadGraphFromOsm() {
     const osmDataContainer = document.getElementById('osmDataInput');
     if (osmDataContainer.value === "") {
-        showTooltip('osmDataInput');
+        showPopoverByID('osmDataInput');
         return;
     }
     const osmParsedData = OSM.parseRoads(JSON.parse(osmDataContainer.value));
@@ -409,6 +923,12 @@ function loadGraphFromOsm() {
     viewport.setOffset(world.graph.getCenter());
     hideLoadOsmGraphModal();
 }
+
+// #endregion
+
+
+
+// #region - Traffic Side (LHT/RHT) Change Helpers
 
 function showTrafficSideChangeConfirmationModal() {
     document.getElementById("trafficSideChangeModal").style.display =
@@ -429,32 +949,11 @@ function cancelTrafficSideChange() {
     isTrafficSideChangedConfirmed = false;
 }
 
-function showMustAddCarPopover(popoverContent) {
-    hideAllPopovers();
-    document.getElementById('startBtn').setAttribute('data-toggle', 'popover');
-    document.getElementById('startBtn').setAttribute('data-trigger', 'manual');
-    document.getElementById('startBtn').setAttribute('data-content', popoverContent);
-    $('#startBtn').popover('show');
-    setTimeout(() => {
-        hideAllPopovers();
-        document.getElementById('startBtn').setAttribute('data-toggle', 'tooltip');
-        document.getElementById('startBtn').setAttribute('data-trigger', 'hover');
-        document.getElementById('startBtn').setAttribute('title', 'Car Editor Mode.');
-    }, 4000);
-}
+// #endregion
 
-function showMustAddTargetPopover() {
-    hideAllPopovers();
-    document.getElementById('targetBtn').setAttribute('data-toggle', 'popover');
-    document.getElementById('targetBtn').setAttribute('data-trigger', 'manual');
-    $('#targetBtn').popover('show');
-    setTimeout(() => {
-        hideAllPopovers();
-        document.getElementById('targetBtn').setAttribute('data-toggle', 'tooltip');
-        document.getElementById('targetBtn').setAttribute('data-trigger', 'hover');
-        document.getElementById('targetBtn').setAttribute('title', 'Target Editor Mode.');
-    }, 4000);
-}
+
+
+// #region - Minimap Handlers
 
 function minimizeMiniMap() {
     if (currentMode !== "graph") {
@@ -468,137 +967,26 @@ function maximizeMiniMap() {
     }
 }
 
-function showSaveConfirmationModal(message) {
-    document.getElementById("saveConfirmationModal").style.display = "flex";
-    document.querySelector("#saveConfirmationModal .modal-body").innerHTML =
-        "<p>" + message + "</p>";;
-}
+// #endregion
 
-function hideSaveConfirmationModal() {
-    document.getElementById("saveConfirmationModal").style.display = "none";
-}
 
-function showErrorModal(message) {
-    document.querySelector("#errorModal .modal-body").innerHTML =
-        "<p>" + message + "</p>";
-    document.getElementById("errorModal").style.display = "flex";
-}
 
-function hideErrorModal() {
-    document.getElementById("errorModal").style.display = "none";
-}
+// #region - Simulation Related Functions
 
-function showConfirmingModal(title = "", body = "", confirmBtnText = "", onConfirm = null) {
-    document.querySelector('#confirmingModal .modal-title').innerText = title;
-    document.querySelector('#confirmingModal .modal-body').innerHTML = body;
-    document.querySelector('#confirmingModal .modal-footer .btn-primary').innerText = confirmBtnText;
-    if (confirmBtnEventListener) {
-        document.querySelector('#confirmingModal .modal-footer .btn-primary').removeEventListener('click', confirmBtnEventListener);
-    }
-    confirmBtnEventListener = onConfirm;
-    document.querySelector('#confirmingModal .modal-footer .btn-primary').addEventListener('click', onConfirm);
-    document.getElementById('confirmingModal').style.display = "flex";
-}
-
-function hideConfirmingModal() {
-    document.getElementById('confirmingModal').style.display = "none";
-}
-
-function showLoadingModal() {
-    document.getElementById("loadingModal").style.display = "flex";
-}
-
-function hideLoadingModal() {
-    document.getElementById("loadingModal").style.display = "none";
-}
-
-function showLoadWorldModal() {
-    // Fetch the list of worlds from the server
-    fetch("http://localhost:3000/api/get-worlds", {
-        method: "POST",
+function resetCarBrain() {
+    const tempBrain = new Brain();
+    tempBrain.resetToDefault();
+    tempBrain.save();
+    Visualizer.brain = tempBrain;
+    world.markings.forEach(m => {
+        if (
+            m instanceof StartMarking &&
+            m.car &&
+            m.car.brain
+        ) {
+            m.car.brain = tempBrain;
+        }
     })
-        .then((response) => {
-            if (!response.ok) {
-                return response.json().then((data) => {
-                    throw new Error(data.details || "Failed to fetch worlds");
-                });
-            }
-            return response.json();
-        })
-        .then((data) => {
-            const worldListContainer = document.getElementById("worldList");
-            worldListContainer.innerHTML = ""; // Clear existing content
-
-            if (data.worlds && data.worlds.length > 0) {
-                data.worlds.forEach((world, index) => {
-                    // Create elements to display the world
-                    const worldItem = document.createElement("div");
-                    const worldId = index + 1;
-                    worldItem.classList.add("world-item");
-                    worldItem.setAttribute("id", world.id + "")
-                    worldItem.innerHTML = `
-                  <img src="${world.screenshot}" alt="World ${worldId}" />
-                  <div class="world-info">
-                    <h4>World ${worldId}</h4>
-                    <div class="world-controls">
-                        <button 
-                            class="btn-world-info" 
-                            id="world-info-${worldId}"
-                            onclick="showWorldInfoPopover('world-info-${worldId}')"
-                            data-toggle="popover"
-                            data-placement="top"
-                            data-trigger="click"
-                            data-html="true"
-                            data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
-                        >ℹ️</button>
-                        <button
-                            class="btn-world-delete"
-                            id="world-delete-${worldId}"
-                            onclick="showConfirmingModal(
-                                'Delete world', 
-                                '<p>Are you sure you want to delete <b>World ${worldId}</b> from the list of saved worlds?</p>', 
-                                'Delete',
-                                () => deleteWorldData('${world.id}')
-                            )"
-                        >🗑️</button>
-                    </div>
-                  </div>
-                `;
-
-                    // Add event listener to handle world selection
-                    worldItem.querySelector('img').addEventListener("click", () => {
-                        loadWorldData(world.id);
-                    });
-
-                    worldItem.querySelector('h4').addEventListener("click", () => {
-                        loadWorldData(world.id);
-                    });
-
-                    // Append the world item to the container
-                    worldListContainer.appendChild(worldItem);
-                });
-            } else {
-                worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
-            }
-            document.getElementById("loadWorldModal").style.display = "flex";
-        })
-        .catch((error) => {
-            console.error("Error fetching worlds:", error);
-            showErrorModal("Error fetching the saved worlds.");
-        });
-}
-
-function hideLoadWorldModal() {
-    hideAllPopovers();
-    document.getElementById("loadWorldModal").style.display = "none";
-}
-
-function showLoadOsmGraphModal() {
-    document.getElementById('loadOsmGraphModal').style.display = "flex";
-}
-
-function hideLoadOsmGraphModal() {
-    document.getElementById('loadOsmGraphModal').style.display = "none";
 }
 
 function checkForSimulationSuccess() {
@@ -645,264 +1033,11 @@ function exitSimulationMode() {
     setMode('world');
 }
 
-function addEventListeners() {
-    $('#trafficToggle').change((ev) => {
-        tempSettings.isLHT = !ev.target.checked;
-    });
+// #endregion
 
-    document
-        .getElementById('clearCanvasBtn')
-        .addEventListener('click', () => {
-            showConfirmingModal(
-                'Clear Canvas',
-                `<p>
-                Are you sure you want to clear the canvas area?
-                <br />
-                <br />
-                <small>(Note: This action is unrecoverable.)</small>
-                </p>`,
-                'Clear',
-                () => {
-                    clearCanvas();
-                    hideConfirmingModal();
-                }
-            );
-        });
 
-    document
-        .getElementById('disposeCarsBtn')
-        .addEventListener('click', () => {
-            showConfirmingModal(
-                'Remove Cars',
-                `<p>
-                Are you sure you want to remove all the cars from the world?
-                <br />
-                <br />
-                <small>(Note: This action is unrecoverable.)</small>
-                </p>`,
-                'Continue',
-                () => {
-                    disposeCars();
-                    hideConfirmingModal();
-                }
-            );
-        });
 
-    document
-        .getElementById('disposeMarkingsBtn')
-        .addEventListener('click', () => {
-            showConfirmingModal(
-                'Remove Markings',
-                `<p>
-                Are you sure you want to remove all the markings from the world?
-                <br />
-                <br />
-                <small>(Note: This action is unrecoverable and will need you to create all markings <b>(including cars)</b> on the world.)</small>
-                </p>`,
-                'Continue',
-                () => {
-                    disposeMarkings();
-                    hideConfirmingModal();
-                }
-            );
-        });
-
-    document
-        .getElementById('editGraphBtn')
-        .addEventListener('click', () => {
-            showConfirmingModal(
-                'Edit Skeleton',
-                `<p>
-                Are you sure you want to change to <b>Edit Skeleton</b> mode for this world?
-                <br />
-                <br />
-                <small>(Note: This action is unrecoverable and will need you to regenerate & redecorate the world.</small>
-                </p>`,
-                'Continue',
-                () => {
-                    setMode('graph');
-                    hideConfirmingModal();
-                }
-            );
-        });
-
-    document
-        .getElementById("roadWidth")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("roadWidth").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("roadWidth").value = tempSettings.roadWidth;
-                showTooltip('roadWidth');
-                return;
-            }
-            tempSettings.roadWidth = value;
-        });
-
-    document
-        .getElementById("buildingWidth")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("buildingWidth").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("buildingWidth").value = tempSettings.buildingWidth;
-                showTooltip('buildingWidth');
-                return;
-            }
-            tempSettings.buildingWidth = value;
-        });
-
-    document
-        .getElementById("buildingMinLength")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("buildingMinLength").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("buildingMinLength").value = tempSettings.buildingMinLength;
-                showTooltip('buildingMinLength');
-                return;
-            }
-            tempSettings.buildingMinLength = value;
-        });
-
-    document
-        .getElementById("spacing")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("spacing").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("spacing").value = tempSettings.spacing;
-                showTooltip('spacing');
-                return;
-            }
-            tempSettings.spacing = value;
-        });
-
-    document
-        .getElementById("treeSize")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("treeSize").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("treeSize").value = tempSettings.treeSize;
-                showTooltip('treeSize');
-                return;
-            }
-            tempSettings.treeSize = value;
-        });
-
-    document
-        .getElementById("treeHeight")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("treeHeight").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("treeHeight").value = tempSettings.treeHeight;
-                showTooltip('treeHeight');
-                return;
-            }
-            tempSettings.treeHeight = value;
-        });
-
-    document
-        .getElementById("carMaxSpeed")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("carMaxSpeed").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("carMaxSpeed").value = tempSettings.carMaxSpeed;
-                showTooltip('carMaxSpeed');
-                return;
-            }
-            tempSettings.carMaxSpeed = value;
-        });
-
-    document
-        .getElementById("carAcceleration")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("carAcceleration").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-'].includes(ev.data)) {
-                document.getElementById("carAcceleration").value = tempSettings.carAcceleration;
-                showTooltip('carAcceleration');
-                return;
-            }
-            tempSettings.carAcceleration = value;
-        });
-
-    document
-        .getElementById("simulationNumCars")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("simulationNumCars").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-', '.'].includes(ev.data)) {
-                document.getElementById("simulationNumCars").value = tempSettings.simulationNumCars;
-                showTooltip('simulationNumCars');
-                return;
-            }
-            if (parseInt(value, 10) < 1) {
-                document.getElementById("simulationNumCars").value = tempSettings.simulationNumCars;
-                showTooltip('simulationNumCars');
-                return;
-            }
-            tempSettings.simulationNumCars = value;
-        });
-
-    document
-        .getElementById("simulationDiffFactor")
-        .addEventListener("input", (ev) => {
-            const value = document.getElementById("simulationDiffFactor").value;
-            if (value === "" && ev.data === null) {
-                return;
-            }
-            if (['+', '-'].includes(ev.data)) {
-                document.getElementById("simulationDiffFactor").value = tempSettings.simulationDiffFactor;
-                showTooltip('simulationDiffFactor');
-                return;
-            }
-            if (parseFloat(value, 10) < 0 || parseFloat(value, 10) > 1) {
-                document.getElementById("simulationDiffFactor").value = tempSettings.simulationDiffFactor;
-                showTooltip('simulationDiffFactor');
-                return;
-            }
-            tempSettings.simulationDiffFactor = value || 0.1;
-        });
-}
-
-function showWorldInfoPopover(inputId) {
-    hideAllPopovers();
-    clearTimeout(tooltipTimeout);
-    $('#' + inputId).popover('show');
-    tooltipTimeout = setTimeout(() => hideAllPopovers(), 5000);
-}
-
-function showTooltip(inputId) {
-    clearTimeout(tooltipTimeout);
-    $('#' + inputId).popover('show');
-    tooltipTimeout = setTimeout((id) => hideTooltip(id), 3000, inputId);
-}
-
-function hideTooltip(inputId) {
-    $('#' + inputId).popover('hide')
-}
+// #region - Settings related functions
 
 function showErrorMessage(inputId) {
     document.getElementById(inputId + 'Error').style.display = 'block';
@@ -940,38 +1075,75 @@ function loadSettingsIntoDisplay() {
 
 function areValidSettings(settings) {
     let valid = true;
-    if (!settings.roadWidth || (settings.roadWidth < 100 || settings.roadWidth > 500)) {
+
+    if (
+        !settings.roadWidth ||
+        settings.roadWidth < Settings.roadWidthRange[0] ||
+        settings.roadWidth > Settings.roadWidthRange[1]
+    ) {
         showErrorMessage('roadWidth')
         valid = false;
     }
-    if (!settings.buildingWidth || (settings.buildingWidth < 50 || settings.buildingWidth > 200)) {
+
+    if (
+        !settings.buildingWidth ||
+        settings.buildingWidth < Settings.buildingWidthRange[0] ||
+        settings.buildingWidth > Settings.buildingWidthRange[1]
+    ) {
         showErrorMessage('buildingWidth')
         valid = false;
     }
-    if (!settings.buildingMinLength || (settings.buildingMinLength < 50 || settings.buildingMinLength > 150)) {
+
+    if (
+        !settings.buildingMinLength ||
+        settings.buildingMinLength < Settings.buildingMinLengthRange[0] ||
+        settings.buildingMinLength > Settings.buildingMinLengthRange[1]
+    ) {
         showErrorMessage('buildingMinLength')
         valid = false;
     }
-    if (!settings.spacing || (settings.spacing < 0 || settings.spacing > 100)) {
+
+    if (
+        !settings.spacing ||
+        settings.spacing < Settings.spacingRange[0] ||
+        settings.spacing > Settings.spacingRange[1]
+    ) {
         showErrorMessage('spacing')
         valid = false;
     }
-    if (!settings.treeSize || (settings.treeSize < 100 || settings.treeSize > 200)) {
+
+    if (!settings.treeSize ||
+        settings.treeSize < Settings.treeSizeRange[0] ||
+        settings.treeSize > Settings.treeSizeRange[1]
+    ) {
         showErrorMessage('treeSize')
         valid = false;
     }
-    if (!settings.treeHeight || (settings.treeHeight < 100 || settings.treeHeight > 300)) {
-        showErrorMessage('treeHeight')
+
+    if (!settings.treeHeight ||
+        settings.treeHeight < Settings.treeHeightRange[0] ||
+        settings.treeHeight > Settings.treeHeightRange[1]
+    ) {
+        showErrorMessage('treeHeight');
         valid = false;
     }
-    if (!settings.simulationNumCars || settings.simulationNumCars < 1) {
+
+    if (!settings.simulationNumCars ||
+        settings.simulationNumCars < Settings.simulationNumCarsRange[0] ||
+        settings.simulationNumCars > Settings.simulationNumCarsRange[1]
+    ) {
         showErrorMessage('simulationNumCars')
         valid = false;
     }
-    if (!settings.simulationDiffFactor || (settings.simulationDiffFactor < 0 || settings.simulationDiffFactor > 1)) {
+
+    if (!settings.simulationDiffFactor ||
+        settings.simulationDiffFactor < Settings.simulationDiffFactorRange[0] ||
+        settings.simulationDiffFactor > Settings.simulationDiffFactorRange[1]
+    ) {
         showErrorMessage('simulationDiffFactor')
         valid = false;
     }
+
     return valid;
 }
 
@@ -1021,8 +1193,7 @@ function saveSettings() {
 
 function resetSettings() {
     hideErrorMessages();
-    showTooltip('saveSettingsBtn');
-    setTimeout(() => hideTooltip('saveSettingsBtn'), 3000)
+    showPopoverByID('saveSettingsBtn');
     world.settings.reset();
     world.settings.save();
     loadSettingsIntoDisplay();
@@ -1049,3 +1220,5 @@ function hideSettingsModal() {
     document.getElementById("settingsModal").style.display = "none";
     hideErrorMessages();
 }
+
+// #endregion

@@ -607,11 +607,12 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 100 and 500 (inclusive)."
                       placeholder="Enter road width"
                     />
                     <small id="roadWidthError" class="error-message form-text">
-                      Road Width must be between 100 to 500 (inclusive).
+                      Road Width must be between
+                      <span class="roadWidthMin"></span> to
+                      <span class="roadWidthMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group">
@@ -624,20 +625,21 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 50 and 200 (inclusive)."
                       placeholder="Enter building width"
                     />
                     <small
                       id="buildingWidthError"
                       class="error-message form-text"
                     >
-                      Building Width must be between 50 to 200 (inclusive).
+                      Building Width must be between
+                      <span class="buildingWidthMin"></span> to
+                      <span class="buildingWidthMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="buildingMinLength"
-                      >Building Minimum Length</label
-                    >
+                    <label for="buildingMinLength">
+                      Building Minimum Length
+                    </label>
                     <input
                       type="number"
                       class="form-control"
@@ -646,15 +648,15 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 50 and 150 (inclusive)."
                       placeholder="Enter building min length"
                     />
                     <small
                       id="buildingMinLengthError"
                       class="error-message form-text"
                     >
-                      Building Minimum Length must be between 50 to 150
-                      (inclusive).
+                      Building Minimum Length must be between
+                      <span class="buildingMinLengthMin"></span> to
+                      <span class="buildingMinLengthMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group">
@@ -667,11 +669,12 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 0 and 100 (inclusive)."
                       placeholder="Enter spacing"
                     />
                     <small id="spacingError" class="error-message form-text">
-                      Spacing must be between 0 to 100 (inclusive).
+                      Spacing must be between
+                      <span class="spacingMin"></span> to
+                      <span class="spacingMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group">
@@ -684,11 +687,12 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 100 and 200 (inclusive)."
                       placeholder="Enter tree size"
                     />
                     <small id="treeSizeError" class="error-message form-text">
-                      Tree Size must be between 100 to 200 (inclusive).
+                      Tree Size must be between
+                      <span class="treeSizeMin"></span> to
+                      <span class="treeSizeMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group">
@@ -701,11 +705,12 @@
                       data-toggle="popover"
                       data-placement="left"
                       data-trigger="manual"
-                      data-content="Enter a value between 100 and 300 (inclusive)."
                       placeholder="Enter tree height"
                     />
                     <small id="treeHeightError" class="error-message form-text">
-                      Tree Height must be between 100 to 300 (inclusive).
+                      Tree Height must be between
+                      <span class="treeHeightMin"></span> to
+                      <span class="treeHeightMax"></span> (inclusive).
                     </small>
                   </div>
                   <div class="form-group flex">
@@ -771,14 +776,15 @@
                     data-toggle="popover"
                     data-placement="left"
                     data-trigger="manual"
-                    data-content="Whole number greater than 0 required."
                     placeholder="Enter number of cars"
                   />
                   <small
                     id="simulationNumCarsError"
                     class="error-message form-text"
                   >
-                    Number of cars for simulation must be greater than 0.
+                    Number of cars for simulation must be between
+                    <span class="simulationNumCarsMin"></span> to
+                    <span class="simulationNumCarsMax"></span> (inclusive).
                   </small>
                 </div>
                 <div class="form-group">
@@ -794,15 +800,15 @@
                     data-toggle="popover"
                     data-placement="left"
                     data-trigger="manual"
-                    data-content="Keep the differentiation factor in the range 0 to 1 (inclusive)."
                     placeholder="Enter differentiation factor"
                   />
                   <small
                     id="simulationDiffFactorError"
                     class="error-message form-text"
                   >
-                    Differentiation Factor for simulation must be between 0 and
-                    1 (inclusive).
+                    Differentiation Factor for simulation must be between
+                    <span class="simulationDiffFactorMin"></span> to
+                    <span class="simulationDiffFactorMax"></span> (inclusive).
                   </small>
                 </div>
               </div>

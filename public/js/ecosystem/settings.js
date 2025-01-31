@@ -1,4 +1,13 @@
 class Settings {
+    static roadWidthRange = [100, 200];
+    static buildingWidthRange = [50, 200];
+    static buildingMinLengthRange = [50, 150];
+    static spacingRange = [0, 100];
+    static treeSizeRange = [100, 200];
+    static treeHeightRange = [100, 300];
+    static simulationNumCarsRange = [1, 10000];
+    static simulationDiffFactorRange = [0, 1];
+
     constructor(
         roadWidth = 100,
         roadRoundness = 10,
