@@ -412,46 +412,69 @@ button {
   align-items: center;
 }
 
-.divider {
-  display: table;
-  font-size: 24px;
-  text-align: center;
-  width: 75%;
-  margin: 20px auto;
-}
-
-.divider span {
-  display: table-cell;
+/* Style for the custom dropdown */
+#carStyle .dropdown {
   position: relative;
+  display: inline-block;
 }
 
-.divider span:first-child,
-.divider span:last-child {
-  width: 50%;
-  top: 15px;
-  -moz-background-size: 100% 2px;
-  background-size: 100% 2px;
-  background-position: 0 0, 0 100%;
-  background-repeat: no-repeat;
+#carStyle .dropdown-btn {
+  padding-left: 1.5rem;
+  width: 7rem;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.divider span:first-child {
-  background-image: -webkit-linear-gradient(180deg, transparent, #000);
-  background-image: -moz-linear-gradient(180deg, transparent, #000);
-  background-image: -o-linear-gradient(180deg, transparent, #000);
-  background-image: linear-gradient(90deg, transparent, #000);
+#carStyle span.dropdown-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
 }
 
-.divider span:nth-child(2) {
-  color: #000;
-  padding: 0px 20px;
-  width: auto;
-  white-space: nowrap;
+#carStyle span.dropdown-arrow img {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
-.divider span:last-child {
-  background-image: -webkit-linear-gradient(180deg, #000, transparent);
-  background-image: -moz-linear-gradient(180deg, #000, transparent);
-  background-image: -o-linear-gradient(180deg, #000, transparent);
-  background-image: linear-gradient(90deg, #000, transparent);
+#carStyle img.selected {
+  transform: rotate(-90deg);
+}
+
+#carStyle .dropdown-content {
+  border-radius: 10px;
+  padding: 5px;
+  display: none;
+  position: absolute;
+  background-color: #676766;
+  min-width: 9.5rem;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#carStyle table {
+  min-width: inherit;
+}
+
+#carStyle .dropdown-option {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+#carStyle .dropdown-option img {
+  transform: rotate(-90deg);
+}
+
+#carStyle .dropdown-option:hover {
+  background-color: #588ded;
+}
+
+#carStyle .dropdown-btn:focus {
+  outline: none;
+  box-shadow: 0px 0px 4px 2.5px #bcd8ff;
 }
