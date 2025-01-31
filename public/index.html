@@ -89,6 +89,89 @@
           </div>
         </div>
         <div class="markings">
+          <div id="carStyle">
+            <div class="dropdown">
+              <button
+                class="dropdown-btn"
+                id="carStyleBtn"
+                onclick="toggleCarStyleDropdown()"
+              >
+                <img
+                  class="selected"
+                  src="images/cars/car_white.png"
+                  alt="White Car"
+                />
+                <span class="dropdown-arrow">
+                  <img src="images/dropdown_arrow.png" alt="Dropdown Arrow" />
+                </span>
+              </button>
+              <div class="dropdown-content" id="carStyleDropdown">
+                <table>
+                  <tr>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="car_white"
+                        onclick="selectCarStyleOption('car_white')"
+                      >
+                        <img src="images/cars/car_white.png" alt="White Car" />
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="car_blue"
+                        onclick="selectCarStyleOption('car_blue')"
+                      >
+                        <img src="images/cars/car_blue.png" alt="Blue Car" />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="car_black"
+                        onclick="selectCarStyleOption('car_black')"
+                      >
+                        <img src="images/cars/car_black.png" alt="Black Car" />
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="car_red"
+                        onclick="selectCarStyleOption('car_red')"
+                      >
+                        <img src="images/cars/car_red.png" alt="Red Car" />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="car_gray"
+                        onclick="selectCarStyleOption('car_gray')"
+                      >
+                        <img src="images/cars/car_gray.png" alt="Gray Car" />
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        class="dropdown-option"
+                        data-value="bike"
+                        onclick="selectCarStyleOption('bike')"
+                      >
+                        <img src="images/cars/bike.png" alt="Bike" />
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          &nbsp; &nbsp; &nbsp; &nbsp;
           <button
             id="stopBtn"
             onclick="setMode('stop')"
