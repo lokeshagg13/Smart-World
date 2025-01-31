@@ -613,7 +613,7 @@ function fillVariableHtmlData() {
 
 // #region - Popovers and Tooltips
 
-const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn', '.hint'];
+const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', '#manualOverrideBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn', '.hint'];
 
 function hideAllPopovers() {
     $(popoverSelectors.join(', ')).popover('hide');
@@ -624,6 +624,7 @@ function showMustAddCarPopover(popoverContent) {
     hideAllPopovers();
     document.getElementById('startBtn').setAttribute('data-toggle', 'popover');
     document.getElementById('startBtn').setAttribute('data-trigger', 'manual');
+    document.getElementById('startBtn').setAttribute('title', 'Cars');
     document.getElementById('startBtn').setAttribute('data-content', popoverContent);
     $('#startBtn').popover('show');
     popoverTimeout = setTimeout(() => {
@@ -639,12 +640,27 @@ function showMustAddTargetPopover() {
     hideAllPopovers();
     document.getElementById('targetBtn').setAttribute('data-toggle', 'popover');
     document.getElementById('targetBtn').setAttribute('data-trigger', 'manual');
+    document.getElementById('targetBtn').setAttribute('title', 'Target');
     $('#targetBtn').popover('show');
     popoverTimeout = setTimeout(() => {
         hideAllPopovers();
         document.getElementById('targetBtn').setAttribute('data-toggle', 'tooltip');
         document.getElementById('targetBtn').setAttribute('data-trigger', 'hover');
         document.getElementById('targetBtn').setAttribute('title', 'Target Editor Mode.');
+    }, 4000);
+}
+
+function showManualOverridePopover() {
+    clearTimeout(popoverTimeout);
+    hideAllPopovers();
+    document.getElementById('manualOverrideBtn').setAttribute('data-toggle', 'popover');
+    document.getElementById('manualOverrideBtn').setAttribute('data-trigger', 'manual');
+    $('#manualOverrideBtn').popover('show');
+    popoverTimeout = setTimeout(() => {
+        hideAllPopovers();
+        document.getElementById('manualOverrideBtn').setAttribute('data-toggle', 'tooltip');
+        document.getElementById('manualOverrideBtn').setAttribute('data-trigger', 'hover');
+        document.getElementById('manualOverrideBtn').setAttribute('title', 'Manual Override');
     }, 4000);
 }
 
@@ -933,12 +949,14 @@ function setMode(mode) {
         document.querySelector('#disposeMarkingsBtn').style.display = "inline-flex";
         document.querySelector('#editGraphBtn').style.display = "inline-flex";
         document.querySelector('#simulationBtn').style.display = "inline-flex";
-
         if (mode !== "world") {
             document
                 .getElementById(mode + 'Btn')
                 .classList
                 .add('clicked');
+        }
+        else if (world.settings.carControlType === "KEYS") {
+            showManualOverridePopover();
         }
         editors[mode].enable();
         miniMap.show();
