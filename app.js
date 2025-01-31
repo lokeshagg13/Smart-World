@@ -5,6 +5,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const app = express();
 
+const { logSuccess, logError } = require('./utils/logger');
 const { encryptId, decryptId } = require('./utils/security');
 
 require('dotenv').config();
@@ -44,6 +45,7 @@ app.post('/api/save-world', async (req, res) => {
     try {
         const { world: worldToSave } = req.body;
         if (!worldToSave) {
+            logError('400 - Save World : No world found to save');
             return res.status(400).json({ error: 'worldString is required' });
         }
 
@@ -60,11 +62,11 @@ app.post('/api/save-world', async (req, res) => {
 
         // Add textual data to the json file
         worlds.push(worldToSave);
-        fs.writeFileSync(worldJSONPath, JSON.stringify(worlds, '', 4))
-        console.log('201: Save World')
+        fs.writeFileSync(worldJSONPath, JSON.stringify(worlds, '', 4));
+        logSuccess('201 - Save World : Success');
         return res.status(201).json({ message: 'World saved successfully' });
     } catch (error) {
-        console.log(error)
+        logError('500 - Save World : ' + error.message);
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
@@ -78,9 +80,10 @@ app.post('/api/get-worlds', async (req, res) => {
             screenshot: world.screenshot,
             createdOn: world.createdOn
         }));
+        logSuccess('200 - Get Worlds : Success');
         return res.status(200).json({ message: 'Worlds retrieved successfully', worlds: worlds });
     } catch (error) {
-        console.log(error)
+        logError('500 - Get Worlds : ' + error.message);
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 })
@@ -92,19 +95,22 @@ app.get('/api/load-world/:worldId', async (req, res) => {
         const worlds = worldDataString !== '' ? JSON.parse(worldDataString) : [];
 
         if (worlds.length === 0) {
+            logError('404 - Load World : No saved worlds');
             return res.status(404).json({ error: 'No saved worlds.' });
         }
 
         const worldId = req.params['worldId'];
         let world = worlds.filter((world) => decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV) === worldId);
         if (world.length == 0) {
+            logError('404 - Load World : World not found');
             return res.status(404).json({ message: 'World not found' })
         }
         world = world[0]
         world.id = decryptId(world.id, ENCRYTION_SECRET, ENCRYTION_IV);
+        logSuccess('200 - Load World : Success');
         return res.status(200).json({ message: 'World retrieved successfully', world: world });
     } catch (error) {
-        console.log(error)
+        logError('500 - Load World : ' + error.message);
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
@@ -116,6 +122,7 @@ app.delete('/api/delete-world/:worldId', async (req, res) => {
         const worlds = worldDataString !== '' ? JSON.parse(worldDataString) : [];
 
         if (worlds.length === 0) {
+            logError('404 - Delete World : No saved worlds');
             return res.status(404).json({ error: 'No saved worlds.' });
         }
 
@@ -133,9 +140,10 @@ app.delete('/api/delete-world/:worldId', async (req, res) => {
             }
         }
         fs.writeFileSync(worldJSONPath, JSON.stringify(worldsRemaining, '', 4))
+        logSuccess('200 - Delete World : Success');
         return res.status(200).json({ message: 'World deleted successfully' });
     } catch (error) {
-        console.log(error)
+        logError('500 - Delete World : ' + error.message);
         return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
 });
@@ -155,16 +163,15 @@ app.post('/api/admin/login', (req, res) => {
         if (hashedPassword === ADMIN_PASSWORD_HASH) {
             // Create a JWT token
             const token = jwt.sign({ user: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
-            console.log('valid')
-            
+            logSuccess('200 - Admin Login : Success');
             return res.status(200).json({ success: true, token });
         } else {
-            console.log('invalid')
+            logError('401 - Admin Login : Invalid password');
             return res.status(401).json({ success: false, message: 'Invalid password' });
         }
     } catch (error) {
-        console.log('invalid')
-        return res.status(401).json({ success: false, message: 'Invalid password' });
+        logError('500 - Admin Login : ' + error.message);
+        return res.status(500).json({ success: false, message: 'Invalid password' });
     }
 });
 
@@ -174,12 +181,15 @@ app.post('/api/admin/verify', (req, res) => {
 
     try {
         if (!token) {
+            logError('401 - Verify Access : Invalid token received');
             return res.status(401).json({ success: false, message: 'Invalid or expired token' });
         }
         const decoded = jwt.verify(token, JWT_SECRET);
+        logSuccess('200 - Verify Access : Success');
         return res.status(200).json({ success: true, decoded });
-    } catch (err) {
-        return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    } catch (error) {
+        logError('500 - Verify Access : ' + error.message);
+        return res.status(500).json({ success: false, message: 'Invalid or expired token' });
     }
 });
 
