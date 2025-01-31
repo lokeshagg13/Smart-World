@@ -32,6 +32,7 @@ const progressTracker = new ProgressTracker();
 
 let currentMode;
 let popoverTimeout;
+let currentCarStyle = 'car_white';
 let confirmBtnEventListener = null;
 let submitBtnEventListener = null;
 let isTrafficSideChangedConfirmed = false;
@@ -369,7 +370,19 @@ function addEventListeners() {
             () => showPopoverByID('showSensorsHint')
         );
 
-
+    window
+        .addEventListener(
+            "click",
+            (ev) => {
+                if (
+                    !ev.target.matches('#carStyle button.dropdown-btn') &&
+                    !ev.target.matches('#carStyle button.dropdown-btn img.selected') &&
+                    !ev.target.matches('#carStyle span.dropdown-arrow') &&
+                    !ev.target.matches('#carStyle span.dropdown-arrow img')
+                ) {
+                    document.getElementById("carStyleDropdown").style.display = "none";
+                }
+            });
 }
 
 function fillVariableHtmlData() {
@@ -826,6 +839,25 @@ function showPromptModal(title = "", body = "", submitBtnText = "", onSubmit = n
 function hidePromptModal() {
     document.getElementById('adminPassword').value = "";
     document.getElementById('promptModal').style.display = "none";
+}
+
+// #endregion
+
+
+
+// #region - Car Select Dropdowns
+
+function toggleCarStyleDropdown() {
+    const dropdown = document.getElementById("carStyleDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
+
+function selectCarStyleOption(carStyle = 'car_white') {
+    const carStyleBtn = document.querySelector("#carStyleBtn img");
+    carStyleBtn.setAttribute('src', 'images/cars/' + carStyle + '.png');
+    carStyleBtn.setAttribute('alt', carStyle.split('_').reverse().map(s => s[0].toUpperCase() + s.slice(1)).join(' '));
+    document.getElementById("carStyleDropdown").style.display = "none";
+    currentCarStyle = carStyle;
 }
 
 // #endregion

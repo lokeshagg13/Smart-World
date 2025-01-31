@@ -32,7 +32,7 @@ class Car {
         this.#addKeyboardListeners();
 
         this.img = new Image();
-        this.img.src = "images/cars/car_white.png";
+        this.img.src = `images/cars/${currentCarStyle || 'car_white'}.png`;
         this.width = this.img.width / 2;
         this.height = this.img.height / 2;
         this.polygon = this.#createPolygonAroundCar();
