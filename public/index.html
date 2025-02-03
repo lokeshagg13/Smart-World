@@ -97,7 +97,7 @@
                 onclick="toggleCarStyleDropdown()"
               >
                 <img
-                  class="selected"
+                  class="dropdown-selected"
                   src="images/cars/car_white.png"
                   alt="White Car"
                 />
@@ -106,13 +106,14 @@
                 </span>
               </button>
               <div class="dropdown-content" id="carStyleDropdown">
+                <img class="dropdown-selected-icon" src="images/check-icon.svg" />
                 <table>
                   <tr>
                     <td>
                       <div
                         class="dropdown-option"
                         data-value="car_white"
-                        onclick="selectCarStyleOption('car_white')"
+                        onclick="selectCarStyleOption('car_white', 0, 0)"
                       >
                         <img src="images/cars/car_white.png" alt="White Car" />
                       </div>
@@ -121,7 +122,7 @@
                       <div
                         class="dropdown-option"
                         data-value="car_blue"
-                        onclick="selectCarStyleOption('car_blue')"
+                        onclick="selectCarStyleOption('car_blue', 0, 1)"
                       >
                         <img src="images/cars/car_blue.png" alt="Blue Car" />
                       </div>
@@ -132,7 +133,7 @@
                       <div
                         class="dropdown-option"
                         data-value="car_black"
-                        onclick="selectCarStyleOption('car_black')"
+                        onclick="selectCarStyleOption('car_black', 1, 0)"
                       >
                         <img src="images/cars/car_black.png" alt="Black Car" />
                       </div>
@@ -141,7 +142,7 @@
                       <div
                         class="dropdown-option"
                         data-value="car_red"
-                        onclick="selectCarStyleOption('car_red')"
+                        onclick="selectCarStyleOption('car_red', 1, 1)"
                       >
                         <img src="images/cars/car_red.png" alt="Red Car" />
                       </div>
@@ -152,7 +153,7 @@
                       <div
                         class="dropdown-option"
                         data-value="car_gray"
-                        onclick="selectCarStyleOption('car_gray')"
+                        onclick="selectCarStyleOption('car_gray', 2, 0)"
                       >
                         <img src="images/cars/car_gray.png" alt="Gray Car" />
                       </div>
@@ -161,7 +162,7 @@
                       <div
                         class="dropdown-option"
                         data-value="bike"
-                        onclick="selectCarStyleOption('bike')"
+                        onclick="selectCarStyleOption('bike', 2, 1)"
                       >
                         <img src="images/cars/bike.png" alt="Bike" />
                       </div>
@@ -172,6 +173,30 @@
             </div>
           </div>
           &nbsp; &nbsp; &nbsp; &nbsp;
+          <button
+            id="startBtn"
+            onclick="setMode('start')"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-trigger="hover"
+            data-content=""
+            title="Car Editor Mode"
+          >
+            🚙
+          </button>
+          &nbsp;
+          <button
+            id="targetBtn"
+            onclick="setMode('target')"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-trigger="hover"
+            data-content="Add the target to be followed by this car."
+            title="Target Editor Mode"
+          >
+            🎯
+          </button>
+          &nbsp; &nbsp;
           <button
             id="stopBtn"
             onclick="setMode('stop')"
@@ -193,18 +218,6 @@
           </button>
           &nbsp;
           <button
-            id="startBtn"
-            onclick="setMode('start')"
-            data-toggle="tooltip"
-            data-placement="top"
-            data-trigger="hover"
-            data-content=""
-            title="Car Editor Mode"
-          >
-            🚙
-          </button>
-          &nbsp;
-          <button
             id="parkingBtn"
             onclick="setMode('parking')"
             data-toggle="tooltip"
@@ -212,18 +225,6 @@
             title="Parking Editor Mode"
           >
             🅿️
-          </button>
-          &nbsp;
-          <button
-            id="targetBtn"
-            onclick="setMode('target')"
-            data-toggle="tooltip"
-            data-placement="top"
-            data-trigger="hover"
-            data-content="Add the target to be followed by this car."
-            title="Target Editor Mode"
-          >
-            🎯
           </button>
           &nbsp;
           <button

@@ -376,7 +376,7 @@ function addEventListeners() {
             (ev) => {
                 if (
                     !ev.target.matches('#carStyle button.dropdown-btn') &&
-                    !ev.target.matches('#carStyle button.dropdown-btn img.selected') &&
+                    !ev.target.matches('#carStyle button.dropdown-btn img.dropdown-selected') &&
                     !ev.target.matches('#carStyle span.dropdown-arrow') &&
                     !ev.target.matches('#carStyle span.dropdown-arrow img')
                 ) {
@@ -852,11 +852,15 @@ function toggleCarStyleDropdown() {
     dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
 }
 
-function selectCarStyleOption(carStyle = 'car_white') {
+function selectCarStyleOption(carStyle = 'car_white', rowIndex = 0, colIndex = 0) {
     const carStyleBtn = document.querySelector("#carStyleBtn img");
     carStyleBtn.setAttribute('src', 'images/cars/' + carStyle + '.png');
     carStyleBtn.setAttribute('alt', carStyle.split('_').reverse().map(s => s[0].toUpperCase() + s.slice(1)).join(' '));
     document.getElementById("carStyleDropdown").style.display = "none";
+    document.getElementById("carStyleDropdown").style.top = -58 * rowIndex - 10;
+    document.getElementById("carStyleDropdown").style.left = -76 * colIndex; 
+    document.querySelector("img.dropdown-selected-icon").style.top = 56 * rowIndex + 5;
+    document.querySelector("img.dropdown-selected-icon").style.left = 76 * colIndex + 8; 
     currentCarStyle = carStyle;
 }
 

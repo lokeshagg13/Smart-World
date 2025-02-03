@@ -439,7 +439,7 @@ button {
   height: 1.2rem;
 }
 
-#carStyle img.selected {
+#carStyle img.dropdown-selected {
   transform: rotate(-90deg);
 }
 
@@ -452,6 +452,16 @@ button {
   min-width: 9.5rem;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+#carStyle .dropdown-selected-icon {
+  position: absolute;
+  z-index: 2;
+  width: 1rem;
+  top: 5px;
+  left: 8px;
 }
 
 #carStyle table {
