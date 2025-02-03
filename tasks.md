@@ -12,12 +12,16 @@
 
 1. Handle mobile tablet mode and laptop mode
 2. Distance to target and ETA to be shown for selected cars.
+3. Check for collisions with other cars.
+4. Fill world with N random cars.
+5. Car sounds for acceleration.
+6. Only allow placements of traffic lights near the road intersections with degree > 2 (max distance of say 100).
+7. Downloads in youtube for deploying this app.
+8. Show cars that reach target in a better way
+
 
 # P1 - Immediate
 
-1. Show cars that reach target in a better way
-2. Bike can be made bigger.
-3. Convert pedcount in crossing to an array of pedestrian objects that are visible on the map
 
 # Done
 
@@ -42,3 +46,9 @@
 11. Show manual override warning in world mode
 12. Alert to add password for admin access.
 13. Allow different car styles to be shown on the map using car style selection dropdown.
+
+03 Feb
+14. Enhancing car select button styling.
+15. Adding pedcount of crossings and also maintain an array of pedestrian objects that are visible on the map.
+16. Synchronize pedestrian movements with traffic lights.
+
