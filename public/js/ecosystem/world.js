@@ -11,6 +11,7 @@ class World {
         this.laneGuides = [];
 
         this.markings = [];
+        this.pedestrians = [];
         this.selectedCar = null;
         this.followedCar = null;
 
@@ -91,6 +92,7 @@ class World {
         this.laneGuides = [];
 
         this.markings = [];
+        this.pedestrians = [];
         this.selectedCar = null;    // For non-simulation mode
         this.followedCar = null;    // For simulation mode
 
@@ -109,24 +111,7 @@ class World {
         return worldSettings;
     }
 
-    async generate() {
-        const progressTracker = new ProgressTracker();
-        progressTracker.show();
-        try {
-            this.roadPaths = await this.#generateRoads(progressTracker);
-            this.roadBorders = await this.#generateRoadBorders(progressTracker);
-            this.roadDividers = await this.#generateRoadDividers(progressTracker);
-            this.buildings = await this.#generateBuildings(progressTracker);
-            this.trees = await this.#generateTrees(progressTracker);
-            this.laneGuides.push(...await this.#generateLaneGuides(progressTracker));
-        } catch (error) {
-            console.log(error)
-            console.error('Error generating the world: ' + error.message);
-            return { error: true, message: 'Error generating the world: ' + error.message };
-        } finally {
-            progressTracker.hide();
-        }
-    }
+    // #region - World Generation Helper Functions
 
     async #generateRoads(progressTracker) {
         this.roadPaths.length = 0;
@@ -326,8 +311,14 @@ class World {
         return segments;
     }
 
-    // Intersections are graph points with two or more intersecting segments (or roads)
+    // #endregion
+
+
+
+    // #region - Traffic Light Helper Functions
+
     #getRoadIntersections(minDegree = 2) {
+        // Intersections are graph points with two or more intersecting segments (or roads)
         const subset = [];
         for (const point of this.graph.points) {
             let degree = 0;
@@ -344,29 +335,63 @@ class World {
         return subset;
     }
 
-    #updateTrafficLights() {
+    #updateTrafficLightsAndCrossings() {
         const trafficLights = this.markings.filter((m) => m instanceof TrafficLightMarking);
+        const crossings = this.markings.filter((m) => m instanceof CrossingMarking);
+
         // Each road intersection has one corresponding control center and 
         // a traffic light is linked to its nearest control center.
         const controlCenters = [];
         for (const trafficLight of trafficLights) {
             // For each traffic light, get the nearest road intersection
-            const nearestIntersectionPoint = Graph.getNearestPoint(trafficLight.center, this.#getRoadIntersections(2));
+            const nearestIntersectionPoint = Graph.getNearestPoint(trafficLight.center, this.#getRoadIntersections(3));
             if (!nearestIntersectionPoint) continue;
-            let controlCenter = controlCenters.find((c) => c.equals(nearestIntersectionPoint));
+            let controlCenter = controlCenters.find((c) => c.center.equals(nearestIntersectionPoint));
+            trafficLight.crossings = [];
             if (!controlCenter) {
-                controlCenter = new Point(
-                    nearestIntersectionPoint.x,
-                    nearestIntersectionPoint.y
-                );
+                controlCenter = {
+                    center: new Point(
+                        nearestIntersectionPoint.x,
+                        nearestIntersectionPoint.y
+                    )
+                };
                 controlCenter.trafficLights = [trafficLight];
                 controlCenters.push(controlCenter);
             } else {
                 controlCenter.trafficLights.push(trafficLight);
             }
         }
+        for (const crossing of crossings) {
+            // For each crossing, get the nearest road intersection
+            const nearestIntersectionPoint = Graph.getNearestPoint(crossing.center, this.#getRoadIntersections(3));
+            if (!nearestIntersectionPoint) continue;
+            let controlCenter = controlCenters.find((c) => c.center.equals(nearestIntersectionPoint));
+            if (controlCenter && controlCenter.trafficLights) {
+                const roadPathOfCrossing = this.roadPaths.find((rp) => rp.polygon.containsPoint(crossing.center));
+                let nearestTrafficLightIndex = -1;
+                let minDistance = Number.MAX_SAFE_INTEGER;
+                for (let t = 0; t < controlCenter.trafficLights.length; t += 1) {
+                    const trafficLight = controlCenter.trafficLights[t];
+                    if (!roadPathOfCrossing.polygon.containsPoint(trafficLight.center)) {
+                        continue;
+                    }
+                    if (distance(trafficLight.center, crossing.center) < minDistance) {
+                        minDistance = distance(trafficLight.center, crossing.center);
+                        nearestTrafficLightIndex = t;
+                    }
+                }
+                if (nearestTrafficLightIndex < 0) {
+                    continue;
+                }
+                if (!controlCenter.trafficLights[nearestTrafficLightIndex].crossings) {
+                    controlCenter.trafficLights[nearestTrafficLightIndex].crossings = [crossing];
+                } else {
+                    controlCenter.trafficLights[nearestTrafficLightIndex].crossings.push(crossing);
+                }
+            }
+        }
 
-        const greenDuration = 2, yellowDuration = 1;
+        const greenDuration = 10, yellowDuration = 2;
         for (const controlCenter of controlCenters) {
             controlCenter.ticks = controlCenter.trafficLights.length * (greenDuration + yellowDuration);
         }
@@ -385,12 +410,20 @@ class World {
             for (let i = 0; i < controlCenter.trafficLights.length; i++) {
                 if (i == greenYellowIndex) {
                     controlCenter.trafficLights[i].state = greenYellowState;
+                    controlCenter.trafficLights[i].crossings.forEach((c) => c.state = "red");
                 } else {
                     controlCenter.trafficLights[i].state = "red";
+                    controlCenter.trafficLights[i].crossings.forEach((c) => c.state = "green");
                 }
             }
         }
     }
+
+    // #endregion
+
+
+
+    // #region - Cars related Helper Functions
 
     #updateCars() {
         const cars = this
@@ -470,16 +503,82 @@ class World {
         );
     }
 
+    // #endregion
+
+
+
+    // #region - Pedestrians related Helper Functions
+
+    #updatePedestrians() {
+        this.pedestrians.forEach(
+            (p) => {
+                if (p.state === Pedestrian.states.MOVING) {
+                    p.update();
+                }
+                else if (p.state === Pedestrian.states.CREATED && p.crossing.state === "green") {
+                    p.update();
+                }
+            }
+        );
+    }
+
+    #removeSuccessfulPedestrians() {
+        this.pedestrians = this.pedestrians.filter(
+            (p) => {
+                if (p.state === Pedestrian.states.REACHED) {
+                    return false;
+                }
+                return true;
+            }
+        );
+    }
+
     #generateRandomPedestrians() {
-        if (Math.floor(this.frameCount % 120) !== 0) {
-            return;
-        }
-        const crossings = this.markings.filter(m => m instanceof CrossingMarking);
+        const crossings = this.markings.filter(m =>
+            (m instanceof CrossingMarking) &&
+            (m.pedCount === 0)
+        );
         if (crossings.length === 0) {
             return;
         }
+
+        const cycle = Math.max(120, 1200 / crossings.length);
+        if (Math.floor(this.frameCount % cycle) !== 0) {
+            return;
+        }
         const randomCrossing = crossings[Math.floor(Math.random() * crossings.length)];
-        randomCrossing.pedCount += 1;
+
+        this.pedestrians.push(
+            new Pedestrian(
+                randomCrossing,
+                0.2
+            )
+        );
+    }
+
+    // #endregion
+
+
+
+    // #region - External Functions
+
+    async generate() {
+        const progressTracker = new ProgressTracker();
+        progressTracker.show();
+        try {
+            this.roadPaths = await this.#generateRoads(progressTracker);
+            this.roadBorders = await this.#generateRoadBorders(progressTracker);
+            this.roadDividers = await this.#generateRoadDividers(progressTracker);
+            this.buildings = await this.#generateBuildings(progressTracker);
+            this.trees = await this.#generateTrees(progressTracker);
+            this.laneGuides.push(...await this.#generateLaneGuides(progressTracker));
+        } catch (error) {
+            console.log(error)
+            console.error('Error generating the world: ' + error.message);
+            return { error: true, message: 'Error generating the world: ' + error.message };
+        } finally {
+            progressTracker.hide();
+        }
     }
 
     getRandomTargetMarking() {
@@ -540,14 +639,17 @@ class World {
     }
 
     draw(ctx, viewpoint, renderRadius = 1000) {
-        this.#updateTrafficLights();
+        this.#updateTrafficLightsAndCrossings();
         if (currentMode !== "select") {
             this.#updateCars();
         }
 
         if (currentMode !== "simulation") {
+            this.#generateRandomPedestrians();
+            this.#updatePedestrians();
             this.#removeSuccessfulCars();
             this.#removeDamagedCars();
+            this.#removeSuccessfulPedestrians();
         }
 
         this.frameCount++;
@@ -573,6 +675,11 @@ class World {
             ) {
                 marking.draw(ctx);
             }
+        }
+
+        // Pedestrians
+        for (const pedestrian of this.pedestrians) {
+            pedestrian.draw(ctx);
         }
 
         // Cars
@@ -627,4 +734,6 @@ class World {
             item.draw(ctx, viewpoint);
         }
     }
+
+    // #endregion
 }

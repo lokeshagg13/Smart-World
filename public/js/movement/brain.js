@@ -89,6 +89,23 @@ class Brain {
         parkingSignReading = 0
     } = {}, network) {
         const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, dLeftReading, dRightReading];
+        if (
+            (
+                trafficLightReading > frontReading &&
+                trafficLightReading > 0.45
+            ) ||
+            (
+                crossingSignReading > frontReading &&
+                crossingSignReading > 0.8
+            )
+        ) {
+            return {
+                forward: false,
+                reverse: false,
+                left: false,
+                right: false
+            }
+        }
         const outputs = NeuralNetwork.feedforward(inputs, network);
         const controls = {
             forward: outputs[0],
@@ -98,14 +115,19 @@ class Brain {
         }
         const turnLimitFactor = 1 - world.settings.roadWidth / (4 * 200);
         if (controls.left === 1 && leftReading > turnLimitFactor) {
-            controls.left = false;
-            controls.right = false;
+            controls.left = 0;
+            controls.right = 0;
         }
         if (controls.right === 1 && rightReading > turnLimitFactor) {
-            controls.left = false;
-            controls.right = false;
+            controls.left = 0;
+            controls.right = 0;
         }
-        return controls;
+        return {
+            forward: controls.forward ? true : false,
+            reverse: controls.reverse ? true : false,
+            left: controls.left ? true : false,
+            right: controls.right ? true : false,
+        };
     }
 }
 
