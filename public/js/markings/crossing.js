@@ -1,9 +1,14 @@
 class CrossingMarking extends Marking {
+    static states = {
+        "RED": 0,
+        "GREEN": 1
+    };
+
     constructor(center, directionVector, width, height, isLHT) {
         super(center, directionVector, width, height, isLHT);
         this.borders = [this.polygon.segments[0], this.polygon.segments[2]];
         this.pedCount = 0;
-        this.state = "green";
+        this.state = CrossingMarking.states.GREEN;
         this.type = "crossing";
     }
 
@@ -20,7 +25,8 @@ class CrossingMarking extends Marking {
             dash: [11, 11]
         });
 
-        new Segment(this.borders[0].p1, this.borders[1].p2).draw(ctx, { color: this.state, width: 4 });
-        new Segment(this.borders[1].p1, this.borders[0].p2).draw(ctx, { color: this.state, width: 4 });
+        const color = this.state === CrossingMarking.states.RED ? "red" : "green";
+        new Segment(this.borders[0].p1, this.borders[1].p2).draw(ctx, { color: color, width: 4 });
+        new Segment(this.borders[1].p1, this.borders[0].p2).draw(ctx, { color: color, width: 4 });
     }
 }

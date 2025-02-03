@@ -405,15 +405,23 @@ class World {
             );
             const greenYellowState =
                 cTick % (greenDuration + yellowDuration) < greenDuration
-                    ? "green"
-                    : "yellow";
+                    ? TrafficLightMarking.states.GREEN
+                    : TrafficLightMarking.states.YELLOW;
             for (let i = 0; i < controlCenter.trafficLights.length; i++) {
                 if (i == greenYellowIndex) {
                     controlCenter.trafficLights[i].state = greenYellowState;
-                    controlCenter.trafficLights[i].crossings.forEach((c) => c.state = "red");
+                    controlCenter.trafficLights[i].crossings.forEach(
+                        (c) => {
+                            c.state = CrossingMarking.states.RED;
+                        }
+                    );
                 } else {
-                    controlCenter.trafficLights[i].state = "red";
-                    controlCenter.trafficLights[i].crossings.forEach((c) => c.state = "green");
+                    controlCenter.trafficLights[i].state = TrafficLightMarking.states.RED;
+                    controlCenter.trafficLights[i].crossings.forEach(
+                        (c) => {
+                            c.state = CrossingMarking.states.GREEN
+                        }
+                    );
                 }
             }
         }
@@ -515,7 +523,10 @@ class World {
                 if (p.state === Pedestrian.states.MOVING) {
                     p.update();
                 }
-                else if (p.state === Pedestrian.states.CREATED && p.crossing.state === "green") {
+                else if (
+                    p.state === Pedestrian.states.CREATED && 
+                    p.crossing.state === CrossingMarking.states.GREEN
+                ) {
                     p.update();
                 }
             }

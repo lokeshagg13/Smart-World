@@ -210,7 +210,10 @@ class MultiSensorRay extends RoadSensorRay {
             markings.filter(m => m instanceof StopMarking)
         );
         this.trafficLightReading = this.#intersectionForOneSidedMarkings(
-            markings.filter(m => (m instanceof TrafficLightMarking) && (m.state !== "green"))
+            markings.filter(
+                m => (m instanceof TrafficLightMarking) &&
+                    (m.state !== TrafficLightMarking.states.GREEN)
+            )
         );
         this.yeildSignReading = this.#intersectionForOneSidedMarkings(
             markings.filter(m => m instanceof YieldMarking)
