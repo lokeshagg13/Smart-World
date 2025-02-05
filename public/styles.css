@@ -156,6 +156,15 @@ button {
   align-items: center;
 }
 
+#editGraphBtn {
+  padding: 9px 5px;
+}
+
+#editGraphBtn img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 #visualizerBtn {
   padding: 9px 5px;
 }
@@ -220,10 +229,31 @@ button {
   font-size: 10px !important;
 }
 
+#generateCarsBtn img {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0.45rem 0;
+}
+
 .modal {
   background: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
+}
+
+#promptModal label {
+  display: inline-flex;
+}
+
+#generateNumCarsHint {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+#generateNumCarsHint img {
+  width: 1rem;
 }
 
 #saveConfirmationModal {

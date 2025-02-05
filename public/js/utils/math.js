@@ -177,3 +177,15 @@ function getRGBA(value) {
     const G = Math.floor(R * 0.7) + Math.floor(B * 0.5);
     return "rgba(" + R + "," + G + "," + B + "," + alpha + ")";
 }
+
+function generateUniqueNumbers(N, m) {
+    if (N > m) {
+        return null;
+    }
+    const array = Array.from({ length: m }, (_, i) => i);
+    array.sort(function (a, b) {
+    	return Math.random() - 0.5;
+  	});
+
+    return array.slice(0, N);
+}

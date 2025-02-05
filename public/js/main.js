@@ -159,8 +159,7 @@ function addEventListeners() {
 
     document
         .getElementById("roadWidthHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('roadWidthHint')
         );
 
@@ -181,8 +180,7 @@ function addEventListeners() {
 
     document
         .getElementById("buildingWidthHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('buildingWidthHint')
         );
 
@@ -203,8 +201,7 @@ function addEventListeners() {
 
     document
         .getElementById("buildingMinLengthHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('buildingMinLengthHint')
         );
 
@@ -225,8 +222,7 @@ function addEventListeners() {
 
     document
         .getElementById("spacingHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('spacingHint')
         );
 
@@ -247,8 +243,7 @@ function addEventListeners() {
 
     document
         .getElementById("treeSizeHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('treeSizeHint')
         );
 
@@ -269,43 +264,37 @@ function addEventListeners() {
 
     document
         .getElementById("treeHeightHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('treeHeightHint')
         );
 
     document
         .getElementById("leftHandTrafficHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('leftHandTrafficHint')
         );
 
     document
         .getElementById("rightHandTrafficHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('rightHandTrafficHint')
         );
 
     document
         .getElementById("carMaxSpeedHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('carMaxSpeedHint')
         );
 
     document
         .getElementById("carAccelerationHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('carAccelerationHint')
         );
 
     document
         .getElementById("carControlTypeHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('carControlTypeHint')
         );
 
@@ -331,8 +320,7 @@ function addEventListeners() {
 
     document
         .getElementById("simulationNumCarsHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('simulationNumCarsHint')
         );
 
@@ -358,21 +346,18 @@ function addEventListeners() {
 
     document
         .getElementById("simulationDiffFactorHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('simulationDiffFactorHint')
         );
 
     document
         .getElementById("showSensorsHint")
-        .addEventListener(
-            'click',
+        .addEventListener('click',
             () => showPopoverByID('showSensorsHint')
         );
 
     window
-        .addEventListener(
-            "click",
+        .addEventListener("click",
             (ev) => {
                 if (
                     !ev.target.matches('#carStyle button.dropdown-btn') &&
@@ -382,7 +367,8 @@ function addEventListeners() {
                 ) {
                     document.getElementById("carStyleDropdown").style.display = "none";
                 }
-            });
+            }
+        );
 }
 
 function fillVariableHtmlData() {
@@ -737,7 +723,7 @@ function showLoadWorldModal() {
                             data-trigger="click"
                             data-html="true"
                             data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
-                        ><img src="images/info-icon.svg" alt="Info" /></button>
+                        ><img src="images/app_icons/info_icon.svg" alt="Info" /></button>
                         <button
                             class="btn-world-delete"
                             id="world-delete-${worldId}"
@@ -837,7 +823,10 @@ function showPromptModal(title = "", body = "", submitBtnText = "", onSubmit = n
 }
 
 function hidePromptModal() {
-    document.getElementById('adminPassword').value = "";
+    hideAllPopovers();
+    if (document.getElementById('adminPassword')) {
+        document.getElementById('adminPassword').value = "";
+    }
     document.getElementById('promptModal').style.display = "none";
 }
 
@@ -858,10 +847,93 @@ function selectCarStyleOption(carStyle = 'car_white', rowIndex = 0, colIndex = 0
     carStyleBtn.setAttribute('alt', carStyle.split('_').reverse().map(s => s[0].toUpperCase() + s.slice(1)).join(' '));
     document.getElementById("carStyleDropdown").style.display = "none";
     document.getElementById("carStyleDropdown").style.top = -58 * rowIndex - 10;
-    document.getElementById("carStyleDropdown").style.left = -76 * colIndex; 
+    document.getElementById("carStyleDropdown").style.left = -76 * colIndex;
     document.querySelector("img.dropdown-selected-icon").style.top = 56 * rowIndex + 5;
-    document.querySelector("img.dropdown-selected-icon").style.left = 76 * colIndex + 8; 
+    document.querySelector("img.dropdown-selected-icon").style.left = 76 * colIndex + 8;
     currentCarStyle = carStyle;
+}
+
+// #endregion
+
+
+
+// #region - Generating random cars in the world
+
+function showGenerateCarsModal() {
+    const maxCars = Math.min(
+        Settings.generateNumCarsRange[1],
+        Math.max(
+            5,
+            Math.round(world.graph.segments.length / 5) * 5
+        )
+    );
+
+    const handleSubmit = (ev) => {
+        ev.preventDefault();
+        let generateNumCars = document.getElementById('generateNumCars').value;
+        if (generateNumCars === "") {
+            document.getElementById('generateNumCarsError').innerText = 'Please enter a value.';
+            document.getElementById('generateNumCarsError').style.display = 'block';
+            return;
+        }
+        if (/^\d+[.]?0?$/.test(generateNumCars) === false) {
+            document.getElementById('generateNumCarsError').innerText = `Please enter an integer value between ${Settings.generateNumCarsRange[0]} and ${maxCars} (inclusive).`;
+            document.getElementById('generateNumCarsError').style.display = 'block';
+            return;
+        }
+
+        generateNumCars = parseInt(generateNumCars, 10);
+        if (generateNumCars < Settings.generateNumCarsRange[0] || generateNumCars > maxCars) {
+            document.getElementById('generateNumCarsError').innerText = `Please enter an integer value between ${Settings.generateNumCarsRange[0]} and ${maxCars} (inclusive).`;
+            document.getElementById('generateNumCarsError').style.display = 'block';
+            return;
+        }
+        world.generateCars(generateNumCars);
+        hidePromptModal();
+        setMode('select');
+    };
+
+    showPromptModal(
+        'Generate Random Cars',
+        `
+            <form>
+                <div class="form-group">
+                    <label for="generateNumCars">
+                        Number of Cars to add &nbsp;
+                        <span
+                            id="generateNumCarsHint"
+                            class="hint"
+                            data-toggle="popover"
+                            data-placement="left"
+                            data-trigger="manual"
+                            data-html="true"
+                            data-content="<b>Minimum Value: </b>${Settings.generateNumCarsRange[0]}<br><b>Maximum Value: </b>${maxCars}<br><b>Purpose: </b>Number of cars to generate in the world.<br>"
+                        >
+                            <img src="images/app_icons/info_icon.svg" alt="Info" />
+                        </span>
+                    </label>
+                    <input
+                        type="number"
+                        id="generateNumCars"
+                        class="form-control"
+                        placeholder="Number of cars"
+                        required
+                    />
+                    <small id="generateNumCarsError" class="error-message form-text">
+                    </small>
+                </div>
+            </form>      
+        `,
+        'Generate',
+        handleSubmit
+    );
+
+    document
+        .getElementById("generateNumCarsHint")
+        .addEventListener('click',
+            () => showPopoverByID('generateNumCarsHint')
+        );
+
 }
 
 // #endregion
@@ -988,20 +1060,18 @@ function setMode(mode) {
         document.querySelector('.simulator').style.display = "flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#exitSimulationModeBtn').style.display = "inline-flex";
-        document.querySelector('#visualizerBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.show();
     } else {
         document.querySelector('.markings').style.display = "flex";
+        document.querySelector('#editGraphBtn').style.display = "inline-flex";
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
-        document.querySelector('#manualOverrideBtn').style.display = "inline-flex";
-        document.querySelector('#visualizerBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
         document.querySelector('#saveWorldBtn').style.display = "inline-flex";
         document.querySelector('#disposeCarsBtn').style.display = "inline-flex";
         document.querySelector('#disposeMarkingsBtn').style.display = "inline-flex";
-        document.querySelector('#editGraphBtn').style.display = "inline-flex";
+        document.querySelector('#generateCarsBtn').style.display = "inline-flex";
         document.querySelector('#simulationBtn').style.display = "inline-flex";
         if (mode !== "world") {
             document
@@ -1039,10 +1109,14 @@ function resetMarkingButtons() {
 }
 
 function resetHeaderControlWidth(mode) {
-    if (mode !== "graph" && mode !== "simulation") {
-        document.querySelector('.header .section').style.width = "25%";
-    } else {
-        document.querySelector('.header .section').style.width = "15%";
+    if (mode === "simulation") {
+        document.querySelector('.header .section').style.width = "7%";
+    }
+    else if (mode === "graph") {
+        document.querySelector('.header .section').style.width = "12%";
+    }
+    else {
+        document.querySelector('.header .section').style.width = "20%";
     }
 }
 
@@ -1064,7 +1138,7 @@ function showVisualizer() {
     document.querySelector('.app').style.display = 'flex';
     document.querySelector('.admin-only').style.display = 'flex';
     document.getElementById('visualizerBtn').setAttribute('title', 'Hide Visualizer');
-    document.getElementById('visualizerIcon').setAttribute('src', 'images/neural_no.svg');
+    document.getElementById('visualizerIcon').setAttribute('src', 'images/app_icons/neural_hide_icon.svg');
     document.getElementById('visualizerIcon').setAttribute('alt', 'Hide Visualizer');
 }
 
@@ -1072,7 +1146,7 @@ function hideVisualizer() {
     document.querySelector('.app').style.display = 'block';
     document.querySelector('.admin-only').style.display = 'none';
     document.getElementById('visualizerBtn').setAttribute('title', 'Show Visualizer');
-    document.getElementById('visualizerIcon').setAttribute('src', 'images/neural.svg');
+    document.getElementById('visualizerIcon').setAttribute('src', 'images/app_icons/neural_icon.svg');
     document.getElementById('visualizerIcon').setAttribute('alt', 'Show Visualizer');
 }
 
@@ -1128,7 +1202,8 @@ function showAdminLoginModal(prompt) {
             </form>      
         `,
         'Submit',
-        handleSubmit)
+        handleSubmit
+    );
 }
 
 async function adminLogin(password) {

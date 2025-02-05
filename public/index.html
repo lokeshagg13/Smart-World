@@ -13,7 +13,11 @@
       href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" href="images/app_icons/favicon.ico" type="image/x-icon" />
+    <link
+      rel="icon"
+      href="images/header_icons/favicon.ico"
+      type="image/x-icon"
+    />
   </head>
   <body>
     <div class="app">
@@ -21,6 +25,14 @@
         <div class="header">
           <h1>Lokesh's World</h1>
           <div class="section">
+            <button
+              id="editGraphBtn"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Skeleton Editor"
+            >
+              <img src="images/app_icons/edit_icon.svg" alt="Edit Skeleton" />
+            </button>
             <button
               id="clearCanvasBtn"
               data-toggle="tooltip"
@@ -37,30 +49,6 @@
               title="World Settings"
             >
               ⚙️
-            </button>
-            <button
-              id="manualOverrideBtn"
-              onclick="toggleCarControlType()"
-              data-toggle="tooltip"
-              data-placement="right"
-              data-trigger="hover"
-              data-content="The cars are in manual override mode."
-              title="Manual Override"
-            >
-              🛞
-            </button>
-            <button
-              id="visualizerBtn"
-              onclick="toggleAdminSection()"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Show Visualizer"
-            >
-              <img
-                id="visualizerIcon"
-                src="images/neural.svg"
-                alt="Show Visualizer"
-              />
             </button>
           </div>
         </div>
@@ -106,7 +94,10 @@
                 </span>
               </button>
               <div class="dropdown-content" id="carStyleDropdown">
-                <img class="dropdown-selected-icon" src="images/check-icon.svg" />
+                <img
+                  class="dropdown-selected-icon"
+                  src="images/app_icons/check_icon.svg"
+                />
                 <table>
                   <tr>
                     <td>
@@ -258,6 +249,32 @@
               <img src="images/car_select.png" alt="Select Car" />
             </div>
           </button>
+          &nbsp;
+          <button
+            id="manualOverrideBtn"
+            onclick="toggleCarControlType()"
+            data-toggle="tooltip"
+            data-placement="right"
+            data-trigger="hover"
+            data-content="The cars are in manual override mode."
+            title="Manual Override"
+          >
+            🛞
+          </button>
+          &nbsp;
+          <button
+            id="visualizerBtn"
+            onclick="toggleAdminSection()"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Show Visualizer"
+          >
+            <img
+              id="visualizerIcon"
+              src="images/app_icons/neural_icon.svg"
+              alt="Show Visualizer"
+            />
+          </button>
         </div>
         <div class="simulator">
           <button
@@ -368,13 +385,16 @@
               <span class="btn-text">Create World</span>
             </button>
             <button
-              id="editGraphBtn"
+              id="generateCarsBtn"
+              onclick="showGenerateCarsModal()"
               data-toggle="tooltip"
               data-placement="top"
-              title="Skeleton Editor"
+              data-trigger="hover"
+              data-content=""
+              title="Generate Random Cars"
             >
-              ⬟
-              <span class="btn-text">Edit Skeleton</span>
+              <img src="images/app_icons/car_icon.svg" alt="Car Icon" />
+              <small class="btn-text">Generate Cars</small>
             </button>
             <button
               id="simulationBtn"
@@ -727,7 +747,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -757,7 +777,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -790,7 +810,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -823,7 +843,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -853,7 +873,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -883,7 +903,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -913,7 +933,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                     <input
@@ -935,7 +955,7 @@
                         data-trigger="manual"
                         data-html="true"
                       >
-                        <img src="images/info-icon.svg" alt="Info" />
+                        <img src="images/app_icons/info_icon.svg" alt="Info" />
                       </span>
                     </label>
                   </div>
@@ -958,7 +978,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                   <select class="form-control" id="carMaxSpeed">
@@ -979,7 +999,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                   <select class="form-control" id="carAcceleration">
@@ -999,7 +1019,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                   <select class="form-control" id="carControlType">
@@ -1025,7 +1045,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                   <input
@@ -1059,7 +1079,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                   <input
@@ -1105,7 +1125,7 @@
                       data-trigger="manual"
                       data-html="true"
                     >
-                      <img src="images/info-icon.svg" alt="Info" />
+                      <img src="images/app_icons/info_icon.svg" alt="Info" />
                     </span>
                   </label>
                 </div>

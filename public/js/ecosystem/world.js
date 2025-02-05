@@ -477,14 +477,17 @@ class World {
         }
     }
 
-    #removeSuccessfulCars() {
+    #removeSuccessfulAndDamagedCars() {
         const indicesToRemove = [];
         const wasteTargetElements = [];
         this.markings.forEach((m, index) => {
-            if (
-                (m instanceof StartMarking) &&
-                (m.car.success === true)
-            ) {
+            if (!(m instanceof StartMarking)) {
+                return;
+            }
+            if (m.car.isSimulation) {
+                return;
+            }
+            if (m.car.success || m.car.damaged) {
                 indicesToRemove.push(index);
                 if (m.car.target) {
                     wasteTargetElements.push(m.car.target);
@@ -501,16 +504,6 @@ class World {
         this.markings = this.markings.filter((_, index) => !indicesToRemove.includes(index));
     }
 
-    #removeDamagedCars() {
-        this.markings = this.markings.filter(m => !(m instanceof StartMarking) ||
-            (
-                (m instanceof StartMarking) &&
-                (m.car.isSimulation === false) &&
-                (m.car.damaged === false)
-            )
-        );
-    }
-
     // #endregion
 
 
@@ -524,7 +517,7 @@ class World {
                     p.update();
                 }
                 else if (
-                    p.state === Pedestrian.states.CREATED && 
+                    p.state === Pedestrian.states.CREATED &&
                     p.crossing.state === CrossingMarking.states.GREEN
                 ) {
                     p.update();
@@ -589,6 +582,60 @@ class World {
             return { error: true, message: 'Error generating the world: ' + error.message };
         } finally {
             progressTracker.hide();
+        }
+    }
+
+    generateCars(numCars) {
+        const randomNumbers = generateUniqueNumbers(numCars, this.graph.segments.length);
+        for (const number in randomNumbers) {
+            const targetMarking = this.getRandomTargetMarking();
+
+            const randomSegment = this.graph.segments[number];
+            const randomPoint = randomSegment.randomPoint(0.3, 0.7);
+
+            let direction;
+            let startPoint;
+            let opposite = Math.random() < 0.5;
+            if (this.settings.isLHT) {
+                if (opposite) {
+                    direction = scale(randomSegment.directionVector(), -1);
+                    startPoint = translate(randomPoint, angle(perpendicular(direction)), -this.settings.roadWidth * 0.25);
+                } else {
+                    direction = randomSegment.directionVector();
+                    startPoint = translate(randomPoint, angle(perpendicular(direction)), -this.settings.roadWidth * 0.25);
+                }
+            } else {
+                if (opposite) {
+                    direction = scale(randomSegment.directionVector(), -1);
+                    startPoint = translate(randomPoint, angle(perpendicular(direction)), -this.settings.roadWidth * 0.25);
+                } else {
+                    direction = randomSegment.directionVector();
+                    startPoint = translate(randomPoint, angle(perpendicular(direction)), -this.settings.roadWidth * 0.25);
+                }
+
+            }
+
+            const startMarking = new StartMarking(
+                startPoint,
+                direction,
+                this.settings.roadWidth * 0.4,
+                this.settings.roadWidth / 4,
+                this.settings.isLHT,
+                false
+            );
+            startMarking.car.target = targetMarking;
+            startMarking.car.path = this.graph.getShortestPath(
+                startMarking.car.center,
+                targetMarking.center
+            );
+            startMarking.car.pathBorders = this.generateCarPath(
+                startMarking.car.center,
+                startMarking.car.angle,
+                startMarking.car.path
+            );
+
+            this.markings.push(startMarking);
+            this.markings.push(targetMarking);
         }
     }
 
@@ -658,9 +705,8 @@ class World {
         if (currentMode !== "simulation") {
             this.#generateRandomPedestrians();
             this.#updatePedestrians();
-            this.#removeSuccessfulCars();
-            this.#removeDamagedCars();
             this.#removeSuccessfulPedestrians();
+            this.#removeSuccessfulAndDamagedCars();
         }
 
         this.frameCount++;

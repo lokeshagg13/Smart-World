@@ -7,6 +7,7 @@ class Settings {
     static treeHeightRange = [100, 300];
     static simulationNumCarsRange = [1, 10000];
     static simulationDiffFactorRange = [0, 1];
+    static generateNumCarsRange = [1, 1000];
 
     constructor(
         roadWidth = 100,
