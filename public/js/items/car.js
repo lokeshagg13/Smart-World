@@ -139,7 +139,7 @@ class Car {
 
     #assessDamage() {
         for (let i = 0; i < this.pathBorders.length; i++) {
-            if (polygonSegmentIntersect(this.polygon, this.pathBorders[i])) {
+            if (this.polygon.intersectsSegment(this.pathBorders[i])) {
                 return true;
             }
         }
@@ -177,7 +177,15 @@ class Car {
         }
         // If car is not already damaged, it will move and damage is checked.
         if (!this.damaged) {
-            this.#move();
+            if (
+                this.controlType === "AI" ||
+                (
+                    this.controlType === "KEYS" &&
+                    world.selectedCar === this
+                )
+            ) {
+                this.#move();
+            }
             if (this.controls.forward && !this.controls.reverse) {
                 this.fitness += 1;
             }
@@ -186,12 +194,23 @@ class Car {
         }
         // If car has sensors, update sensor readings and if car is of type AI, update controls based on it.
         if (this.sensor) {
+            const otherCars = markings
+                .filter(
+                    (m) =>
+                        (m instanceof StartMarking) &&
+                        (m.car !== this)
+                )
+                .map(
+                    (m) => m.car
+                );
+
             this.sensor.update(
                 this.center,
                 this.angle,
                 roadBorders,
                 this.pathBorders,
-                markings
+                markings,
+                otherCars
             );
             const sensorReadings = this.sensor.getReadings();
             if (this.target && this.target.polygon.containsPoint(this.center)) {

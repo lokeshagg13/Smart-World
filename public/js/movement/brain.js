@@ -18,15 +18,15 @@ class Brain {
         this.network.levels[0].biases[4] = 0;  // Left turn
         this.network.levels[0].biases[5] = 0.01;  // Right turn
         // First Level - Weights
-        // For weights[x][y], x = 0 (frontReading), 
+        // For weights[x][y], x = 0 (frontRoadReading), 
         //                        1 (speed), 
         //                        2 (trafficLightReading)
         //                        3 (stopSignReading), 
         //                        4 (crossingSignReading), 
         //                        5 (yeildSignReading), 
         //                        6 (parkingSignReading),
-        //                        7 (leftReading), 
-        //                        8 (rightReading)
+        //                        7 (left90RoadReading), 
+        //                        8 (right90RoadReading)
         this.network.levels[0].weights[0][0] = -1;
         this.network.levels[0].weights[1][0] = -1;
         this.network.levels[0].weights[1][1] = -1;
@@ -76,26 +76,26 @@ class Brain {
     }
 
     static getControls({
-        frontReading = 0,
-        dLeftReading = 0,
-        dRightReading = 0,
-        leftReading = 0,
-        rightReading = 0,
+        frontRoadReading = 0,
+        left45RoadReading = 0,
+        right45RoadReading = 0,
+        left90RoadReading = 0,
+        right90RoadReading = 0,
         speed = 0,
         stopSignReading = 0,
         trafficLightReading = 0,
         crossingSignReading = 0,
         yeildSignReading = 0,
-        parkingSignReading = 0
+        parkingSignReading = 0,
+        collisionReading = 0
     } = {}, network) {
-        const inputs = [frontReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, dLeftReading, dRightReading];
         if (
             (
-                trafficLightReading > frontReading &&
+                trafficLightReading > frontRoadReading &&
                 trafficLightReading > 0.45
             ) ||
             (
-                crossingSignReading > frontReading &&
+                crossingSignReading > frontRoadReading &&
                 crossingSignReading > 0.8
             )
         ) {
@@ -106,6 +106,13 @@ class Brain {
                 right: false
             }
         }
+
+        if (collisionReading > frontRoadReading) {
+            frontRoadReading = collisionReading;
+        }
+
+        const inputs = [frontRoadReading, speed, trafficLightReading, stopSignReading, crossingSignReading, yeildSignReading, parkingSignReading, left45RoadReading, right45RoadReading];
+
         const outputs = NeuralNetwork.feedforward(inputs, network);
         const controls = {
             forward: outputs[0],
@@ -114,11 +121,11 @@ class Brain {
             right: outputs[3]
         }
         const turnLimitFactor = 1 - world.settings.roadWidth / (4 * 200);
-        if (controls.left === 1 && leftReading > turnLimitFactor) {
+        if (controls.left === 1 && left90RoadReading > turnLimitFactor) {
             controls.left = 0;
             controls.right = 0;
         }
-        if (controls.right === 1 && rightReading > turnLimitFactor) {
+        if (controls.right === 1 && right90RoadReading > turnLimitFactor) {
             controls.left = 0;
             controls.right = 0;
         }

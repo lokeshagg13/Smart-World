@@ -1,5 +1,4 @@
-class RoadSensorRay {
-    // turnLimitFactor is dependent on rayLength values, so change carefully
+class SensorRay {
     constructor(startPoint, angle, rayLength = 200) {
         this.startPoint = startPoint;
         this.rayLength = rayLength;
@@ -7,6 +6,13 @@ class RoadSensorRay {
             startPoint.x + Math.sin(angle) * rayLength,
             startPoint.y - Math.cos(angle) * rayLength
         );
+    }
+}
+
+class RoadSensorRay extends SensorRay {
+    // turnLimitFactor is dependent on rayLength values, so change carefully
+    constructor(startPoint, angle, rayLength = 200) {
+        super(startPoint, angle, rayLength);
         this.borderReading = null;
     }
 
@@ -83,6 +89,83 @@ class RoadSensorRay {
             ctx.stroke();
             ctx.globalAlpha = 1;
         }
+    }
+}
+
+class CarSensorRay extends SensorRay {
+    constructor(startPoint, angle, rayLength = 200) {
+        super(startPoint, angle, rayLength);
+        this.collisionReading = null;
+    }
+
+    detectCollisions(roadBorders, pathBorders, cars) {
+        let minOffset = Number.MAX_SAFE_INTEGER;
+        let closestTouch = null;
+        for (const car of cars) {
+            const carPolygon = car.polygon;
+            if (carPolygon) {
+                const touch = carPolygon.intersectsSegmentAtMinOffset(
+                    new Segment(
+                        this.startPoint,
+                        this.endPoint
+                    )
+                );
+                if (touch && touch.offset < minOffset) {
+                    minOffset = touch.offset;
+                    closestTouch = touch;
+                }
+            }
+        }
+        if (closestTouch) {
+            for (const pathBorder of pathBorders) {
+                const touch = getIntersection(
+                    this.startPoint,
+                    this.endPoint,
+                    pathBorder.p1,
+                    pathBorder.p2
+                );
+                if (touch && touch.offset < minOffset) {
+                    minOffset = touch.offset;
+                    closestTouch = null;
+                }
+            }
+            for (const roadBorder of roadBorders) {
+                const touch = getIntersection(
+                    this.startPoint,
+                    this.endPoint,
+                    roadBorder.p1,
+                    roadBorder.p2
+                );
+                if (touch && touch.offset < minOffset) {
+                    minOffset = touch.offset;
+                    closestTouch = null;
+                }
+            }
+        }
+        this.collisionReading = closestTouch;
+    }
+
+    draw(ctx) {
+        if (!this.collisionReading) {
+            return;
+        }
+
+        const offset = 1 - this.collisionReading.offset;
+        const color = `rgb(${Math.round(offset * 255)}, ${Math.round((1 - offset) * 255)}, 0)`
+
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = color;
+        ctx.moveTo(
+            this.startPoint.x,
+            this.startPoint.y
+        );
+        ctx.lineTo(
+            this.collisionReading.x,
+            this.collisionReading.y
+        );
+        ctx.arc(this.collisionReading.x, this.collisionReading.y, 2, 0, Math.PI * 2);
+        ctx.stroke();
     }
 }
 
@@ -243,55 +326,88 @@ class MultiSensorRay extends RoadSensorRay {
 
 class Sensor {
     constructor() {
-        this.frontRay = null;
-        this.dLeftRay = null; // Diagonally Left
-        this.dRightRay = null; // Diagonally Right
-        this.leftRay = null; // Left
-        this.rightRay = null; // Right
+        this.multiSensorRay = null;
+        this.roadSensorRays = {
+            left45: null,
+            left90: null,
+            right45: null,
+            right90: null,
+        }
+        this.collisionSensorRays = []; // Sensor Rays for detecting collisions with cars
     }
 
     #castRays(origin, baseAngle) {
-        this.frontRay = new MultiSensorRay(origin, baseAngle);
-        this.dLeftRay = new RoadSensorRay(origin, baseAngle - Math.PI / 4);
-        this.dRightRay = new RoadSensorRay(origin, baseAngle + Math.PI / 4);
-        this.leftRay = new RoadSensorRay(origin, baseAngle - Math.PI / 2);
-        this.rightRay = new RoadSensorRay(origin, baseAngle + Math.PI / 2)
+        this.multiSensorRay = new MultiSensorRay(origin, baseAngle);
+        this.roadSensorRays.left45 = new RoadSensorRay(origin, baseAngle - Math.PI / 4);
+        this.roadSensorRays.right45 = new RoadSensorRay(origin, baseAngle + Math.PI / 4);
+        this.roadSensorRays.left90 = new RoadSensorRay(origin, baseAngle - Math.PI / 2);
+        this.roadSensorRays.right90 = new RoadSensorRay(origin, baseAngle + Math.PI / 2);
+        this.collisionSensorRays.length = 0;
+        for (let i = -Math.PI / 2; i <= Math.PI / 2; i += Math.PI / 20) {
+            this.collisionSensorRays.push(
+                new CarSensorRay(
+                    origin,
+                    baseAngle + i
+                )
+            )
+        }
     }
 
     getReadings() {
+        const collisionReading = this.collisionSensorRays.length > 0
+            ? Math.max(
+                ...this.collisionSensorRays.map(
+                    ray => ray.collisionReading ? 1 - ray.collisionReading.offset : 0
+                )
+            )
+            : 0;
+
         return {
-            frontReading: this.frontRay.borderReading ? 1 - this.frontRay.borderReading.offset : 0,
-            dLeftReading: this.dLeftRay.borderReading ? 1 - this.dLeftRay.borderReading.offset : 0,
-            dRightReading: this.dRightRay.borderReading ? 1 - this.dRightRay.borderReading.offset : 0,
-            leftReading: this.leftRay.borderReading ? 1 - this.leftRay.borderReading.offset : 0,
-            rightReading: this.rightRay.borderReading ? 1 - this.rightRay.borderReading.offset : 0,
-            stopSignReading: this.frontRay.stopSignReading ? 1 - this.frontRay.stopSignReading.offset : 0,
-            trafficLightReading: this.frontRay.trafficLightReading ? 1 - this.frontRay.trafficLightReading.offset : 0,
-            yeildSignReading: this.frontRay.yeildSignReading ? 1 - this.frontRay.yeildSignReading.offset : 0,
-            crossingSignReading: this.frontRay.crossingSignReading ? 1 - this.frontRay.crossingSignReading.offset : 0,
-            parkingSignReading: this.frontRay.parkingSignReading ? 1 - this.frontRay.parkingSignReading.offset : 0,
-            targetSignReading: this.frontRay.targetSignReading ? 1 - this.frontRay.targetSignReading.offset : 0,
+            frontRoadReading: this.multiSensorRay.borderReading ? 1 - this.multiSensorRay.borderReading.offset : 0,
+            left45RoadReading: this.roadSensorRays.left45.borderReading ? 1 - this.roadSensorRays.left45.borderReading.offset : 0,
+            right45RoadReading: this.roadSensorRays.right45.borderReading ? 1 - this.roadSensorRays.right45.borderReading.offset : 0,
+            left90RoadReading: this.roadSensorRays.left90.borderReading ? 1 - this.roadSensorRays.left90.borderReading.offset : 0,
+            right90RoadReading: this.roadSensorRays.right90.borderReading ? 1 - this.roadSensorRays.right90.borderReading.offset : 0,
+            stopSignReading: this.multiSensorRay.stopSignReading ? 1 - this.multiSensorRay.stopSignReading.offset : 0,
+            trafficLightReading: this.multiSensorRay.trafficLightReading ? 1 - this.multiSensorRay.trafficLightReading.offset : 0,
+            yeildSignReading: this.multiSensorRay.yeildSignReading ? 1 - this.multiSensorRay.yeildSignReading.offset : 0,
+            crossingSignReading: this.multiSensorRay.crossingSignReading ? 1 - this.multiSensorRay.crossingSignReading.offset : 0,
+            parkingSignReading: this.multiSensorRay.parkingSignReading ? 1 - this.multiSensorRay.parkingSignReading.offset : 0,
+            targetSignReading: this.multiSensorRay.targetSignReading ? 1 - this.multiSensorRay.targetSignReading.offset : 0,
+            collisionReading: collisionReading,
         };
     }
 
-    update(origin, baseAngle, roadBorders, pathBorders, markings) {
+    update(origin, baseAngle, roadBorders, pathBorders, markings, cars) {
         this.#castRays(origin, baseAngle);
-        this.frontRay.detectRoadBorders(roadBorders, pathBorders);
-        this.frontRay.detectMarkings(markings);
-        this.dLeftRay.detectRoadBorders(roadBorders, pathBorders);
-        this.dRightRay.detectRoadBorders(roadBorders, pathBorders);
-        this.leftRay.detectRoadBorders(roadBorders, pathBorders);
-        this.rightRay.detectRoadBorders(roadBorders, pathBorders);
+        this.multiSensorRay.detectRoadBorders(roadBorders, pathBorders);
+        this.multiSensorRay.detectMarkings(markings);
+        this.roadSensorRays.left45.detectRoadBorders(roadBorders, pathBorders);
+        this.roadSensorRays.right45.detectRoadBorders(roadBorders, pathBorders);
+        this.roadSensorRays.left90.detectRoadBorders(roadBorders, pathBorders);
+        this.roadSensorRays.right90.detectRoadBorders(roadBorders, pathBorders);
+        this.collisionSensorRays.forEach((collisionSensorRay) => {
+            collisionSensorRay.detectCollisions(roadBorders, pathBorders, cars);
+        });
     }
 
     draw(ctx) {
-        if (!this.frontRay || !this.dLeftRay || !this.dRightRay || !this.leftRay || !this.rightRay) {
+        if (
+            !this.multiSensorRay ||
+            !this.roadSensorRays.left45 ||
+            !this.roadSensorRays.right45 ||
+            !this.roadSensorRays.left90 ||
+            !this.roadSensorRays.right90) {
             return;
         }
-        this.frontRay.draw(ctx);
-        this.dLeftRay.draw(ctx);
-        this.dRightRay.draw(ctx);
-        this.leftRay.draw(ctx);
-        this.rightRay.draw(ctx);
+        this.multiSensorRay.draw(ctx);
+        this.roadSensorRays.left45.draw(ctx);
+        this.roadSensorRays.right45.draw(ctx);
+        this.roadSensorRays.left90.draw(ctx);
+        this.roadSensorRays.right90.draw(ctx);
+        this.collisionSensorRays.forEach((collisionSensorRay) => {
+            if (!collisionSensorRay) return;
+            collisionSensorRay.draw(ctx);
+        });
     }
 }

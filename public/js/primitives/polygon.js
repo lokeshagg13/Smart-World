@@ -144,6 +144,40 @@ class Polygon {
         return false;
     }
 
+    intersectsSegment(segment) {
+        for (let i = 0; i < this.points.length; i++) {
+            if (
+                getIntersection(
+                    segment.p1,
+                    segment.p2,
+                    this.points[i],
+                    this.points[(i + 1) % this.points.length]
+                )) {
+                return true
+            }
+        }
+        return false;
+    }
+
+    intersectsSegmentAtMinOffset(segment) {
+        let minOffset = Number.MAX_SAFE_INTEGER;
+        let closestTouch = null;
+        for (let i = 0; i < this.points.length; i++) {
+            const touch = getIntersection(
+                segment.p1,
+                segment.p2,
+                this.points[i],
+                this.points[(i + 1) % this.points.length]
+            );
+
+            if (touch && touch.offset < minOffset) {
+                closestTouch = touch;
+                minOffset = touch.offset;
+            }
+        }
+        return closestTouch;
+    }
+
     containsSegment(segment) {
         // This works because the whole broken segment lies either completely inside or outside the polygon
         const midpoint = average(segment.p1, segment.p2);

@@ -129,39 +129,6 @@ function getFake3dPoint(point, viewPoint, height) {
     return add(point, scale(dir, height * scaler));
 }
 
-function polygonSegmentIntersect(polygon, segment) {
-    for (let i = 0; i < polygon.points.length; i++) {
-        const touch = getIntersection(
-            polygon.points[i],
-            polygon.points[(i + 1) % polygon.points.length],
-            segment.p1,
-            segment.p2
-        );
-        if (touch) {
-            return true;
-        }
-
-    }
-    return false;
-}
-
-function polygonsIntersect(poly1, poly2) {
-    for (let i = 0; i < poly1.points.length; i++) {
-        for (let j = 0; j < poly2.points.length; j++) {
-            const touch = getIntersection(
-                poly1.points[i],
-                poly1.points[(i + 1) % poly1.points.length],
-                poly2.points[j],
-                poly2.points[(j + 1) % poly2.points.length],
-            );
-            if (touch) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 function getRGBA_old(value) {
     const alpha = Math.abs(value);
     const R = value < 0 ? 0 : 255;
@@ -184,8 +151,8 @@ function generateUniqueNumbers(N, m) {
     }
     const array = Array.from({ length: m }, (_, i) => i);
     array.sort(function (a, b) {
-    	return Math.random() - 0.5;
-  	});
+        return Math.random() - 0.5;
+    });
 
     return array.slice(0, N);
 }
