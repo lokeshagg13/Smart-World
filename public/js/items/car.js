@@ -23,6 +23,7 @@ class Car {
         this.target = null;
         this.path = [];
         this.pathBorders = [];
+        this.distanceToTarget = 0;
         this.success = false;    // becomes true when car reaches the target of the world
 
         this.showSensor = settings.showSensors;
@@ -36,13 +37,6 @@ class Car {
         this.width = this.img.width / 2;
         this.height = this.img.height / 2;
         this.polygon = this.#createPolygonAroundCar();
-    }
-
-    #addKeyboardListeners() {
-        this.boundKeyDown = this.#handleKeyDown.bind(this);
-        this.boundKeyUp = this.#handleKeyUp.bind(this);
-        document.addEventListener('keydown', this.boundKeyDown);
-        document.addEventListener('keyup', this.boundKeyUp);
     }
 
     #handleKeyDown(ev) {
@@ -83,6 +77,33 @@ class Car {
             case "ArrowDown":
                 this.controls.reverse = false;
                 break;
+        }
+    }
+
+    #addKeyboardListeners() {
+        this.boundKeyDown = this.#handleKeyDown.bind(this);
+        this.boundKeyUp = this.#handleKeyUp.bind(this);
+        document.addEventListener('keydown', this.boundKeyDown);
+        document.addEventListener('keyup', this.boundKeyUp);
+    }
+
+    #updateSettings(settings) {
+        this.maxSpeed = settings.carMaxSpeed;
+        this.acceleration = settings.carAcceleration;
+        this.friction = settings.roadFriction;
+        this.showSensor = settings.showSensors;
+        if (this.isSimulation) {
+            this.controlType = "AI";
+        } else {
+            if (this.controlType === "AI" && settings.carControlType === "KEYS") {
+                this.controls = {
+                    forward: false,
+                    left: false,
+                    right: false,
+                    reverse: false
+                };
+            }
+            this.controlType = settings.carControlType;
         }
     }
 
@@ -147,24 +168,42 @@ class Car {
         return false;
     }
 
-    #updateSettings(settings) {
-        this.maxSpeed = settings.carMaxSpeed;
-        this.acceleration = settings.carAcceleration;
-        this.friction = settings.roadFriction;
-        this.showSensor = settings.showSensors;
-        if (this.isSimulation) {
-            this.controlType = "AI";
-        } else {
-            if (this.controlType === "AI" && settings.carControlType === "KEYS") {
-                this.controls = {
-                    forward: false,
-                    left: false,
-                    right: false,
-                    reverse: false
-                };
-            }
-            this.controlType = settings.carControlType;
+    #assessSuccess() {
+        return this.target && this.target.polygon.containsPoint(this.center);
+    }
+
+    #getDistanceToTarget() {
+        if (!this.path || this.path.length <= 1) {
+            return 0;
         }
+
+        const pathSegments = [];
+        for (let i = 1; i < this.path.length; i += 1) {
+            pathSegments.push(
+                new Segment(this.path[i - 1], this.path[i])
+            );
+        }
+
+        const carProjection = Graph.projectPointOnNearestSegment(
+            this.center,
+            pathSegments
+        );
+        if (carProjection) {
+            let reached = false;
+            let dist = 0;
+
+            for (let i = 0; i < pathSegments.length; i += 1) {
+                if (reached) {
+                    dist += pathSegments[i].length();
+                }
+                else if (pathSegments[i] === carProjection.nearestSegment) {
+                    reached = true;
+                    dist += distance(carProjection.projectedPoint, pathSegments[i].p2)
+                }
+            }
+            return dist;
+        }
+        return this.distanceToTarget;     // Just return the previous value.
     }
 
     update(roadBorders, markings) {
@@ -175,23 +214,25 @@ class Car {
         if (this.controlType === "AI" && this.target === null) {
             return;
         }
-        // If car is not already damaged, it will move and damage is checked.
-        if (!this.damaged) {
-            if (
-                this.controlType === "AI" ||
-                (
-                    this.controlType === "KEYS" &&
-                    world.selectedCar === this
-                )
-            ) {
-                this.#move();
-            }
-            if (this.controls.forward && !this.controls.reverse) {
-                this.fitness += 1;
-            }
-            this.polygon = this.#createPolygonAroundCar();
-            this.damaged = this.#assessDamage();
+
+        // If car is already damaged, nothing to be done
+        if (this.damaged) {
+            return;
         }
+
+        // If car is not already damaged, it will move only if control type is AI or this is the selected car.
+        if (this.controlType === "AI") {
+            this.#move();
+        } else if (world.selectedCar === this) {
+            this.#move();
+        }
+
+        // Create polygon around new position of car, check for damaged and then check for success.
+        this.polygon = this.#createPolygonAroundCar();
+        this.damaged = this.#assessDamage();
+        this.success = this.#assessSuccess();
+        this.distanceToTarget = this.#getDistanceToTarget();
+
         // If car has sensors, update sensor readings and if car is of type AI, update controls based on it.
         if (this.sensor) {
             const otherCars = markings
@@ -213,9 +254,6 @@ class Car {
                 otherCars
             );
             const sensorReadings = this.sensor.getReadings();
-            if (this.target && this.target.polygon.containsPoint(this.center)) {
-                this.success = true;
-            }
 
             if (this.brain) {
                 const calculatedControls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
