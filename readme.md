@@ -78,7 +78,7 @@ This application supports loading the world using OSM data.
 
 ### Steps to fetch OSM data.
 
-1. Go to www.overpass-turb.eu
+1. Go to [https://overpass-turb.eu](https://overpass-turbo.eu/)
 2. Select the region from the world map that you want to load onto the app.
 3. Paste the following in the left side of the map area to perform some initial data filtering and remove any irrelevant data.
 
