@@ -79,9 +79,9 @@ class MiniMapEditor {
 
     #handleMouseWheel(ev) {
         ev.preventDefault();
-        const dir = Math.sign(ev.deltaY);
-        const step = 0.005;
-        this.zoom += dir * step;
+        const direction = ev.shiftKey ? Math.sign(ev.deltaX) : Math.sign(ev.deltaY);
+        const step = ev.shiftKey ? 0.001 : 0.005;
+        this.zoom += direction * step;
         this.zoom = Math.max(this.zoomRange[0], Math.min(this.zoomRange[1], this.zoom));
     }
 
