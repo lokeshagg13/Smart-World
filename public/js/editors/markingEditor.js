@@ -143,11 +143,19 @@ class MarkingEditor {
                     }
                 }
                 // Update the target of the current car being followed
-                this.world.selectedCar.target = this.intent;
-                this.world.selectedCar.path = this.world.graph.getShortestPath(
+                const shortestPath = this.world.graph.getShortestPath(
                     this.world.selectedCar.center,
                     this.intent.center
                 );
+                // Check if the path exist
+                if (!shortestPath) {
+                    showErrorModal('No path exist between the car and its target. Try again');
+                    this.intent = null;
+                    return;
+                }
+                // If shortest path exist, then generate the path borders
+                this.world.selectedCar.target = this.intent;
+                this.world.selectedCar.path = shortestPath;
                 this.world.selectedCar.pathBorders = this.world.generateCarPath(
                     this.world.selectedCar.center,
                     this.world.selectedCar.angle,

@@ -33,10 +33,7 @@ const OSM = {
                 for (let i = 1; i < ids.length; i++) {
                     const prev = points.find((p) => p.id == ids[i - 1]);
                     const curr = points.find((p) => p.id == ids[i]);
-                    const oneWay =
-                        way.tags.oneway ||
-                        way.tags.lanes === 1 ||
-                        (way.tags.junction && way.tags.junction === "roundabout");
+                    const oneWay = way.tags.junction && way.tags.junction === "roundabout";
                     segments.push(new Segment(prev, curr, oneWay));
                 }
             }

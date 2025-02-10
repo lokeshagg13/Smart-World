@@ -74,6 +74,11 @@ class SimulationEditor {
                         this.intent.center,
                         this.targetMarking.center
                     );
+                    if (!shortestPath) {
+                        showErrorModal('No path exist between the simulation cars and target. Try again');
+                        this.intent = null;
+                        return;
+                    }
                     const shortestPathBorders = this.world.generateCarPath(
                         this.intent.center,
                         this.intent.angle,

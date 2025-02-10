@@ -588,8 +588,6 @@ class World {
     generateCars(numCars) {
         const randomNumbers = generateUniqueNumbers(numCars, this.graph.segments.length);
         for (const number in randomNumbers) {
-            const targetMarking = this.getRandomTargetMarking();
-
             const randomSegment = this.graph.segments[number];
             const randomPoint = randomSegment.randomPoint(0.3, 0.7);
 
@@ -623,11 +621,20 @@ class World {
                 this.settings.isLHT,
                 false
             );
+            let targetMarking = null;
+            let shortestPath = null;
+            while (true) {
+                targetMarking = this.getRandomTargetMarking();
+                shortestPath = this.graph.getShortestPath(
+                    startMarking.car.center,
+                    targetMarking.center
+                );
+                if (shortestPath) {
+                    break;
+                }
+            }
             startMarking.car.target = targetMarking;
-            startMarking.car.path = this.graph.getShortestPath(
-                startMarking.car.center,
-                targetMarking.center
-            );
+            startMarking.car.path = shortestPath;
             startMarking.car.pathBorders = this.generateCarPath(
                 startMarking.car.center,
                 startMarking.car.angle,

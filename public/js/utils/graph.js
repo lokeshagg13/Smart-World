@@ -200,7 +200,7 @@ class Graph {
         this.removePoint(endPoint);
 
 
-        return path;
+        return path.length >= 2 ? path : null;
     }
 
     getCenter() {

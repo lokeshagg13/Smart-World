@@ -786,6 +786,7 @@ function hideSaveConfirmationModal() {
 }
 
 function showErrorModal(message) {
+    hideAllPopovers();
     document.querySelector("#errorModal .modal-body").innerHTML =
         "<p>" + message + "</p>";
     document.getElementById("errorModal").style.display = "flex";
