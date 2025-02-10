@@ -755,6 +755,7 @@ function showLoadWorldModal() {
                 worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
             }
             document.getElementById("loadWorldModal").style.display = "flex";
+            document.body.classList.add('modal-open');
         })
         .catch((error) => {
             console.error("Error fetching worlds:", error);
@@ -765,6 +766,7 @@ function showLoadWorldModal() {
 function hideLoadWorldModal() {
     hideAllPopovers();
     document.getElementById("loadWorldModal").style.display = "none";
+    document.body.classList.remove('modal-open');
 }
 
 function showLoadOsmGraphModal() {
