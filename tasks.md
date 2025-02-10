@@ -1,24 +1,15 @@
-# P4
+# P3
 
 1. Confirmation for reset simulation, exit simulation buttons (with do not show again if possible).
 2. Way to avoid saving the same world multiple times.
 3. Check and compare where the loading progress bar reaches end and where not and find any differences.
 
-# P3
-
-1. Make any segment in graph as one way in the graph editor by pressing o while near that segment. In this case, remove lane guides from one way segments.
 
 # P2
 
 1. Handle mobile tablet mode and laptop mode
-2. Distance to target and ETA to be shown for selected cars.
-3. Check for collisions with other cars.
-4. Fill world with N random cars.
-5. Car sounds for acceleration.
-6. Only allow placements of traffic lights near the road intersections with degree > 2 (max distance of say 100).
-7. Downloads in youtube for deploying this app.
-8. Show cars that reach target in a better way
-
+2. Only allow placements of traffic lights near the road intersections with degree > 2 (max distance of say 100).
+3. Downloads in youtube for deploying this app.
 
 # P1 - Immediate
 
@@ -48,7 +39,31 @@
 13. Allow different car styles to be shown on the map using car style selection dropdown.
 
 03 Feb
+
 14. Enhancing car select button styling.
 15. Adding pedcount of crossings and also maintain an array of pedestrian objects that are visible on the map.
 16. Synchronize pedestrian movements with traffic lights.
+
+05 Feb
+
+17. Fill world with N random cars.
+
+06 Feb
+
+18. Checked for collisions with other cars.
+
+08 Feb
+
+19. Distance to target and ETA shown for selected cars.
+
+10 Feb
+
+20. Fix simulation to avoid check for car collisions.
+21. Transparency for simulating cars.
+22. Slower zooming of minimap with shift key.
+23. Handling roundabouts in world.
+24. Marking Editors to include type (ROADSPREAD/LANESPREAD) instead of target segments.
+25. Handling case where no path exist between src and dest.
+26. Addings car engine sound and success sound in world.
+
 
