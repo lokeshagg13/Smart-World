@@ -232,6 +232,11 @@ class Car {
         this.success = this.#assessSuccess();
         this.distanceToTarget = this.#getDistanceToTarget();
 
+        // Play Success Sound for Selected Car
+        if (world.selectedCar === this && this.success) {
+            world.sounds.playSuccessSound();
+        }
+
         // If car has sensors, update sensor readings and if car is of type AI, update controls based on it.
         if (this.sensor) {
 

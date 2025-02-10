@@ -176,6 +176,7 @@ class MarkingEditor {
             showMustAddTargetPopover();
             this.world.markings.push(this.intent);
             this.world.selectedCar = this.intent.car;
+            this.world.sounds.startEngine();
             setMode('target');
         } else {
             this.world.markings.push(this.intent);

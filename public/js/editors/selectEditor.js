@@ -41,6 +41,7 @@ class SelectEditor {
         if (ev.button == 0) {   // Left click
             if (this.nearestCar) {
                 this.world.selectedCar = this.nearestCar;
+                this.world.sounds.startEngine();
                 setMode("world");
             }
         }

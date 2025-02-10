@@ -17,6 +17,8 @@ class World {
 
         this.frameCount = 0;
 
+        this.sounds = new SoundControl();
+
         if (graph.points.length > 0) {
             this.generate();
         }
@@ -464,8 +466,12 @@ class World {
         else if (this.selectedCar) {
             if (this.selectedCar.success) {
                 this.selectedCar = null;
+                this.sounds.stopEngine();
                 return;
             }
+            const engineSound = Math.abs(this.selectedCar.speed / this.selectedCar.maxSpeed);
+            this.sounds.setEngineSound(engineSound);
+
             const checkMarking = this.markings.find(
                 m =>
                     (m instanceof StartMarking) &&
@@ -473,6 +479,7 @@ class World {
             );
             if (!checkMarking) {
                 this.selectedCar = null;
+                this.sounds.stopEngine();
             }
         }
     }
