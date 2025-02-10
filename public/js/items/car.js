@@ -276,12 +276,14 @@ class Car {
         ctx.translate(this.center.x, this.center.y);
         ctx.rotate(this.angle)
 
+        ctx.globalAlpha = this.isSimulation ? 0.5 : 1;
         ctx.drawImage(this.img,
             -this.width / 2,
             -this.height / 2,
             this.width,
             this.height
         );
+        ctx.globalAlpha = 1;
         ctx.restore();
     }
 }
