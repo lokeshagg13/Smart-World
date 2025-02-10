@@ -1,6 +1,6 @@
 class CrossingEditor extends MarkingEditor {
     constructor(viewport, world) {
-        super(viewport, world, world.graph.segments);
+        super(viewport, world, MarkingEditor.types.ROADSPREAD);
     }
 
     createMarking(center, directionVector) {

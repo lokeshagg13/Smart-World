@@ -1,6 +1,6 @@
 class StopEditor extends MarkingEditor {
     constructor(viewport, world) {
-        super(viewport, world, world.laneGuides);
+        super(viewport, world, MarkingEditor.types.LANESPREAD);
     }
 
     createMarking(center, directionVector) {

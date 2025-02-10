@@ -1,5 +1,10 @@
 class MarkingEditor {
-    constructor(viewport, world, targetSegments) {
+    static types = {
+        "LANESPREAD": 0,
+        "ROADSPREAD": 1
+    }
+
+    constructor(viewport, world, type = MarkingEditor.types.LANESPREAD) {
         this.viewport = viewport;
         this.world = world;
 
@@ -9,7 +14,7 @@ class MarkingEditor {
         this.hoveredPoint = null;
         this.intent = null;
 
-        this.targetSegments = targetSegments;
+        this.type = type;
     }
 
     // to be overwritten by subclasses
@@ -83,9 +88,10 @@ class MarkingEditor {
 
     #handleMouseMove(ev) {
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
+        const targetSegments = this.type === MarkingEditor.types.ROADSPREAD ? this.world.graph.segments : this.world.laneGuides;
         const nearestSegment = Graph.getNearestSegment(
             this.hoveredPoint,
-            this.targetSegments,
+            targetSegments,
             12 * this.viewport.zoom
         );
         if (nearestSegment) {
