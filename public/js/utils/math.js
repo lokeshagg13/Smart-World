@@ -156,3 +156,19 @@ function generateUniqueNumbers(N, m) {
 
     return array.slice(0, N);
 }
+
+function getDistanceForDisplay(distance) {
+    // expects distance in metres
+    if (distance < 1) {
+        return "1m";
+    }
+    if (distance >= 1 && distance <= 999) {
+        return `${distance.toFixed(0)}m`;
+    }
+    return `${(distance / 1000).toFixed(1)}km`
+}
+
+function getETAForDisplay(eta) {
+    // expects eta in seconds
+    return formatDisplayETA(eta);
+}

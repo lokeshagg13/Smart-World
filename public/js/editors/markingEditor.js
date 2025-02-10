@@ -118,6 +118,7 @@ class MarkingEditor {
 
     #addMarkingToWorld() {
         if (this.intent instanceof TargetMarking) {
+            hideAllPopovers();
             if (this.world.selectedCar) {
                 // Removal of any unused targets
                 if (this.world.selectedCar.target) {

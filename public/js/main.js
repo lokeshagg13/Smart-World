@@ -11,6 +11,7 @@ const visualizerCtx = visualizerCanvas.getContext("2d");
 let world = new World(new Graph());
 let viewport = new Viewport(mainCanvas, world.zoom, world.offset);
 let miniMap = new MiniMap(new MiniMapEditor(), world);
+let carDashboard = new CarDashboard(world);
 
 Visualizer.reset();
 Visualizer.addEventListeners();
@@ -942,10 +943,29 @@ function showGenerateCarsModal() {
 
 // #region - World Animator
 
+function displayEmptyGraph(viewpoint) {
+    viewpoint.draw(mainCtx, { size: mainCanvas.width / 2, color: "rgba(0,0,0,0.1)" });
+    mainCtx.beginPath();
+    mainCtx.textAlign = "center";
+    mainCtx.textBaseline = "middle";
+    mainCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    mainCtx.font = "100px Arial";
+    mainCtx.fillText(
+        "REF",
+        viewpoint.x,
+        viewpoint.y
+    );
+}
+
 function animate(time) {
     viewport.reset();
     const viewpoint = scale(viewport.getOffset(), -1);
-    if (currentMode !== "graph") {
+
+    if (currentMode === "graph") {
+        if (!world.graph || world.graph.points.length === 0) {
+            displayEmptyGraph(viewpoint);
+        }
+    } else {
         visualizerCtx.lineDashOffset = -time / 60;
         if (currentMode === "world" && world.selectedCar) {
             viewport.setOffset(world.selectedCar.center);
@@ -960,18 +980,13 @@ function animate(time) {
         const renderRadius = viewport.getScreenRadius();
         world.draw(mainCtx, viewpoint, renderRadius, currentMode);
         miniMap.load(world).draw(viewpoint);
-    } else if (!world.graph || world.graph.points.length === 0) {
-        viewpoint.draw(mainCtx, { size: mainCanvas.width / 2, color: "rgba(0,0,0,0.1)" });
-        mainCtx.beginPath();
-        mainCtx.textAlign = "center";
-        mainCtx.textBaseline = "middle";
-        mainCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
-        mainCtx.font = "100px Arial";
-        mainCtx.fillText(
-            "REF",
-            viewpoint.x,
-            viewpoint.y
-        );
+
+        if (currentMode !== "simulation" && world.selectedCar && world.selectedCar.target) {
+            carDashboard.show();
+            carDashboard.load(world).draw();
+        } else {
+            carDashboard.hide();
+        }
     }
 
     editors[currentMode]?.display();
@@ -989,6 +1004,7 @@ function clearCanvas() {
     world = new World(new Graph());
     viewport = new Viewport(mainCanvas, world.zoom, world.offset);
     miniMap = new MiniMap(new MiniMapEditor(), world);
+    carDashboard = new CarDashboard(world);
     editors = {
         graph: new GraphEditor(viewport, world),
         simulation: new SimulationEditor(viewport, world),
@@ -1055,6 +1071,7 @@ function setMode(mode) {
         document.querySelector('#generateWorldBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.hide();
+        carDashboard.hide();
         hideVisualizer();
     } else if (mode === "simulation") {
         document.querySelector('.simulator').style.display = "flex";
@@ -1062,6 +1079,7 @@ function setMode(mode) {
         document.querySelector('#exitSimulationModeBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.show();
+        carDashboard.hide();
     } else {
         document.querySelector('.markings').style.display = "flex";
         document.querySelector('#editGraphBtn').style.display = "inline-flex";
@@ -1472,19 +1490,33 @@ function cancelTrafficSideChange() {
 
 function minimizeMiniMap() {
     if (currentMode !== "graph") {
-        miniMap.minimize()
+        miniMap.minimize();
     }
 }
 
 function maximizeMiniMap() {
     if (currentMode !== "graph") {
-        miniMap.maximize()
+        miniMap.maximize();
     }
 }
 
 // #endregion
 
 
+
+// #region - Car Dashboard Handlers
+
+function minimizeCarDashboard() {
+    if (currentMode !== "graph") {
+        carDashboard.minimize();
+    }
+}
+
+function maximizeCarDashboard() {
+    if (currentMode !== "graph") {
+        carDashboard.maximize();
+    }
+}
 
 // #region - Simulation Related Functions
 

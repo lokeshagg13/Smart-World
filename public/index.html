@@ -62,7 +62,7 @@
             >
               ➕ Show Mini Map
             </button>
-            <div id="maximizedMapContent">
+            <div id="maximizedMiniMap">
               <button
                 class="minimize-icon"
                 id="minimizeMiniMapBtn"
@@ -73,6 +73,25 @@
               <canvas id="miniMapCanvas"></canvas>
               <div class="resize-handle handle-left"></div>
               <div class="resize-handle handle-bottom"></div>
+            </div>
+          </div>
+          <div id="carDashboardContainer">
+            <button
+              class="maximize-icon"
+              id="maximizeCarDashboardBtn"
+              onclick="maximizeCarDashboard()"
+            >
+              ➕ Show Car Dashboard
+            </button>
+            <div id="maximizedCarDashboard">
+              <button
+                class="minimize-icon"
+                id="minimizeCarDashboardBtn"
+                onclick="minimizeCarDashboard()"
+              >
+                ➖
+              </button>
+              <canvas id="carDashboardCanvas"></canvas>
             </div>
           </div>
         </div>
@@ -1228,6 +1247,7 @@
     <script src="js/ecosystem/world.js"></script>
     <script src="js/ecosystem/viewport.js"></script>
     <script src="js/ecosystem/miniMap.js"></script>
+    <script src="js/ecosystem/carDashboard.js"></script>
     <script src="js/movement/sensor.js"></script>
     <script src="js/movement/brain.js"></script>
     <script src="js/movement/visualizer.js"></script>

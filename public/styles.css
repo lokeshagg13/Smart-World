@@ -93,7 +93,7 @@ h1 {
   border-radius: 50%;
 }
 
-.resize-handle {
+#miniMapContainer .resize-handle {
   position: absolute;
   width: 10px;
   height: 10px;
@@ -101,21 +101,30 @@ h1 {
   cursor: pointer;
 }
 
-.resize-handle.handle-left {
+#miniMapContainer .resize-handle.handle-left {
   left: -5px;
   top: 50%;
   transform: translateY(-50%);
   cursor: ew-resize;
 }
 
-.resize-handle.handle-bottom {
+#miniMapContainer .resize-handle.handle-bottom {
   bottom: -5px;
   left: 50%;
   transform: translateX(-50%);
   cursor: ns-resize;
 }
 
-.minimize-icon {
+#miniMapContainer .maximize-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  font-size: 15px;
+  display: none;
+}
+
+#miniMapContainer .minimize-icon {
   position: absolute;
   top: 0;
   right: 0;
@@ -124,13 +133,35 @@ h1 {
   padding: 0 5px;
 }
 
-.maximize-icon {
+#carDashboardContainer {
   position: absolute;
-  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  background: none;
+}
+
+#carDashboardCanvas {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+#carDashboardContainer .maximize-icon {
+  position: absolute;
+  bottom: 0;
   right: 0;
   z-index: 2;
   font-size: 15px;
   display: none;
+}
+
+#carDashboardContainer .minimize-icon {
+  position: absolute;
+  bottom: 28;
+  right: 0;
+  font-size: 15px;
+  background: none;
+  padding: 0 5px;
 }
 
 button {

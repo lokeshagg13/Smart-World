@@ -27,13 +27,13 @@ class MiniMap {
     minimize() {
         this.minimized = true;
         this.editor.container.querySelector('#maximizeMiniMapBtn').style.display = 'block';
-        this.editor.container.querySelector('#maximizedMapContent').style.display = 'none';
+        this.editor.container.querySelector('#maximizedMiniMap').style.display = 'none';
     }
 
     maximize() {
         this.minimized = false;
         this.editor.container.querySelector('#maximizeMiniMapBtn').style.display = 'none';
-        this.editor.container.querySelector('#maximizedMapContent').style.display = 'block';
+        this.editor.container.querySelector('#maximizedMiniMap').style.display = 'block';
 
     }
 

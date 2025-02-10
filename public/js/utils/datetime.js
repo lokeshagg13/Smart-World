@@ -14,3 +14,15 @@ function formatTimestamp(timestamp) {
 
     return new Intl.DateTimeFormat('en-US', options).format(date);
 }
+
+function formatDisplayETA(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const hrText = hrs > 0 ? `${hrs.toFixed(0)} hr` : '';
+    const minText = mins > 0 ? `${mins.toFixed(0)} min` : '';
+    const secText = secs > 0 || (hrs === 0 && mins === 0) ? `${secs.toFixed(0)} sec` : '';
+
+    return [hrText, minText, secText].filter(Boolean).join(' ');
+}
