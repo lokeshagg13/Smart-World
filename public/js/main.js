@@ -1342,6 +1342,8 @@ function saveWorldData() {
     world.zoom = viewport.zoom;
     world.offset = scale(viewport.offset, -1);
     world.screenshot = mainCanvas.toDataURL("image/png");
+    world.settings.carControlType = "AI";
+    world.settings.showSensors = false;
 
     // Send the API request
     fetch("http://localhost:3000/api/save-world", {
