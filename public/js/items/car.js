@@ -12,7 +12,6 @@ class Car {
 
         this.damaged = false;
         this.speed = 0;
-        this.fitness = 0;
         this.controls = {
             forward: false,
             left: false,
@@ -235,15 +234,6 @@ class Car {
 
         // If car has sensors, update sensor readings and if car is of type AI, update controls based on it.
         if (this.sensor) {
-            const otherCars = markings
-                .filter(
-                    (m) =>
-                        (m instanceof StartMarking) &&
-                        (m.car !== this)
-                )
-                .map(
-                    (m) => m.car
-                );
 
             this.sensor.update(
                 this.center,
@@ -251,12 +241,23 @@ class Car {
                 roadBorders,
                 this.pathBorders,
                 markings,
-                otherCars
+                this.isSimulation
+                    ? []
+                    : markings
+                        .filter(
+                            (m) =>
+                                (m instanceof StartMarking) &&
+                                (m.car !== this)
+                        )
+                        .map(
+                            (m) => m.car
+                        )
             );
+
             const sensorReadings = this.sensor.getReadings();
 
             if (this.brain) {
-                const calculatedControls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network);
+                const calculatedControls = Brain.getControls({ ...sensorReadings, speed: this.speed / this.maxSpeed }, this.brain.network,);
                 if (this.controlType === "AI") {
                     this.controls = calculatedControls;
                 }

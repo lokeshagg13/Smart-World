@@ -453,9 +453,9 @@ class World {
         if (currentMode === "simulation") {
             this.followedCar = cars.find(
                 car => (
-                    car.fitness === (
-                        Math.max(
-                            ...cars.map(c => c.fitness)
+                    car.distanceToTarget === (
+                        Math.min(
+                            ...cars.map(c => c.distanceToTarget)
                         )
                     )
                 )

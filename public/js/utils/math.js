@@ -170,5 +170,8 @@ function getDistanceForDisplay(distance) {
 
 function getETAForDisplay(eta) {
     // expects eta in seconds
+    if (eta <= 60) {
+        return "< 1 min"
+    }
     return formatDisplayETA(eta);
 }
