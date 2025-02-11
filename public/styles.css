@@ -340,7 +340,7 @@ button {
   max-height: 80vh;
   height: 80vh;
   overflow: auto;
-  z-index: 1;
+  z-index: 3;
 }
 
 #settingsModal .modal-content {
@@ -399,6 +399,10 @@ button {
   text-align: justify;
   font-style: italic;
   margin-bottom: 0.5rem;
+}
+
+#loadWorldModal {
+  z-index: 3;
 }
 
 #loadWorldModal .modal-dialog {

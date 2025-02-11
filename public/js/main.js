@@ -1490,7 +1490,6 @@ function loadWorldFromFile() {
     const reader = new FileReader();
     reader.onload = function (event) {
         try {
-            hideLoadWorldModal();
             const loadedWorld = JSON.parse(event.target.result);
             world = World.load(loadedWorld);
             editors = {
@@ -1509,13 +1508,14 @@ function loadWorldFromFile() {
             showLoadingModal();
             setTimeout(() => {
                 hideLoadingModal();
+                hideLoadWorldModal();
                 setMode('world');
                 viewport.setOffset(world.offset || world.graph.getCenter());
                 viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
             }, 3000);
         } catch (error) {
             console.error("Error loading world:", error);
-            showErrorModal("Error loading the world. Please check the file content.");
+            showErrorMessage('loadWorldFile', 'Error loading the world. Please check the file content.');
         }
     };
 
@@ -1533,7 +1533,6 @@ function loadWorldFromData() {
     }
 
     try {
-        hideLoadWorldModal();
         const loadedWorld = JSON.parse(dataInput);
         world = World.load(loadedWorld);
         editors = {
@@ -1552,13 +1551,14 @@ function loadWorldFromData() {
         showLoadingModal();
         setTimeout(() => {
             hideLoadingModal();
+            hideLoadWorldModal();
             setMode('world');
             viewport.setOffset(world.offset || world.graph.getCenter());
             viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
         }, 3000);
     } catch (error) {
         console.error("Error loading world:", error);
-        showErrorModal("Error loading the world. Please check the JSON data.");
+        showErrorMessage('loadWorldData', 'Error loading the world. Please check the JSON data.');
     }
 }
 
