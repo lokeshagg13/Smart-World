@@ -4,6 +4,13 @@
 
 ---
 
+## 🌐 Live Web App
+
+Experience **Smart World** directly in your browser!  
+[Visit the live web app](https://smart-world-ske3.onrender.com)
+
+---
+
 ## ✨ Features
 
 - **🛣️ Ecosystem Simulation:**
@@ -76,11 +83,11 @@
 
 This application supports loading the world using OSM data.
 
-### Steps to fetch OSM data.
+### Steps to Fetch OSM Data
 
-1. Go to [https://overpass-turb.eu](https://overpass-turbo.eu/)
+1. Go to [https://overpass-turbo.eu](https://overpass-turbo.eu)
 2. Select the region from the world map that you want to load onto the app.
-3. Paste the following in the left side of the map area to perform some initial data filtering and remove any irrelevant data.
+3. Paste the following in the left side of the map area to perform some initial data filtering and remove any irrelevant data:
 
 ```
 [out:json];
@@ -115,6 +122,15 @@ out skel;
 ## 🎯 Vision
 
 The Smart World project aims to create an intelligent and interactive platform for urban planning, real-time traffic analysis, and educational purposes.
+
+---
+
+## 📽️ References
+
+- [YouTube Tutorials by Radu](https://www.youtube.com/@Radu)
+- Audio files are sourced from [Pixabay Audio](https://pixabay.com/service/terms/) under the **CC0 License**.
+- Icons provided by [FontAwesome](https://fontawesome.com) under the **[Font Awesome Free License](https://fontawesome.com/license)**.
+- Emojis sourced from [EmojiDB](https://emojidb.org).
 
 ---
 
