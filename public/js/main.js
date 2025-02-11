@@ -1410,7 +1410,7 @@ function downloadWorldFile() {
     // Create a temporary link element
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    
+
     link.download = `world_${formatCurrentTimeForFileName()}.json`;
     link.click();
 
@@ -1659,6 +1659,10 @@ function maximizeCarDashboard() {
         carDashboard.maximize();
     }
 }
+
+// #endregion
+
+
 
 // #region - Simulation Related Functions
 

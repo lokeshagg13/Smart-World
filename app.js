@@ -39,7 +39,7 @@ const worldJSONPath = path.join(dataBasePath, 'worlds.json');
 if (!fs.existsSync(worldJSONPath)) {
     fs.writeFileSync(worldJSONPath, '');
 }
-const worldScreenshotsFolderPath = path.join(__dirname, 'db', 'screenshots');
+const worldScreenshotsFolderPath = path.join(dataBasePath, 'screenshots');
 if (!fs.existsSync(worldScreenshotsFolderPath)) {
     fs.mkdirSync(worldScreenshotsFolderPath);
 }
