@@ -1300,6 +1300,7 @@ function saveWorldData() {
     world.settings.carControlType = "AI";
     world.settings.showSensors = false;
 
+    showLoadingModal();
     // Send the API request
     fetch("http://localhost:3000/api/save-world", {
         method: "POST",
@@ -1319,10 +1320,12 @@ function saveWorldData() {
             return response.json();
         })
         .then(() => {
+            hideLoadingModal();
             showSaveConfirmationModal("World saved successfully.");
         })
         .catch((error) => {
             console.error("Error saving world:", error);
+            hideLoadingModal();
             showErrorModal("Error saving the world.");
         });
 }
@@ -1349,6 +1352,7 @@ function downloadWorldFile() {
 
 function loadSavedWorldsData() {
     document.getElementById('loadSavedWorldsError').style.display = "none";
+    document.getElementById('worldList').innerHTML = "";
     document.querySelector('.modal-loader').style.display = "flex";
 
     // Fetch the list of worlds from the server
@@ -1365,8 +1369,7 @@ function loadSavedWorldsData() {
         })
         .then((data) => {
             const worldListContainer = document.getElementById("worldList");
-            worldListContainer.innerHTML = ""; // Clear existing content
-
+            
             if (data.worlds && data.worlds.length > 0) {
                 data.worlds.forEach((world, index) => {
                     // Create elements to display the world
