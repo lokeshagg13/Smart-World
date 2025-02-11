@@ -612,7 +612,29 @@ function fillVariableHtmlData() {
 
 
 
-// #region - Popovers and Tooltips
+// #region - Error Messages
+
+const errorMessageSelectors = ['#settingsModal small.error-message', '#loadWorldModal small.error-message'];
+
+function showErrorMessage(inputId, message = null) {
+    if (message) {
+        document.getElementById(inputId + 'Error').innerText = message;
+    }
+    document.getElementById(inputId + 'Error').style.display = 'block';
+}
+
+function hideErrorMessages() {
+    const selectors = [...document.querySelectorAll(errorMessageSelectors.join(', '))];
+    for (let i = 0; i < selectors.length; i++) {
+        selectors[i].style.display = 'none';
+    }
+}
+
+// #endregion
+
+
+
+// #region - Popovers
 
 const popoverSelectors = ['.btn-world-info', '#startBtn', '#targetBtn', '#manualOverrideBtn', 'input[data-content]', '#osmDataInput', '#saveSettingsBtn', '.hint'];
 
@@ -732,7 +754,7 @@ function showLoadWorldModal() {
                                 'Delete world', 
                                 '<p>Are you sure you want to delete <b>World ${worldId}</b> from the list of saved worlds?</p>', 
                                 'Delete',
-                                () => deleteWorldData('${world.id}')
+                                () => deleteWorldUsingID('${world.id}')
                             )"
                         >🗑️</button>
                     </div>
@@ -741,11 +763,11 @@ function showLoadWorldModal() {
 
                     // Add event listener to handle world selection
                     worldItem.querySelector('img').addEventListener("click", () => {
-                        loadWorldData(world.id);
+                        loadWorldUsingID(world.id);
                     });
 
                     worldItem.querySelector('h4').addEventListener("click", () => {
-                        loadWorldData(world.id);
+                        loadWorldUsingID(world.id);
                     });
 
                     // Append the world item to the container
@@ -754,6 +776,8 @@ function showLoadWorldModal() {
             } else {
                 worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
             }
+            document.getElementById("worldFileInput").value = "";
+            document.getElementById("worldDataInput").value = "";
             document.getElementById("loadWorldModal").style.display = "flex";
             document.body.classList.add('modal-open');
         })
@@ -1086,6 +1110,7 @@ function setMode(mode) {
     } else {
         document.querySelector('.markings').style.display = "flex";
         document.querySelector('#editGraphBtn').style.display = "inline-flex";
+        document.querySelector('#downloadWorldBtn').style.display = "inline-flex";
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
@@ -1137,7 +1162,7 @@ function resetHeaderControlWidth(mode) {
         document.querySelector('.header .section').style.width = "12%";
     }
     else {
-        document.querySelector('.header .section').style.width = "20%";
+        document.querySelector('.header .section').style.width = "25%";
     }
 }
 
@@ -1325,7 +1350,7 @@ function toggleCarControlType() {
 
 
 
-// #region - World generation, saving, loading and deletion as well as Open Street Map Handler
+// #region - World generation, saving, loading, downloading and deletion as well as Open Street Map Handler
 
 async function generateWorld() {
     if (world.graph.points.length === 0) {
@@ -1372,7 +1397,27 @@ function saveWorldData() {
         });
 }
 
-function loadWorldData(worldId) {
+function downloadWorldFile() {
+    world.zoom = viewport.zoom;
+    world.offset = scale(viewport.offset, -1);
+    world.screenshot = mainCanvas.toDataURL("image/png");
+    world.settings.carControlType = "AI";
+    world.settings.showSensors = false;
+
+    const worldString = JSON.stringify(world, null, 4);
+    const blob = new Blob([worldString], { type: "application/json" });
+
+    // Create a temporary link element
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    link.download = `world_${formatCurrentTimeForFileName()}.json`;
+    link.click();
+
+    URL.revokeObjectURL(link.href); // Clean up by revoking the object URL
+}
+
+function loadWorldUsingID(worldId) {
     hideLoadWorldModal();
     fetch(`https://smart-world-ske3.onrender.com/api/load-world/${worldId}`, {
         method: "GET",
@@ -1415,7 +1460,99 @@ function loadWorldData(worldId) {
         });
 }
 
-function deleteWorldData(worldId) {
+function loadWorldFromFile() {
+    hideErrorMessages();
+
+    const fileInput = document.getElementById('worldFileInput');
+
+    if (!fileInput.files.length) {
+        showErrorMessage('loadWorldFile', 'Please select a JSON file to load.');
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    if (file.type !== 'application/json') {
+        showErrorMessage('loadWorldFile', 'Invalid file type. Please upload a .json file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        try {
+            hideLoadWorldModal();
+            const loadedWorld = JSON.parse(event.target.result);
+            world = World.load(loadedWorld);
+            editors = {
+                graph: new GraphEditor(viewport, world),
+                simulation: new SimulationEditor(viewport, world),
+                world: new WorldEditor(viewport, world),
+                select: new SelectEditor(viewport, world),
+                start: new StartEditor(viewport, world),
+                stop: new StopEditor(viewport, world),
+                yield: new YieldEditor(viewport, world),
+                crossing: new CrossingEditor(viewport, world),
+                parking: new ParkingEditor(viewport, world),
+                target: new TargetEditor(viewport, world),
+                trafficLight: new TrafficLightEditor(viewport, world),
+            };
+            showLoadingModal();
+            setTimeout(() => {
+                hideLoadingModal();
+                setMode('world');
+                viewport.setOffset(world.offset || world.graph.getCenter());
+                viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
+            }, 3000);
+        } catch (error) {
+            console.error("Error loading world:", error);
+            showErrorModal("Error loading the world. Please check the file content.");
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+function loadWorldFromData() {
+    hideErrorMessages();
+
+    const dataInput = document.getElementById('worldDataInput').value;
+
+    if (dataInput === "") {
+        showErrorMessage('loadWorldData', 'Please input JSON data to load.');
+        return;
+    }
+
+    try {
+        hideLoadWorldModal();
+        const loadedWorld = JSON.parse(dataInput);
+        world = World.load(loadedWorld);
+        editors = {
+            graph: new GraphEditor(viewport, world),
+            simulation: new SimulationEditor(viewport, world),
+            world: new WorldEditor(viewport, world),
+            select: new SelectEditor(viewport, world),
+            start: new StartEditor(viewport, world),
+            stop: new StopEditor(viewport, world),
+            yield: new YieldEditor(viewport, world),
+            crossing: new CrossingEditor(viewport, world),
+            parking: new ParkingEditor(viewport, world),
+            target: new TargetEditor(viewport, world),
+            trafficLight: new TrafficLightEditor(viewport, world),
+        };
+        showLoadingModal();
+        setTimeout(() => {
+            hideLoadingModal();
+            setMode('world');
+            viewport.setOffset(world.offset || world.graph.getCenter());
+            viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
+        }, 3000);
+    } catch (error) {
+        console.error("Error loading world:", error);
+        showErrorModal("Error loading the world. Please check the JSON data.");
+    }
+}
+
+function deleteWorldUsingID(worldId) {
     hideConfirmingModal();
     fetch(`https://smart-world-ske3.onrender.com/api/delete-world/${worldId}`, {
         method: "DELETE",
@@ -1523,6 +1660,10 @@ function maximizeCarDashboard() {
     }
 }
 
+// #endregion
+
+
+
 // #region - Simulation Related Functions
 
 function resetCarBrain() {
@@ -1590,17 +1731,6 @@ function exitSimulationMode() {
 
 
 // #region - Settings related functions
-
-function showErrorMessage(inputId) {
-    document.getElementById(inputId + 'Error').style.display = 'block';
-}
-
-function hideErrorMessages() {
-    const selectors = [...document.querySelectorAll('#settingsModal small.error-message')];
-    for (let i = 0; i < selectors.length; i++) {
-        selectors[i].style.display = 'none';
-    }
-}
 
 function loadSettingsIntoDisplay() {
     // Reset World Section

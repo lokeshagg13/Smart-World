@@ -34,6 +34,18 @@
               <img src="images/app_icons/edit_icon.svg" alt="Edit Skeleton" />
             </button>
             <button
+              id="downloadWorldBtn"
+              onclick="downloadWorldFile()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Download World"
+            >
+              <img
+                src="images/app_icons/download_icon.svg"
+                alt="Download World"
+              />
+            </button>
+            <button
               id="clearCanvasBtn"
               data-toggle="tooltip"
               data-placement="top"
@@ -642,9 +654,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="loadWorldModalTitle">
-              Load a saved world
-            </h4>
+            <h4 class="modal-title" id="loadWorldModalTitle">Load World</h4>
             <button
               type="button"
               class="close"
@@ -656,7 +666,45 @@
             </button>
           </div>
           <div class="modal-body">
-            <div id="worldList" class="world-list"></div>
+            <div class="modal-section">
+              <h5 class="modal-subheader">Saved Worlds</h5>
+              <div id="worldList" class="world-list"></div>
+            </div>
+            <hr />
+            <div class="modal-section modal-file-section">
+              <h5 class="modal-subheader">Load from JSON file</h5>
+              <div class="modal-form">
+                <input type="file" id="worldFileInput" accept=".json" />
+                <button
+                  class="btn btn-primary"
+                  id="loadWorldFileButton"
+                  onclick="loadWorldFromFile()"
+                >
+                  Load
+                </button>
+              </div>
+              <small class="error-message" id="loadWorldFileError"></small>
+            </div>
+            <hr />
+            <div class="modal-section modal-data-section">
+              <h5 class="modal-subheader">Load from JSON data</h5>
+              <div class="modal-form">
+                <textarea
+                  id="worldDataInput"
+                  class="form-control"
+                  rows="5"
+                  placeholder="Paste your World JSON data here..."
+                ></textarea>
+                <small class="error-message" id="loadWorldDataError"></small>
+                <button
+                  class="btn btn-primary"
+                  id="loadWorldDataButton"
+                  onclick="loadWorldFromData()"
+                >
+                  Load
+                </button>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button

@@ -26,3 +26,19 @@ function formatDisplayETA(seconds) {
     const minText = mins > 0 ? `${mins.toFixed(0)} min` : '';
     return [hrText, minText].filter(Boolean).join(' ');
 }
+
+function formatCurrentTimeForFileName() {
+    const now = new Date();
+
+    const pad = (num, size) => String(num).padStart(size, '0');
+
+    const day = pad(now.getDate(), 2); // DD
+    const month = pad(now.getMonth() + 1, 2); // MM
+    const year = now.getFullYear(); // YYYY
+    const hours = pad(now.getHours(), 2); // HH
+    const minutes = pad(now.getMinutes(), 2); // MM
+    const seconds = pad(now.getSeconds(), 2); // SS
+    const milliseconds = pad(now.getMilliseconds(), 3); // MSS
+
+    return `${day}${month}${year}_${hours}${minutes}${seconds}${milliseconds}`;
+}

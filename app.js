@@ -31,11 +31,15 @@ app.get('/index.html', (req, res) => {
 
 // API Endpoints
 
-const worldJSONPath = path.join(__dirname, 'db', 'worlds.json');
+const dataBasePath = path.join(__dirname, 'db');
+if (!fs.existsSync(dataBasePath)) {
+    fs.mkdirSync(dataBasePath);
+}
+const worldJSONPath = path.join(dataBasePath, 'worlds.json');
 if (!fs.existsSync(worldJSONPath)) {
     fs.writeFileSync(worldJSONPath, '');
 }
-const worldScreenshotsFolderPath = path.join(__dirname, 'db', 'screenshots');
+const worldScreenshotsFolderPath = path.join(dataBasePath, 'screenshots');
 if (!fs.existsSync(worldScreenshotsFolderPath)) {
     fs.mkdirSync(worldScreenshotsFolderPath);
 }
