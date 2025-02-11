@@ -437,6 +437,10 @@ button {
   margin: 1rem 0;
 }
 
+#loadWorldModal .modal-saved-section {
+  margin-bottom: 1.5rem;
+}
+
 #loadWorldModal .modal-file-section,
 #loadWorldModal .modal-data-section {
   padding: 2rem;
@@ -504,7 +508,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  margin-top: 20px;
+  margin-top: 2rem;
 }
 
 .world-item {
