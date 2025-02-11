@@ -9,7 +9,6 @@
 
 1. Handle mobile tablet mode and laptop mode
 2. Only allow placements of traffic lights near the road intersections with degree > 2 (max distance of say 100).
-3. Downloads in youtube for deploying this app.
 
 # P1 - Immediate
 
@@ -65,5 +64,11 @@
 24. Marking Editors to include type (ROADSPREAD/LANESPREAD) instead of target segments.
 25. Handling case where no path exist between src and dest.
 26. Addings car engine sound and success sound in world.
+
+11 Feb
+
+27. Deploying the app.
+28. Download world json as well as load world using JSON file or JSON data.
+29. Loaders to show while delay in saving or loading bigger worlds.
 
 
