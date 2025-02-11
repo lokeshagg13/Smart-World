@@ -201,6 +201,15 @@ button {
   height: 1.5rem;
 }
 
+#downloadWorldBtn {
+  padding: 10.5px 5px;
+}
+
+#downloadWorldBtn img {
+  width: 1.5rem;
+  height: 1.3rem;
+}
+
 #visualizerBtn {
   padding: 9px 5px;
 }
@@ -411,6 +420,35 @@ button {
 
 #loadWorldModal button.btn-world-info img {
   width: 1rem;
+}
+
+#loadWorldModal .modal-subheader {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+#loadWorldModal .modal-file-section, #loadWorldModal .modal-data-section {
+  padding: 2rem;
+  padding-top: 0.5rem;
+}
+
+#loadWorldModal .modal-form {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+#loadWorldModal .modal-data-section .modal-form {
+  flex-direction: column;
+}
+
+#loadWorldModal .modal-data-section button {
+  margin-top: 1rem;
+}
+
+#loadWorldModal small.error-message {
+  color: red;
+  display: none;
 }
 
 #loadOsmGraphModal div.modal-body {
