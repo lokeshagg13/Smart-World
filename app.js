@@ -196,5 +196,5 @@ app.post('/api/admin/verify', (req, res) => {
 
 // Start Server
 app.listen(process.env.PORT, () => {
-    console.log(`Server running on http://localhost:${process.env.PORT}`);
+    console.log(`Server running on https://smart-world-ske3.onrender.com at port ${process.env.PORT}`);
 });
