@@ -714,78 +714,7 @@ function showLoadWorldModal() {
     document.getElementById("loadWorldModal").style.display = "flex";
     document.body.classList.add('modal-open');
 
-    // Fetch the list of worlds from the server
-    fetch("http://localhost:3000/api/get-worlds", {
-        method: "POST",
-    })
-        .then((response) => {
-            if (!response.ok) {
-                return response.json().then((data) => {
-                    throw new Error(data.details || "Failed to fetch worlds");
-                });
-            }
-            return response.json();
-        })
-        .then((data) => {
-            const worldListContainer = document.getElementById("worldList");
-            worldListContainer.innerHTML = ""; // Clear existing content
-
-            if (data.worlds && data.worlds.length > 0) {
-                data.worlds.forEach((world, index) => {
-                    // Create elements to display the world
-                    const worldItem = document.createElement("div");
-                    const worldId = index + 1;
-                    worldItem.classList.add("world-item");
-                    worldItem.setAttribute("id", world.id + "")
-                    worldItem.innerHTML = `
-                  <img src="${world.screenshot}" alt="World ${worldId}" />
-                  <div class="world-info">
-                    <h4>World ${worldId}</h4>
-                    <div class="world-controls">
-                        <button 
-                            class="btn-world-info" 
-                            id="world-info-${worldId}"
-                            onclick="showPopoverByID('world-info-${worldId}', 5000)"
-                            data-toggle="popover"
-                            data-placement="top"
-                            data-trigger="click"
-                            data-html="true"
-                            data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
-                        ><img src="images/app_icons/info_icon.svg" alt="Info" /></button>
-                        <button
-                            class="btn-world-delete"
-                            id="world-delete-${worldId}"
-                            onclick="showConfirmingModal(
-                                'Delete world', 
-                                '<p>Are you sure you want to delete <b>World ${worldId}</b> from the list of saved worlds?</p>', 
-                                'Delete',
-                                () => deleteWorldUsingID('${world.id}')
-                            )"
-                        >🗑️</button>
-                    </div>
-                  </div>
-                `;
-
-                    // Add event listener to handle world selection
-                    worldItem.querySelector('img').addEventListener("click", () => {
-                        loadWorldUsingID(world.id);
-                    });
-
-                    worldItem.querySelector('h4').addEventListener("click", () => {
-                        loadWorldUsingID(world.id);
-                    });
-
-                    // Append the world item to the container
-                    worldListContainer.appendChild(worldItem);
-                });
-            } else {
-                worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
-            }
-        })
-        .catch((error) => {
-            console.error("Error fetching worlds:", error);
-            showErrorModal("Error fetching the saved worlds.");
-        });
+    loadSavedWorldsData();
 }
 
 function hideLoadWorldModal() {
@@ -1416,6 +1345,86 @@ function downloadWorldFile() {
     link.click();
 
     URL.revokeObjectURL(link.href); // Clean up by revoking the object URL
+}
+
+function loadSavedWorldsData() {
+    document.getElementById('loadSavedWorldsError').style.display = "none";
+    document.querySelector('.modal-loader').style.display = "flex";
+
+    // Fetch the list of worlds from the server
+    fetch("http://localhost:3000/api/get-worlds", {
+        method: "POST",
+    })
+        .then((response) => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    throw new Error(data.details || "Failed to fetch worlds");
+                });
+            }
+            return response.json();
+        })
+        .then((data) => {
+            const worldListContainer = document.getElementById("worldList");
+            worldListContainer.innerHTML = ""; // Clear existing content
+
+            if (data.worlds && data.worlds.length > 0) {
+                data.worlds.forEach((world, index) => {
+                    // Create elements to display the world
+                    const worldItem = document.createElement("div");
+                    const worldId = index + 1;
+                    worldItem.classList.add("world-item");
+                    worldItem.setAttribute("id", world.id + "")
+                    worldItem.innerHTML = `
+              <img src="${world.screenshot}" alt="World ${worldId}" />
+              <div class="world-info">
+                <h4>World ${worldId}</h4>
+                <div class="world-controls">
+                    <button 
+                        class="btn-world-info" 
+                        id="world-info-${worldId}"
+                        onclick="showPopoverByID('world-info-${worldId}', 5000)"
+                        data-toggle="popover"
+                        data-placement="top"
+                        data-trigger="click"
+                        data-html="true"
+                        data-content="<b>World ${worldId}</b><br />Created On: ${formatTimestamp(world.createdOn)}"    
+                    ><img src="images/app_icons/info_icon.svg" alt="Info" /></button>
+                    <button
+                        class="btn-world-delete"
+                        id="world-delete-${worldId}"
+                        onclick="showConfirmingModal(
+                            'Delete world', 
+                            '<p>Are you sure you want to delete <b>World ${worldId}</b> from the list of saved worlds?</p>', 
+                            'Delete',
+                            () => deleteWorldUsingID('${world.id}')
+                        )"
+                    >🗑️</button>
+                </div>
+              </div>
+            `;
+
+                    // Add event listener to handle world selection
+                    worldItem.querySelector('img').addEventListener("click", () => {
+                        loadWorldUsingID(world.id);
+                    });
+
+                    worldItem.querySelector('h4').addEventListener("click", () => {
+                        loadWorldUsingID(world.id);
+                    });
+
+                    // Append the world item to the container
+                    worldListContainer.appendChild(worldItem);
+                });
+            } else {
+                worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
+            }
+            document.querySelector('.modal-loader').style.display = "none";
+        })
+        .catch((error) => {
+            console.error("Error fetching worlds:", error);
+            document.getElementById('loadSavedWorldsError').style.display = "block";
+            document.querySelector('.modal-loader').style.display = "none";
+        });
 }
 
 function loadWorldUsingID(worldId) {

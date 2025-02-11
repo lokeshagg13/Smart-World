@@ -668,7 +668,16 @@
           <div class="modal-body">
             <div class="modal-section">
               <h5 class="modal-subheader">Saved Worlds</h5>
+              <div class="modal-loader">
+                <img src="images/spinning.gif" />
+              </div>
               <div id="worldList" class="world-list"></div>
+              <div class="error-message" id="loadSavedWorldsError">
+                <p>Unable to fetch the saved worlds.</p>
+                <button class="btn btn-info" onclick="loadSavedWorldsData()">
+                  Try Again
+                </button>
+              </div>
             </div>
             <hr />
             <div class="modal-section modal-file-section">

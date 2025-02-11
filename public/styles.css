@@ -418,6 +418,12 @@ button {
   overflow-y: auto;
 }
 
+#loadWorldModal .modal-loader {
+  display: none;
+  justify-content: center;
+  margin: 4rem;
+}
+
 #loadWorldModal button.btn-world-info img {
   width: 1rem;
 }
@@ -427,7 +433,8 @@ button {
   margin: 1rem 0;
 }
 
-#loadWorldModal .modal-file-section, #loadWorldModal .modal-data-section {
+#loadWorldModal .modal-file-section,
+#loadWorldModal .modal-data-section {
   padding: 2rem;
   padding-top: 0.5rem;
 }
@@ -444,6 +451,12 @@ button {
 
 #loadWorldModal .modal-data-section button {
   margin-top: 1rem;
+}
+
+#loadWorldModal div.error-message {
+  display: none;
+  text-align: center;
+  margin: 2rem 0;
 }
 
 #loadWorldModal small.error-message {
