@@ -709,6 +709,11 @@ function hideLoadingModal() {
 }
 
 function showLoadWorldModal() {
+    document.getElementById("worldFileInput").value = "";
+    document.getElementById("worldDataInput").value = "";
+    document.getElementById("loadWorldModal").style.display = "flex";
+    document.body.classList.add('modal-open');
+
     // Fetch the list of worlds from the server
     fetch("http://localhost:3000/api/get-worlds", {
         method: "POST",
@@ -776,10 +781,6 @@ function showLoadWorldModal() {
             } else {
                 worldListContainer.innerHTML = "<p>No saved worlds found.</p>";
             }
-            document.getElementById("worldFileInput").value = "";
-            document.getElementById("worldDataInput").value = "";
-            document.getElementById("loadWorldModal").style.display = "flex";
-            document.body.classList.add('modal-open');
         })
         .catch((error) => {
             console.error("Error fetching worlds:", error);
