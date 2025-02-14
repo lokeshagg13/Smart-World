@@ -42,6 +42,15 @@ class Viewport {
         return subtractDragOffset ? subtract(p, this.drag.offset) : p;
     }
 
+    getCurrentTouchPoint(ev, subtractDragOffset = false) {
+        const rect = this.canvas.getBoundingClientRect();
+        const p = new Point(
+            (ev.touches[0].clientX - rect.left - this.center.x) * this.zoom - this.offset.x,
+            (ev.touches[0].clientY - rect.top - this.center.y) * this.zoom - this.offset.y
+        );
+        return subtractDragOffset ? subtract(p, this.drag.offset) : p;
+    }
+
     getOffset() {
         return add(this.offset, this.drag.offset);
     }
@@ -70,8 +79,6 @@ class Viewport {
         this.canvas.addEventListener("mousedown", this.#handleMouseDown.bind(this));
         this.canvas.addEventListener("mousemove", this.#handleMouseMove.bind(this));
         this.canvas.addEventListener("mouseup", this.#handleMouseUp.bind(this));
-
-        // Touch events for pinch zoom
         this.canvas.addEventListener("touchstart", this.#handleTouchStart.bind(this));
         this.canvas.addEventListener("touchmove", this.#handleTouchMove.bind(this));
         this.canvas.addEventListener("touchend", this.#handleTouchEnd.bind(this));
@@ -116,7 +123,7 @@ class Viewport {
             this.pinch.initialDistance = this.#getTouchDistance(ev.touches);
             this.pinch.initialZoom = this.zoom;
             this.pinch.active = true;
-            
+
             this.drag.start = this.#getTouchMidPoint(ev.touches);
             this.drag.active = true;
         }

@@ -28,18 +28,25 @@ class GraphEditor {
         this.boundMouseDown = this.#handleMouseDown.bind(this);
         this.boundMouseMove = this.#handleMouseMove.bind(this);
         this.boundMouseUp = () => this.dragging = false;
+        this.boundTouchStart = this.#handleTouchStart.bind(this);
+        this.boundTouchMove = this.#handleTouchMove.bind(this);
         this.boundContextMenu = (ev) => ev.preventDefault();
+
         this.canvas.addEventListener("mousedown", this.boundMouseDown);
         this.canvas.addEventListener("mousemove", this.boundMouseMove);
-        this.canvas.addEventListener("contextmenu", this.boundContextMenu);
         this.canvas.addEventListener("mouseup", this.boundMouseUp);
+        this.canvas.addEventListener("touchstart", this.boundTouchStart);
+        this.canvas.addEventListener("touchmove", this.boundTouchMove);
+        this.canvas.addEventListener("contextmenu", this.boundContextMenu);
     }
 
     #removeEventListeners() {
         this.canvas.removeEventListener("mousedown", this.boundMouseDown);
         this.canvas.removeEventListener("mousemove", this.boundMouseMove);
-        this.canvas.removeEventListener("contextmenu", this.boundContextMenu);
         this.canvas.removeEventListener("mouseup", this.boundMouseUp);
+        this.canvas.removeEventListener("touchstart", this.boundTouchStart);
+        this.canvas.removeEventListener("touchmove", this.boundTouchMove);
+        this.canvas.removeEventListener("contextmenu", this.boundContextMenu);
     }
 
     #handleMouseDown(ev) {
@@ -59,18 +66,42 @@ class GraphEditor {
                 return
             }
             // Else adding a new point to the graph and selecting it
-            this.world.graph.addPoint(this.hoveredPoint);
-            this.#select(this.hoveredPoint);
-            this.nearestPoint = this.hoveredPoint;
+            if (this.hoveredPoint) {
+                this.world.graph.addPoint(this.hoveredPoint);
+                this.#select(this.hoveredPoint);
+                this.nearestPoint = this.hoveredPoint;
+            }
         }
     }
 
     #handleMouseMove(ev) {
         this.hoveredPoint = this.viewport.getCurrentMousePoint(ev, true);
-        this.nearestPoint = Graph.getNearestPoint(this.hoveredPoint, this.world.graph.points, 12 * this.viewport.zoom);
+        this.nearestPoint = Graph.getNearestPoint(this.hoveredPoint, this.world.graph.points, 24 * this.viewport.zoom);
         if (this.dragging) {
             this.selectedPoint.x = this.hoveredPoint.x;
             this.selectedPoint.y = this.hoveredPoint.y;
+        }
+    }
+
+    #handleTouchStart(ev) {
+        if (ev.touches.length === 2) {
+            if (this.selectedPoint) {
+                this.selectedPoint = null;
+            }
+            else if (this.nearestPoint) {
+                this.#removePoint(this.nearestPoint)
+            }
+        }
+    }
+
+    #handleTouchMove(ev) {
+        if (ev.touches.length === 1) {
+            ev.preventDefault();
+            if (this.selectedPoint) {
+                this.hoveredPoint = this.viewport.getCurrentTouchPoint(ev, true);
+                this.selectedPoint.x = this.hoveredPoint.x;
+                this.selectedPoint.y = this.hoveredPoint.y;
+            }
         }
     }
 
