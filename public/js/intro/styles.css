@@ -1,6 +1,12 @@
 body {
   width: fit-content;
   height: fit-content;
+  font-family: "Montserrat", serif;
+}
+
+span.app-name {
+  letter-spacing: 2px;
+  font-weight: 300;
 }
 
 #appIntro {
@@ -66,14 +72,14 @@ body {
 }
 
 #appIntro .cta-message {
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   color: #555;
   margin-top: 15px;
   line-height: 1.8;
 }
 
 #appIntro p.exit-message {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #555;
   margin-top: 15px;
   line-height: 1.8;

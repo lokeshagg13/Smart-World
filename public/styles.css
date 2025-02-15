@@ -1,5 +1,6 @@
 body {
   background-color: black;
+  font-family: "Montserrat", serif;
 }
 
 body.modal-open {
@@ -199,13 +200,18 @@ button {
   }
 }
 
+span.app-name {
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
 .header {
   margin-bottom: 25px;
   display: flex;
   justify-content: space-between;
 }
 
-.header .app-name {
+.header .app-title {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -216,7 +222,7 @@ button {
   height: 40%;
 }
 
-.header .app-name p {
+.header .app-title p {
   color: white;
   font-weight: lighter;
   font-size: smaller;
@@ -385,6 +391,15 @@ button {
 #progressBarModal .progress {
   height: 1.5rem;
   font-size: medium;
+}
+
+#appIntroModal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: #007bff;
+  font-weight: 300;
 }
 
 #appIntroModal .modal-content {
