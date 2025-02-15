@@ -22,9 +22,9 @@
   <body>
     <div id="appIntro" class="main">
       <p class="intro-message">
-        <b>IntelliDriven</b> is your gateway to creating smart, interactive
-        worlds. Design and simulate a world with traffic systems, AI-driven
-        cars, and advanced automation.
+        <b><span class="app-name">INTELLIDRIVEN</span></b> is your gateway to
+        creating smart, interactive worlds. Design and simulate a world with
+        traffic systems, AI-driven cars, and advanced automation.
       </p>
 
       <div class="cta-section">
@@ -50,20 +50,24 @@
 
       <p class="exit-message">
         Whether you're building a simple simulation or a complex smart city,
-        IntelliDriven empowers you to create and explore.
+        it empowers you to create and explore.
       </p>
     </div>
 
     <script>
       const ctaMessage = document.querySelector(".cta-message");
-      document.querySelector(".cta-create").addEventListener("mouseover", () => {
-        ctaMessage.innerHTML =
-          "Design custom worlds with nodes, edges, and imported skeletons.";
-      });
-      document.querySelector(".cta-simulate").addEventListener("mouseover", () => {
-        ctaMessage.innerHTML =
-          "Add cars, traffic markings, and other interactive elements.";
-      });
+      document
+        .querySelector(".cta-create")
+        .addEventListener("mouseover", () => {
+          ctaMessage.innerHTML =
+            "Design custom worlds with nodes, edges, and imported skeletons.";
+        });
+      document
+        .querySelector(".cta-simulate")
+        .addEventListener("mouseover", () => {
+          ctaMessage.innerHTML =
+            "Add cars, traffic markings, and other interactive elements.";
+        });
       document.querySelector(".cta-train").addEventListener("mouseover", () => {
         ctaMessage.innerHTML =
           "Train AI models to drive cars and optimize traffic.";
