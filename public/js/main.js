@@ -1450,7 +1450,8 @@ function loadSavedWorldsData() {
 
 function loadWorldUsingID(worldId) {
     hideLoadWorldModal();
-    fetch(`http://localhost:3000/api/load-world/${worldId}`, {
+    showLoadingModal();
+    fetch(`http://localhost:3000/api/load-worlds/${worldId}`, {
         method: "GET",
     })
         .then((response) => {
@@ -1477,16 +1478,14 @@ function loadWorldUsingID(worldId) {
                 target: new TargetEditor(viewport, world),
                 trafficLight: new TrafficLightEditor(viewport, world),
             };
-            showLoadingModal();
-            setTimeout(() => {
-                hideLoadingModal();
-                setMode('world');
-                viewport.setOffset(world.offset || world.graph.getCenter());
-                viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
-            }, 3000);
+            hideLoadingModal();
+            setMode('world');
+            viewport.setOffset(world.offset || world.graph.getCenter());
+            viewport.setCustomZoom(world.zoom || viewport.zoomRange[1]);
         })
         .catch((error) => {
             console.error("Error loading world:", error);
+            hideLoadingModal();
             showErrorModal("Error loading the world.");
         });
 }
@@ -1585,6 +1584,7 @@ function loadWorldFromData() {
 
 function deleteWorldUsingID(worldId) {
     hideConfirmingModal();
+    showLoadingModal();
     fetch(`http://localhost:3000/api/delete-world/${worldId}`, {
         method: "DELETE",
     })
@@ -1598,16 +1598,13 @@ function deleteWorldUsingID(worldId) {
         })
         .then((data) => {
             if (data.message && data.message === 'World deleted successfully') {
-                hideLoadWorldModal();
-                showLoadingModal();
-                setTimeout(() => {
-                    hideLoadingModal();
-                    showLoadWorldModal();
-                }, 3000);
+                hideLoadingModal();
+                showLoadWorldModal();
             }
         })
         .catch((error) => {
             console.error("Error deleting the world:", error);
+            hideLoadingModal();
             showErrorModal("Error deleting the world.");
         });
 }
