@@ -363,7 +363,7 @@ class Tutorial {
             }
         }
 
-        this.prevButton.disabled = this.currentStep === 0;
+        this.prevButton.style.display = this.currentStep === 0 ? "none" : "inline-block";
         this.nextButton.textContent = this.currentStep === this.steps[this.currentMode].length - 1 ? "Finish" : "Next";
     }
 
