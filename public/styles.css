@@ -205,6 +205,25 @@ button {
   justify-content: space-between;
 }
 
+.header .app-name {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header img.logo {
+  width: 75%;
+  height: 40%;
+}
+
+.header .app-name p {
+  color: white;
+  font-weight: lighter;
+  font-size: smaller;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
 .header .section {
   display: flex;
   justify-content: space-between;
