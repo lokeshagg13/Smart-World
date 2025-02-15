@@ -393,6 +393,10 @@ span.app-name {
   font-size: medium;
 }
 
+#progressBarModal .progress-bar {
+  width: 0;
+}
+
 #appIntroModal .modal-header {
   display: flex;
   align-items: center;
@@ -429,6 +433,11 @@ span.app-name {
 #appIntroModal .modal-section-flex input#appIntroDontShow + label {
   font-size: 0.8rem;
   margin-bottom: 0;
+}
+
+#tutorialModal .modal-footer {
+  display: flex;
+  justify-content: space-between;
 }
 
 #settingsModal .modal-dialog {
