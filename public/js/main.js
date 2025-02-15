@@ -12,6 +12,7 @@ let world = new World(new Graph());
 let viewport = new Viewport(mainCanvas, world.zoom, world.offset);
 let miniMap = new MiniMap(new MiniMapEditor(), world);
 let carDashboard = new CarDashboard(world);
+let appIntro = new AppIntro();
 let tutorial = new Tutorial();
 
 Visualizer.reset();
@@ -44,14 +45,13 @@ let tempSettings = JSON.parse(JSON.stringify(world.settings));
 
 // Initial Function Calls
 
-setMode("graph");
-
 addEventListeners();
 
 fillVariableHtmlData();
 
-animate();
+setMode("graph");
 
+animate();
 
 
 
@@ -72,7 +72,7 @@ function addEventListeners() {
         .getElementById('helpBtn')
         .addEventListener('click', () => {
             tutorial.startTutorial(currentMode);
-        })
+        });
 
     document
         .getElementById('clearCanvasBtn')
@@ -1026,9 +1026,9 @@ function setMode(mode) {
     disableEditors();
     resetMarkingButtons();
     resetHeaderControlWidth(mode);
-    tutorial.checkAndShowTutorial(mode);
     currentMode = mode;
     if (mode === "graph") {
+        appIntro.checkAndShowAppIntro();   // Graph tutorial will begin after Get Started is clicked in App Intro
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#helpBtn').style.display = "inline-flex";
@@ -1040,6 +1040,7 @@ function setMode(mode) {
         carDashboard.hide();
         hideVisualizer();
     } else if (mode === "simulation") {
+        tutorial.checkAndShowTutorial(mode);
         document.querySelector('.simulator-toolbox').style.display = "flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#helpBtn').style.display = "inline-flex";
@@ -1048,6 +1049,7 @@ function setMode(mode) {
         miniMap.show();
         carDashboard.hide();
     } else {
+        tutorial.checkAndShowTutorial(mode);
         document.querySelector('.world-toolbox').style.display = "flex";
         document.querySelector('#editGraphBtn').style.display = "inline-flex";
         document.querySelector('#downloadWorldBtn').style.display = "inline-flex";

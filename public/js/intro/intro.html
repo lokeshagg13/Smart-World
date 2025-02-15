@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <title>IntelliDriven Intro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      href="images/header_icons/favicon.ico"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    <div id="appIntro" class="main">
+      <p class="intro-message">
+        <b>IntelliDriven</b> is your gateway to creating smart, interactive
+        worlds. Design and simulate a world with traffic systems, AI-driven
+        cars, and advanced automation.
+      </p>
+
+      <div class="cta-section">
+        <div class="cta cta-create">
+          <div class="cta-circle cta-create-circle">Create</div>
+          <!-- Design custom worlds with nodes, edges, and imported skeletons. -->
+        </div>
+
+        <!-- Simulate Circle -->
+        <div class="cta cta-simulate">
+          <div class="cta-circle cta-simulate-circle">Simulate</div>
+          <!-- Add cars, traffic markings, and other interactive elements. -->
+        </div>
+
+        <!-- Train Circle -->
+        <div class="cta cta-train">
+          <div class="cta-circle cta-train-circle">Train</div>
+          <!-- Train AI models to drive cars and optimize traffic. -->
+        </div>
+      </div>
+
+      <div class="cta-message"></div>
+
+      <p class="exit-message">
+        Whether you're building a simple simulation or a complex smart city,
+        IntelliDriven empowers you to create and explore.
+      </p>
+    </div>
+
+    <script>
+      const ctaMessage = document.querySelector(".cta-message");
+      document.querySelector(".cta-create").addEventListener("mouseover", () => {
+        ctaMessage.innerHTML =
+          "Design custom worlds with nodes, edges, and imported skeletons.";
+      });
+      document.querySelector(".cta-simulate").addEventListener("mouseover", () => {
+        ctaMessage.innerHTML =
+          "Add cars, traffic markings, and other interactive elements.";
+      });
+      document.querySelector(".cta-train").addEventListener("mouseover", () => {
+        ctaMessage.innerHTML =
+          "Train AI models to drive cars and optimize traffic.";
+      });
+    </script>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>AI Virtual World</title>
+    <title>IntelliDriven - Smart World</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
@@ -556,12 +556,46 @@
       </div>
     </div>
 
+    <!-- Modal for App Intro -->
+    <div id="appIntroModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 style="font-size: 1.6rem; color: #007bff; margin-bottom: 15px">
+              <b>Welcome to IntelliDriven</b>
+            </h1>
+          </div>
+          <div class="modal-body">
+            <iframe
+              id="introFrame"
+              src="js/intro/intro.html"
+            >
+            </iframe>
+          </div>
+          <div class="modal-footer">
+            <div class="modal-section-flex">
+              <input type="checkbox" id="appIntroDontShow" />
+              <label for="appIntroDontShow"> Do not show again </label>
+            </div>
+            <button
+              id="getStartedButton"
+              type="button"
+              class="btn btn-primary"
+              onclick="appIntro.handleGetStartedButton()"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal for tutorial -->
     <div id="tutorialModal" class="modal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="tutorialTitle">Tutorial</h5>
+            <h5 class="modal-title" id="tutorialTitle"></h5>
             <button
               type="button"
               class="close"
@@ -1333,6 +1367,7 @@
     <script src="js/utils/math.js"></script>
     <script src="js/utils/datetime.js"></script>
     <script src="js/utils/tutorial.js"></script>
+    <script src="js/utils/appIntro.js"></script>
     <script src="js/utils/progressTracker.js"></script>
     <script src="js/primitives/point.js"></script>
     <script src="js/primitives/segment.js"></script>

@@ -290,7 +290,7 @@ button {
 
 .car-select-icon img {
   width: 1.25rem;
-  height: 1.30rem;
+  height: 1.3rem;
   margin: 4.6px 0px;
 }
 
@@ -385,6 +385,35 @@ button {
 #progressBarModal .progress {
   height: 1.5rem;
   font-size: medium;
+}
+
+#appIntroModal .modal-content {
+  width: fit-content;
+}
+
+#appIntroModal iframe#introFrame {
+  border: none;
+}
+
+#appIntroModal .modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+#appIntroModal .modal-section-flex {
+  display: flex;
+  align-items: center;
+}
+
+#appIntroModal .modal-section-flex input#appIntroDontShow {
+  width: 1.5rem;
+  height: 1.2rem;
+  margin: 0.25rem;
+}
+
+#appIntroModal .modal-section-flex input#appIntroDontShow + label {
+  font-size: 0.8rem;
+  margin-bottom: 0;
 }
 
 #settingsModal .modal-dialog {

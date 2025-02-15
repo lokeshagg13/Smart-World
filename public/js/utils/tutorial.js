@@ -4,7 +4,6 @@ class Tutorial {
             graph: [
                 {
                     content: `
-                        <h5 style="font-size: 1.3rem; margin-bottom: 10px;"><b>Welcome to IntelliDriven</b></h5>
                         <p style="font-size: 1rem; margin: 0; line-height: 1.5;">
                             You are currently in the <b>Graph Mode</b> where you can design the skeleton of your world.
                         </p>
@@ -336,7 +335,6 @@ class Tutorial {
         this.contentElement = document.getElementById("tutorialContent");
         this.prevButton = document.getElementById("prevButton");
         this.nextButton = document.getElementById("nextButton");
-        this.skipButton = document.getElementById("skipButton");
 
         this.#initEventListeners();
     }
@@ -425,13 +423,14 @@ class Tutorial {
 
     startTutorial(mode) {
         this.currentStep = 0;
-        this.currentMode = mode = (mode === "graph"
-            ? "graph"
-            : (
-                mode === "simulation"
-                    ? "simulation"
-                    : "world"
-            )
+        this.currentMode = (
+            mode === "graph"
+                ? "graph"
+                : (
+                    mode === "simulation"
+                        ? "simulation"
+                        : "world"
+                )
         );
         this.#changeTutorialTitle();
         this.#showTutorial();
@@ -439,13 +438,14 @@ class Tutorial {
     }
 
     checkAndShowTutorial(mode) {
-        mode = (mode === "graph"
-            ? "graph"
-            : (
-                mode === "simulation"
-                    ? "simulation"
-                    : "world"
-            )
+        mode = (
+            mode === "graph"
+                ? "graph"
+                : (
+                    mode === "simulation"
+                        ? "simulation"
+                        : "world"
+                )
         );
         if (!localStorage.getItem(`${mode}TutorialSeen`)) {
             this.startTutorial(mode);
@@ -456,5 +456,6 @@ class Tutorial {
         ["graph", "world", "simulation"].forEach((mode) => {
             localStorage.removeItem(`${mode}TutorialSeen`);
         });
+        localStorage.removeItem("appIntroHide");
     }
 }
