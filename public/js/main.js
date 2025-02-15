@@ -12,6 +12,7 @@ let world = new World(new Graph());
 let viewport = new Viewport(mainCanvas, world.zoom, world.offset);
 let miniMap = new MiniMap(new MiniMapEditor(), world);
 let carDashboard = new CarDashboard(world);
+let tutorial = new Tutorial();
 
 Visualizer.reset();
 Visualizer.addEventListeners();
@@ -66,6 +67,12 @@ function addEventListeners() {
     $('#trafficToggle').change((ev) => {
         tempSettings.isLHT = !ev.target.checked;
     });
+
+    document
+        .getElementById('helpBtn')
+        .addEventListener('click', () => {
+            tutorial.startTutorial(currentMode);
+        })
 
     document
         .getElementById('clearCanvasBtn')
@@ -1019,10 +1026,12 @@ function setMode(mode) {
     disableEditors();
     resetMarkingButtons();
     resetHeaderControlWidth(mode);
+    tutorial.checkAndShowTutorial(mode);
     currentMode = mode;
     if (mode === "graph") {
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
+        document.querySelector('#helpBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
         document.querySelector('#loadOsmGraphBtn').style.display = "inline-flex";
         document.querySelector('#generateWorldBtn').style.display = "inline-flex";
@@ -1031,18 +1040,20 @@ function setMode(mode) {
         carDashboard.hide();
         hideVisualizer();
     } else if (mode === "simulation") {
-        document.querySelector('.simulator').style.display = "flex";
+        document.querySelector('.simulator-toolbox').style.display = "flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
+        document.querySelector('#helpBtn').style.display = "inline-flex";
         document.querySelector('#exitSimulationModeBtn').style.display = "inline-flex";
         editors[mode].enable();
         miniMap.show();
         carDashboard.hide();
     } else {
-        document.querySelector('.markings').style.display = "flex";
+        document.querySelector('.world-toolbox').style.display = "flex";
         document.querySelector('#editGraphBtn').style.display = "inline-flex";
         document.querySelector('#downloadWorldBtn').style.display = "inline-flex";
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
+        document.querySelector('#helpBtn').style.display = "inline-flex";
         document.querySelector('#loadWorldBtn').style.display = "inline-flex";
         document.querySelector('#saveWorldBtn').style.display = "inline-flex";
         document.querySelector('#disposeCarsBtn').style.display = "inline-flex";
@@ -1064,8 +1075,9 @@ function setMode(mode) {
 }
 
 function hideToolboxes() {
-    document.querySelector('.markings').style.display = "none";
-    document.querySelector('.simulator').style.display = "none";
+    document.querySelectorAll('.toolbox').forEach((el) => {
+        el.style.display = "none"
+    });
 }
 
 function hideButtons() {
@@ -1079,20 +1091,20 @@ function disableEditors() {
 }
 
 function resetMarkingButtons() {
-    document.querySelectorAll('.markings button.clicked').forEach((btn) => {
+    document.querySelectorAll('.world-toolbox button.clicked').forEach((btn) => {
         btn.classList.remove('clicked')
     });
 }
 
 function resetHeaderControlWidth(mode) {
     if (mode === "simulation") {
-        document.querySelector('.header .section').style.width = "7%";
-    }
-    else if (mode === "graph") {
         document.querySelector('.header .section').style.width = "12%";
     }
+    else if (mode === "graph") {
+        document.querySelector('.header .section').style.width = "18%";
+    }
     else {
-        document.querySelector('.header .section').style.width = "25%";
+        document.querySelector('.header .section').style.width = "32%";
     }
 }
 
@@ -1369,7 +1381,7 @@ function loadSavedWorldsData() {
         })
         .then((data) => {
             const worldListContainer = document.getElementById("worldList");
-            
+
             if (data.worlds && data.worlds.length > 0) {
                 data.worlds.forEach((world, index) => {
                     // Create elements to display the world

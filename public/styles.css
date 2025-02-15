@@ -179,6 +179,26 @@ button {
   cursor: pointer;
 }
 
+.highlighted {
+  position: relative;
+  z-index: 1100;
+  pointer-events: none;
+  border: 2px solid blue;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px blue;
+  }
+  50% {
+    box-shadow: 0 0 20px blue;
+  }
+  100% {
+    box-shadow: 0 0 10px blue;
+  }
+}
+
 .header {
   margin-bottom: 25px;
   display: flex;
@@ -190,6 +210,15 @@ button {
   justify-content: space-between;
   width: 15%;
   align-items: center;
+}
+
+#helpBtn {
+  padding: 10.5px 5px;
+}
+
+#helpBtn img {
+  width: 1.5rem;
+  height: 1.3rem;
 }
 
 #editGraphBtn {
@@ -219,28 +248,31 @@ button {
   height: 1.5rem;
 }
 
-.markings,
-.simulator {
+.toolbox {
   margin-top: 10px;
   display: flex;
   align-items: center;
 }
 
-.markings button {
+.world-toolbox button {
   display: inline-flex;
   align-items: center;
 }
 
-.markings button.clicked {
+.world-toolbox button.clicked {
   background-color: rgb(0, 85, 255);
   box-shadow: inset 4px 4px 5px rgba(0, 0, 0, 0.3);
   transform: translateY(2px);
 }
 
+.world-toolbox .markings {
+  display: flex;
+}
+
 .car-select-icon img {
   width: 1.25rem;
-  height: 1.25rem;
-  margin: 4.5px 0px;
+  height: 1.30rem;
+  margin: 4.6px 0px;
 }
 
 .controls {
