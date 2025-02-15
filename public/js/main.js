@@ -1202,7 +1202,7 @@ function showAdminLoginModal(prompt) {
 
 async function adminLogin(password) {
     try {
-        const response = await fetch("http://localhost:3000/api/admin/login", {
+        const response = await fetch("https://smart-world-ske3.onrender.com/api/admin/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1238,7 +1238,7 @@ async function toggleAdminSection() {
     // Access Token exists, so verify it first and then perform login only if it is invalid/expired.
     if (accessToken) {
         try {
-            const response = await fetch("http://localhost:3000/api/admin/verify", {
+            const response = await fetch("https://smart-world-ske3.onrender.com/api/admin/verify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1320,7 +1320,7 @@ function saveWorldData() {
 
     showLoadingModal();
     // Send the API request
-    fetch("http://localhost:3000/api/save-world", {
+    fetch("https://smart-world-ske3.onrender.com/api/save-world", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -1374,7 +1374,7 @@ function loadSavedWorldsData() {
     document.querySelector('.modal-loader').style.display = "flex";
 
     // Fetch the list of worlds from the server
-    fetch("http://localhost:3000/api/get-worlds", {
+    fetch("https://smart-world-ske3.onrender.com/api/get-worlds", {
         method: "POST",
     })
         .then((response) => {
@@ -1451,7 +1451,7 @@ function loadSavedWorldsData() {
 function loadWorldUsingID(worldId) {
     hideLoadWorldModal();
     showLoadingModal();
-    fetch(`http://localhost:3000/api/load-world/${worldId}`, {
+    fetch(`https://smart-world-ske3.onrender.com/api/load-world/${worldId}`, {
         method: "GET",
     })
         .then((response) => {
@@ -1585,7 +1585,7 @@ function loadWorldFromData() {
 function deleteWorldUsingID(worldId) {
     hideConfirmingModal();
     showLoadingModal();
-    fetch(`http://localhost:3000/api/delete-world/${worldId}`, {
+    fetch(`https://smart-world-ske3.onrender.com/api/delete-world/${worldId}`, {
         method: "DELETE",
     })
         .then((response) => {
