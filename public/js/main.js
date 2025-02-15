@@ -1451,7 +1451,7 @@ function loadSavedWorldsData() {
 function loadWorldUsingID(worldId) {
     hideLoadWorldModal();
     showLoadingModal();
-    fetch(`http://localhost:3000/api/load-worlds/${worldId}`, {
+    fetch(`http://localhost:3000/api/load-world/${worldId}`, {
         method: "GET",
     })
         .then((response) => {
