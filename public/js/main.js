@@ -49,7 +49,7 @@ addEventListeners();
 
 fillVariableHtmlData();
 
-setMode("graph");
+setMode("graph", true);
 
 animate();
 
@@ -1007,7 +1007,7 @@ function disposeCars() {
 
 // #region - Mode Set and Helper Functions
 
-function setMode(mode) {
+function setMode(mode, appInit = false) {
     if (mode !== "graph" && mode !== "simulation" && mode !== "world" && mode === currentMode) {
         mode = "world"
     }
@@ -1028,7 +1028,11 @@ function setMode(mode) {
     resetHeaderControlWidth(mode);
     currentMode = mode;
     if (mode === "graph") {
-        appIntro.checkAndShowAppIntro();   // Graph tutorial will begin after Get Started is clicked in App Intro
+        if (appInit) {
+            appIntro.checkAndShowAppIntro();   // Graph tutorial will begin after Get Started is clicked in App Intro
+        } else {
+            tutorial.checkAndShowTutorial();
+        }
         document.querySelector('#clearCanvasBtn').style.display = "inline-flex";
         document.querySelector('#settingsBtn').style.display = "inline-flex";
         document.querySelector('#helpBtn').style.display = "inline-flex";
