@@ -1137,7 +1137,7 @@ function showVisualizer() {
 }
 
 function hideVisualizer() {
-    document.querySelector('.app').style.display = 'block';
+    document.querySelector('.app').style.display = 'flex';
     document.querySelector('.admin-only').style.display = 'none';
     document.getElementById('visualizerBtn').setAttribute('title', 'Show Visualizer');
     document.getElementById('visualizerIcon').setAttribute('src', 'images/app_icons/neural_icon.svg');
