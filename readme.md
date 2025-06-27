@@ -58,8 +58,8 @@ Experience **Smart World** directly in your browser!
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/smart-world.git
-   cd smart-world
+   git clone https://github.com/lokeshagg13/Smart-World.git
+   cd Smart-World
    ```
 
 2. **Install dependencies:**
