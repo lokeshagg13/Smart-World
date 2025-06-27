@@ -26,455 +26,474 @@
     />
   </head>
   <body>
-    <div class="app">
-      <div class="common">
-        <div class="header">
-          <div class="app-title">
-            <img class="logo" src="images/logos/logo.jpg" alt="INTELLIDRIVEN" />
-            <p>Steering the future of smart mobility</p>
-          </div>
-          <div class="section">
-            <button
-              id="editGraphBtn"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Skeleton Editor"
-            >
-              <img src="images/app_icons/edit_icon.svg" alt="Edit Skeleton" />
-            </button>
-            <button
-              id="downloadWorldBtn"
-              onclick="downloadWorldFile()"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Download World"
-            >
+    <div class="root">
+      <div class="app">
+        <div class="common">
+          <div class="header">
+            <div class="app-title">
               <img
-                src="images/app_icons/download_icon.svg"
-                alt="Download World"
+                class="logo"
+                src="images/logos/logo.jpg"
+                alt="INTELLIDRIVEN"
               />
-            </button>
-            <button
-              id="clearCanvasBtn"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Clear Canvas"
-            >
-              🗑️
-            </button>
-            <button
-              id="settingsBtn"
-              onclick="showSettingsModal()"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="World Settings"
-            >
-              ⚙️
-            </button>
-            <button
-              id="helpBtn"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Help"
-            >
-              <img src="images/app_icons/help_icon.svg" alt="Help" />
-            </button>
-          </div>
-        </div>
-        <div class="main-container">
-          <canvas id="mainCanvas"></canvas>
-          <div id="miniMapContainer">
-            <button
-              class="maximize-icon"
-              id="maximizeMiniMapBtn"
-              onclick="maximizeMiniMap()"
-            >
-              ➕ Show Mini Map
-            </button>
-            <div id="maximizedMiniMap">
-              <button
-                class="minimize-icon"
-                id="minimizeMiniMapBtn"
-                onclick="minimizeMiniMap()"
-              >
-                ➖
-              </button>
-              <canvas id="miniMapCanvas"></canvas>
-              <div class="resize-handle handle-left"></div>
-              <div class="resize-handle handle-bottom"></div>
+              <p>Steering the future of smart mobility</p>
             </div>
-          </div>
-          <div id="carDashboardContainer">
-            <button
-              class="maximize-icon"
-              id="maximizeCarDashboardBtn"
-              onclick="maximizeCarDashboard()"
-            >
-              ➕ Show Car Dashboard
-            </button>
-            <div id="maximizedCarDashboard">
+            <div class="section">
               <button
-                class="minimize-icon"
-                id="minimizeCarDashboardBtn"
-                onclick="minimizeCarDashboard()"
+                id="editGraphBtn"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Skeleton Editor"
               >
-                ➖
+                <img src="images/app_icons/edit_icon.svg" alt="Edit Skeleton" />
               </button>
-              <canvas id="carDashboardCanvas"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="toolbox world-toolbox">
-          <div id="carStyle">
-            <div class="dropdown">
               <button
-                class="dropdown-btn"
-                id="carStyleBtn"
-                onclick="toggleCarStyleDropdown()"
+                id="downloadWorldBtn"
+                onclick="downloadWorldFile()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Download World"
               >
                 <img
-                  class="dropdown-selected"
-                  src="images/cars/car_white.png"
-                  alt="White Car"
+                  src="images/app_icons/download_icon.svg"
+                  alt="Download World"
                 />
-                <span class="dropdown-arrow">
-                  <img src="images/dropdown_arrow.png" alt="Dropdown Arrow" />
-                </span>
               </button>
-              <div class="dropdown-content" id="carStyleDropdown">
-                <img
-                  class="dropdown-selected-icon"
-                  src="images/app_icons/check_icon.svg"
-                />
-                <table>
-                  <tr>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="car_white"
-                        onclick="selectCarStyleOption('car_white', 0, 0)"
-                      >
-                        <img src="images/cars/car_white.png" alt="White Car" />
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="car_blue"
-                        onclick="selectCarStyleOption('car_blue', 0, 1)"
-                      >
-                        <img src="images/cars/car_blue.png" alt="Blue Car" />
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="car_black"
-                        onclick="selectCarStyleOption('car_black', 1, 0)"
-                      >
-                        <img src="images/cars/car_black.png" alt="Black Car" />
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="car_red"
-                        onclick="selectCarStyleOption('car_red', 1, 1)"
-                      >
-                        <img src="images/cars/car_red.png" alt="Red Car" />
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="car_gray"
-                        onclick="selectCarStyleOption('car_gray', 2, 0)"
-                      >
-                        <img src="images/cars/car_gray.png" alt="Gray Car" />
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        class="dropdown-option"
-                        data-value="bike"
-                        onclick="selectCarStyleOption('bike', 2, 1)"
-                      >
-                        <img src="images/cars/bike.png" alt="Bike" />
-                      </div>
-                    </td>
-                  </tr>
-                </table>
+              <button
+                id="clearCanvasBtn"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Clear Canvas"
+              >
+                🗑️
+              </button>
+              <button
+                id="settingsBtn"
+                onclick="showSettingsModal()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="World Settings"
+              >
+                ⚙️
+              </button>
+              <button
+                id="helpBtn"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Help"
+              >
+                <img src="images/app_icons/help_icon.svg" alt="Help" />
+              </button>
+            </div>
+          </div>
+          <div class="main-container">
+            <canvas id="mainCanvas"></canvas>
+            <div id="miniMapContainer">
+              <button
+                class="maximize-icon"
+                id="maximizeMiniMapBtn"
+                onclick="maximizeMiniMap()"
+              >
+                ➕ Show Mini Map
+              </button>
+              <div id="maximizedMiniMap">
+                <button
+                  class="minimize-icon"
+                  id="minimizeMiniMapBtn"
+                  onclick="minimizeMiniMap()"
+                >
+                  ➖
+                </button>
+                <canvas id="miniMapCanvas"></canvas>
+                <div class="resize-handle handle-left"></div>
+                <div class="resize-handle handle-bottom"></div>
+              </div>
+            </div>
+            <div id="carDashboardContainer">
+              <button
+                class="maximize-icon"
+                id="maximizeCarDashboardBtn"
+                onclick="maximizeCarDashboard()"
+              >
+                ➕ Show Car Dashboard
+              </button>
+              <div id="maximizedCarDashboard">
+                <button
+                  class="minimize-icon"
+                  id="minimizeCarDashboardBtn"
+                  onclick="minimizeCarDashboard()"
+                >
+                  ➖
+                </button>
+                <canvas id="carDashboardCanvas"></canvas>
               </div>
             </div>
           </div>
-          &nbsp; &nbsp; &nbsp; &nbsp;
-          <div class="markings">
-            <button
-              id="startBtn"
-              onclick="setMode('start')"
-              data-toggle="tooltip"
-              data-placement="top"
-              data-trigger="hover"
-              data-content=""
-              title="Car Editor Mode"
-            >
-              🚙
-            </button>
-            &nbsp;
-            <button
-              id="targetBtn"
-              onclick="setMode('target')"
-              data-toggle="tooltip"
-              data-placement="top"
-              data-trigger="hover"
-              data-content="Add the target to be followed by this car."
-              title="Target Editor Mode"
-            >
-              🎯
-            </button>
-            &nbsp; &nbsp;
-            <button
-              id="stopBtn"
-              onclick="setMode('stop')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Stops Editor Mode"
-            >
-              🛑
-            </button>
-            &nbsp;
-            <button
-              id="crossingBtn"
-              onclick="setMode('crossing')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Crossing Editor Mode"
-            >
-              🚶
-            </button>
-            &nbsp;
-            <button
-              id="parkingBtn"
-              onclick="setMode('parking')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Parking Editor Mode"
-            >
-              🅿️
-            </button>
-            &nbsp;
-            <button
-              id="yieldBtn"
-              onclick="setMode('yield')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Yield Editor Mode"
-            >
-              ⚠️
-            </button>
-            &nbsp;
-            <button
-              id="trafficLightBtn"
-              onclick="setMode('trafficLight')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Light Editor Mode"
-            >
-              🚦
-            </button>
-          </div>
-          &nbsp; &nbsp; &nbsp; &nbsp;
-          <button
-            id="selectBtn"
-            onclick="setMode('select')"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Select Car"
-          >
-            <div class="car-select-icon">
-              <img src="images/car_select.png" alt="Select Car" />
+          <div class="toolbox world-toolbox">
+            <div id="carStyle">
+              <div class="dropdown">
+                <button
+                  class="dropdown-btn"
+                  id="carStyleBtn"
+                  onclick="toggleCarStyleDropdown()"
+                >
+                  <img
+                    class="dropdown-selected"
+                    src="images/cars/car_white.png"
+                    alt="White Car"
+                  />
+                  <span class="dropdown-arrow">
+                    <img src="images/dropdown_arrow.png" alt="Dropdown Arrow" />
+                  </span>
+                </button>
+                <div class="dropdown-content" id="carStyleDropdown">
+                  <img
+                    class="dropdown-selected-icon"
+                    src="images/app_icons/check_icon.svg"
+                  />
+                  <table>
+                    <tr>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="car_white"
+                          onclick="selectCarStyleOption('car_white', 0, 0)"
+                        >
+                          <img
+                            src="images/cars/car_white.png"
+                            alt="White Car"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="car_blue"
+                          onclick="selectCarStyleOption('car_blue', 0, 1)"
+                        >
+                          <img src="images/cars/car_blue.png" alt="Blue Car" />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="car_black"
+                          onclick="selectCarStyleOption('car_black', 1, 0)"
+                        >
+                          <img
+                            src="images/cars/car_black.png"
+                            alt="Black Car"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="car_red"
+                          onclick="selectCarStyleOption('car_red', 1, 1)"
+                        >
+                          <img src="images/cars/car_red.png" alt="Red Car" />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="car_gray"
+                          onclick="selectCarStyleOption('car_gray', 2, 0)"
+                        >
+                          <img src="images/cars/car_gray.png" alt="Gray Car" />
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          class="dropdown-option"
+                          data-value="bike"
+                          onclick="selectCarStyleOption('bike', 2, 1)"
+                        >
+                          <img src="images/cars/bike.png" alt="Bike" />
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
             </div>
-          </button>
-          &nbsp;
-          <button
-            id="manualOverrideBtn"
-            onclick="toggleCarControlType()"
-            data-toggle="tooltip"
-            data-placement="right"
-            data-trigger="hover"
-            data-content="The cars are in manual override mode."
-            title="Manual Override"
-          >
-            🛞
-          </button>
-          &nbsp;
-          <button
-            id="visualizerBtn"
-            onclick="toggleAdminSection()"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Show Visualizer"
-          >
-            <img
-              id="visualizerIcon"
-              src="images/app_icons/neural_icon.svg"
-              alt="Show Visualizer"
-            />
-          </button>
-        </div>
-        <div class="toolbox simulator-toolbox">
-          <button
-            id="saveSimulationBtn"
-            onclick="saveSimulationResult()"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Save Simulation"
-          >
-            💾 🤖
-          </button>
-          &nbsp;
-          <button
-            id="resetSimulationBtn"
-            onclick="resetSimulation()"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Reset Simulation"
-          >
-            🔄 🤖
-          </button>
-          &nbsp; &nbsp; &nbsp; &nbsp;
-          <button
-            id="exitSimulationModeBtn"
-            onclick="exitSimulationMode()"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Exit Simulation Mode"
-          >
-            <span class="btn-text text-sm">Exit Simulation Mode</span>
-          </button>
-        </div>
-        <div class="controls">
-          <div class="section">
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <div class="markings">
+              <button
+                id="startBtn"
+                onclick="setMode('start')"
+                data-toggle="tooltip"
+                data-placement="top"
+                data-trigger="hover"
+                data-content=""
+                title="Car Editor Mode"
+              >
+                🚙
+              </button>
+              &nbsp;
+              <button
+                id="targetBtn"
+                onclick="setMode('target')"
+                data-toggle="tooltip"
+                data-placement="top"
+                data-trigger="hover"
+                data-content="Add the target to be followed by this car."
+                title="Target Editor Mode"
+              >
+                🎯
+              </button>
+              &nbsp; &nbsp;
+              <button
+                id="stopBtn"
+                onclick="setMode('stop')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Stops Editor Mode"
+              >
+                🛑
+              </button>
+              &nbsp;
+              <button
+                id="crossingBtn"
+                onclick="setMode('crossing')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Crossing Editor Mode"
+              >
+                🚶
+              </button>
+              &nbsp;
+              <button
+                id="parkingBtn"
+                onclick="setMode('parking')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Parking Editor Mode"
+              >
+                🅿️
+              </button>
+              &nbsp;
+              <button
+                id="yieldBtn"
+                onclick="setMode('yield')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Yield Editor Mode"
+              >
+                ⚠️
+              </button>
+              &nbsp;
+              <button
+                id="trafficLightBtn"
+                onclick="setMode('trafficLight')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Light Editor Mode"
+              >
+                🚦
+              </button>
+            </div>
+            &nbsp; &nbsp; &nbsp; &nbsp;
             <button
-              id="loadWorldBtn"
-              onclick="showLoadWorldModal()"
+              id="selectBtn"
+              onclick="setMode('select')"
               data-toggle="tooltip"
               data-placement="top"
-              title="Load World"
+              title="Select Car"
             >
-              📂
-              <span class="btn-text">Load World</span>
+              <div class="car-select-icon">
+                <img src="images/car_select.png" alt="Select Car" />
+              </div>
             </button>
+            &nbsp;
             <button
-              id="saveWorldBtn"
-              onclick="saveWorldData()"
+              id="manualOverrideBtn"
+              onclick="toggleCarControlType()"
               data-toggle="tooltip"
-              data-placement="top"
-              title="Save World"
-            >
-              💾
-              <span class="btn-text">Save World</span>
-            </button>
-            <button
-              id="editWorldBtn"
-              onclick="setMode('world')"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="World Editor Mode"
-            >
-              🌐
-              <span class="btn-text">Edit World</span>
-            </button>
-          </div>
-          <div class="section">
-            <button
-              id="loadOsmGraphBtn"
-              onclick="showLoadOsmGraphModal()"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Load Skeleton from OSM Data"
-            >
-              🗺️
-              <span class="btn-text text-sm">
-                <div>Load Skeleton</div>
-                <div>(using OSM data)</div>
-              </span>
-            </button>
-            <button
-              id="disposeCarsBtn"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Delete Cars"
-            >
-              🗑️
-              <span class="btn-text">Remove Cars</span>
-            </button>
-            <button
-              id="disposeMarkingsBtn"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Delete Markings"
-            >
-              🗑️
-              <span class="btn-text">Remove Markings</span>
-            </button>
-          </div>
-          <div class="section">
-            <button
-              id="generateWorldBtn"
-              onclick="generateWorld()"
-              data-toggle="tooltip"
-              data-placement="top"
-              title="Generate World"
-            >
-              🌐
-              <span class="btn-text">Create World</span>
-            </button>
-            <button
-              id="generateCarsBtn"
-              onclick="showGenerateCarsModal()"
-              data-toggle="tooltip"
-              data-placement="top"
+              data-placement="right"
               data-trigger="hover"
-              data-content=""
-              title="Generate Random Cars"
+              data-content="The cars are in manual override mode."
+              title="Manual Override"
             >
-              <img src="images/app_icons/car_icon.svg" alt="Car Icon" />
-              <small class="btn-text">Generate Cars</small>
+              🛞
             </button>
+            &nbsp;
             <button
-              id="simulationBtn"
-              onclick="setMode('simulation')"
+              id="visualizerBtn"
+              onclick="toggleAdminSection()"
               data-toggle="tooltip"
               data-placement="top"
-              title="Simulation Mode"
+              title="Show Visualizer"
             >
-              🤖
-              <span class="btn-text">Train Cars</span>
+              <img
+                id="visualizerIcon"
+                src="images/app_icons/neural_icon.svg"
+                alt="Show Visualizer"
+              />
+            </button>
+          </div>
+          <div class="toolbox simulator-toolbox">
+            <button
+              id="saveSimulationBtn"
+              onclick="saveSimulationResult()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Save Simulation"
+            >
+              💾 🤖
+            </button>
+            &nbsp;
+            <button
+              id="resetSimulationBtn"
+              onclick="resetSimulation()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Reset Simulation"
+            >
+              🔄 🤖
+            </button>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <button
+              id="exitSimulationModeBtn"
+              onclick="exitSimulationMode()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Exit Simulation Mode"
+            >
+              <span class="btn-text text-sm">Exit Simulation Mode</span>
+            </button>
+          </div>
+          <div class="controls">
+            <div class="section">
+              <button
+                id="loadWorldBtn"
+                onclick="showLoadWorldModal()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Load World"
+              >
+                📂
+                <span class="btn-text">Load World</span>
+              </button>
+              <button
+                id="saveWorldBtn"
+                onclick="saveWorldData()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Save World"
+              >
+                💾
+                <span class="btn-text">Save World</span>
+              </button>
+              <button
+                id="editWorldBtn"
+                onclick="setMode('world')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="World Editor Mode"
+              >
+                🌐
+                <span class="btn-text">Edit World</span>
+              </button>
+            </div>
+            <div class="section">
+              <button
+                id="loadOsmGraphBtn"
+                onclick="showLoadOsmGraphModal()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Load Skeleton from OSM Data"
+              >
+                🗺️
+                <span class="btn-text text-sm">
+                  <div>Load Skeleton</div>
+                  <div>(using OSM data)</div>
+                </span>
+              </button>
+              <button
+                id="disposeCarsBtn"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Delete Cars"
+              >
+                🗑️
+                <span class="btn-text">Remove Cars</span>
+              </button>
+              <button
+                id="disposeMarkingsBtn"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Delete Markings"
+              >
+                🗑️
+                <span class="btn-text">Remove Markings</span>
+              </button>
+            </div>
+            <div class="section">
+              <button
+                id="generateWorldBtn"
+                onclick="generateWorld()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Generate World"
+              >
+                🌐
+                <span class="btn-text">Create World</span>
+              </button>
+              <button
+                id="generateCarsBtn"
+                onclick="showGenerateCarsModal()"
+                data-toggle="tooltip"
+                data-placement="top"
+                data-trigger="hover"
+                data-content=""
+                title="Generate Random Cars"
+              >
+                <img src="images/app_icons/car_icon.svg" alt="Car Icon" />
+                <small class="btn-text">Generate Cars</small>
+              </button>
+              <button
+                id="simulationBtn"
+                onclick="setMode('simulation')"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Simulation Mode"
+              >
+                🤖
+                <span class="btn-text">Train Cars</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-only">
+          <canvas id="visualizerCanvas"></canvas>
+          <div class="admin-controls">
+            <button
+              id="resetBrainBtn"
+              onclick="resetCarBrain()"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Reset Car Brain"
+            >
+              <span class="btn-text">Reset Car Brain</span>
             </button>
           </div>
         </div>
       </div>
-      <div class="admin-only">
-        <canvas id="visualizerCanvas"></canvas>
-        <div class="admin-controls">
-          <button
-            id="resetBrainBtn"
-            onclick="resetCarBrain()"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="Reset Car Brain"
-          >
-            <span class="btn-text">Reset Car Brain</span>
-          </button>
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-text">
+            Designed and Developed by
+            <span class="footer-name"> Lokesh Aggarwal</span>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
-
     <!-- Modals -->
 
     <!-- Modal for loading -->
@@ -563,13 +582,46 @@
 
     <!-- Modal for App Intro -->
     <div id="appIntroModal" class="modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog" role="document" style="padding: 1rem">
         <div class="modal-content">
           <div class="modal-header">
             <b>Welcome to <span class="app-name">INTELLIDRIVEN</span></b>
           </div>
           <div class="modal-body">
-            <iframe id="introFrame" src="js/intro/intro.html"> </iframe>
+            <div id="appIntro" class="main">
+              <p class="intro-message">
+                <b><span class="app-name">INTELLIDRIVEN</span></b> is your
+                gateway to creating smart, interactive worlds. Design and
+                simulate a world with traffic systems, AI-driven cars, and
+                advanced automation.
+              </p>
+
+              <div class="cta-section">
+                <div class="cta cta-create">
+                  <div class="cta-circle cta-create-circle">Create</div>
+                  <!-- Design custom worlds with nodes, edges, and imported skeletons. -->
+                </div>
+
+                <!-- Simulate Circle -->
+                <div class="cta cta-simulate">
+                  <div class="cta-circle cta-simulate-circle">Simulate</div>
+                  <!-- Add cars, traffic markings, and other interactive elements. -->
+                </div>
+
+                <!-- Train Circle -->
+                <div class="cta cta-train">
+                  <div class="cta-circle cta-train-circle">Train</div>
+                  <!-- Train AI models to drive cars and optimize traffic. -->
+                </div>
+              </div>
+
+              <div class="cta-message"></div>
+
+              <p class="exit-message">
+                Whether you're building a simple simulation or a complex smart
+                city, it empowers you to create and explore.
+              </p>
+            </div>
           </div>
           <div class="modal-footer">
             <div class="modal-section-flex">
